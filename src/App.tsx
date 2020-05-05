@@ -1,17 +1,24 @@
-import React, { Component } from 'react';
-import { Route, Redirect, Router } from 'react-router-dom';
-import { Paths } from 'src/pages/paths';
-import { history } from './history';
+import React, { Component } from "react";
+import { Route, Router, Redirect, Switch } from "react-router-dom";
+import { Paths } from "src/pages/paths";
+import { history } from "./history";
 
-import MainPage from './pages/main/main-page';
+import MainPage from "./pages/main/main-page";
+import StartPage from "./pages/start/start-page";
+
+import "./colors.scss";
 
 export default class App extends Component {
   render() {
     return (
       <>
         <Router history={history}>
-          <Route path={Paths.HOME_PATH} component={MainPage} />
-          <Redirect to={Paths.HOME_PATH}></Redirect>
+          {/* <Route path={Paths.TOP_BAR} component={TopBar} /> */}
+          <Switch>
+            <Route path={Paths.HOME} component={MainPage} />
+            <Route path={Paths.START} component={StartPage} />
+            <Redirect to={Paths.START}></Redirect>
+          </Switch>
         </Router>
       </>
     );

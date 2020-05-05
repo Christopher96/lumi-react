@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^4.1.0",
     "@babel/plugin-proposal-optional-chaining": "^7.7.4",
     "@reduxjs/toolkit": "^1.2.3",
     "animate.css": "^3.7.2",
@@ -77,11 +78,8 @@
     "react:build": "react-app-rewired build",
     "react:test": "react-app-rewired test",
     "react:eject": "react-scripts eject",
-    "electron:dev": "ELECTRON_IS_DEV=1 concurrently \"npm run node:start\" \"BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:dev": "ELECTRON_IS_DEV=1 concurrently \"BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron:build": "npm run react-build && npm run node-build && electron-builder",
-    "node:start": "cd public/client && npm run start",
-    "node:watch": "cd public/client && npm run start:watch",
-    "node:build": "cd public/client && npm run build",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },
   "eslintConfig": {
@@ -107,7 +105,7 @@
     "@types/node": "^12.12.30",
     "@types/node-fetch": "^2.5.4",
     "@types/numeral": "0.0.26",
-    "@types/react": "^16.9.11",
+    "@types/react": "^16.9.34",
     "@types/react-animate-on-scroll": "^2.1.2",
     "@types/react-burger-menu": "^2.6.0",
     "@types/react-dom": "16.9.4",
