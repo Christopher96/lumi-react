@@ -99,6 +99,7 @@
   },
   "devDependencies": {
     "@types/diff": "^4.0.2",
+    "@types/electron": "^1.6.10",
     "@types/fs-extra": "^8.1.0",
     "@types/i18next": "^13.0.0",
     "@types/jest": "^24.0.23",

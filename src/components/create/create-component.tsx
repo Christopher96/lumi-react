@@ -1,33 +1,37 @@
 import React, { Component } from "react";
-import { Upload, Button, Input } from "antd";
-import { UploadProps } from "antd/lib/upload";
 import { FolderOpenOutlined } from "@ant-design/icons";
+import { Input } from "antd";
+
+const { ipcRenderer } = window.require("electron");
 
 interface IProps {}
-interface IState {}
+interface IState {
+  selectedPath: string;
+}
 
 export default class CreateComponent extends Component<IProps, IState> {
-  uploadProps: UploadProps = {
-    name: "file",
-    directory: true,
-    showUploadList: false,
-    onChange(e) {
-      window.console.log(e);
-    },
+  state = {
+    selectedPath: "",
   };
 
-  onChange = (e: any) => {
-    console.log(e);
+  selectDir = () => {
+    ipcRenderer.invoke("select-dir").then((res: any) => {
+      this.setState({
+        selectedPath: res,
+      });
+    });
   };
 
   render() {
-    const config = {
-      directory: "",
-      webkitdirectory: "",
-    };
     return (
       <>
-        <input {...config} onInput={this.onChange} type="file" />
+        <Input
+          size="large"
+          onClick={this.selectDir}
+          value={this.state.selectedPath}
+          placeholder="Select a folder..."
+          suffix={<FolderOpenOutlined />}
+        />
       </>
     );
   }
