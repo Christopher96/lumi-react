@@ -1,44 +1,18 @@
-import React, { Component } from 'react';
-import { Modal } from 'antd';
+import React, { Component } from "react";
+import { Modal } from "antd";
+import { ModalProps } from "antd/lib/modal";
 
-interface IProps {}
-interface IState {
+interface IProps extends ModalProps {
   message: string;
-  visible: boolean;
 }
+interface IState {}
 
 export default class Popup extends Component<IProps, IState> {
-  state = {
-    message: '',
-    visible: false
-  };
-
-  showModal(message: string) {
-    this.setState({
-      visible: true,
-      message
-    });
-  }
-
-  handleOk = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    console.log(e);
-    this.setState({
-      visible: false
-    });
-  };
-
-  handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    console.log(e);
-    this.setState({
-      visible: false
-    });
-  };
-
   render() {
     return (
       <div>
-        <Modal title="Hello there!" visible={this.state.visible} onOk={this.handleOk} onCancel={this.handleCancel}>
-          <p>{this.state.message}</p>
+        <Modal {...this.props}>
+          <p>{this.props.message}</p>
         </Modal>
       </div>
     );
