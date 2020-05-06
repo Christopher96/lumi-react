@@ -82,7 +82,7 @@
     "react:test": "react-app-rewired test",
     "react:eject": "react-scripts eject",
     "electron:all": "concurrently \"cross-env BROWSER=none && npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron:dev": "cross-env NODE_ENV=development npm run electron:all",
+    "electron:dev": "cross-env NODE_ENV=development && npm run electron:all",
     "electron:build": "npm run react-build && npm run node-build && electron-builder",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },
@@ -124,6 +124,7 @@
     "antd-scss-theme-plugin": "^1.0.8",
     "chownr": "^2.0.0",
     "concurrently": "^5.1.0",
+    "cross-env": "^7.0.2",
     "electron": "8.2.5",
     "electron-builder": "^22.4.1",
     "eslint": "^6.8.0",
