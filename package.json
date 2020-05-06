@@ -81,8 +81,8 @@
     "react:build": "react-app-rewired build",
     "react:test": "react-app-rewired test",
     "react:eject": "react-scripts eject",
-    "electron:all": "concurrently \"BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron:dev": "NODE_ENV=development npm run electron:all",
+    "electron:all": "concurrently \"cross-env BROWSER=none && npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:dev": "cross-env NODE_ENV=development npm run electron:all",
     "electron:build": "npm run react-build && npm run node-build && electron-builder",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },
