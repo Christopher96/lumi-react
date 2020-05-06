@@ -1,5 +1,4 @@
-const electron = require("electron");
-const { ipcMain, dialog } = electron;
+const { ipcMain, dialog } = require("electron");
 const { API } = require("lumi-cli/dist/api/API");
 const { FS } = require("lumi-cli/dist/lib/common/FS");
 

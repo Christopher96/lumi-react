@@ -17,7 +17,6 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
-console.log(process.env.SERVER_ENDPOINT);
 if (!process.env.SERVER_ENDPOINT)
   throw new Error("You need to configure host and port.");
 
