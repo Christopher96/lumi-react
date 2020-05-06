@@ -5,16 +5,25 @@ const { app, BrowserWindow } = electron;
 const path = require("path");
 const isDev = require("electron-is-dev");
 
-if (isDev !== true) {
-  // const { fork } = require('child_process');
-  // const ps = fork(`${__dirname}/lumi-client/dist/index.js`);
-  console.log("hello production");
+const dotenv = require("dotenv");
+
+if (process.env.NODE_ENV === "development") {
+  dotenv.config({
+    path: path.resolve(process.cwd(), ".env.local"),
+  });
+} else {
+  dotenv.config({
+    path: path.resolve(process.cwd(), ".env"),
+  });
 }
+
+console.log(process.env.SERVER_ENDPOINT);
+if (!process.env.SERVER_ENDPOINT)
+  throw new Error("You need to configure host and port.");
 
 let mainWindow;
 
 function createWindow() {
-  console.log("asd");
   mainWindow = new BrowserWindow({
     width: 900,
     height: 680,

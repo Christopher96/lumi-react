@@ -6,6 +6,7 @@ const {
   adjustStyleLoaders,
 } = require("customize-cra");
 const AntdScssThemePlugin = require("antd-scss-theme-plugin");
+const Dotenv = require("dotenv-webpack");
 const path = require("path");
 
 module.exports = override(
@@ -14,7 +15,8 @@ module.exports = override(
     style: true,
   }),
   addWebpackPlugin(
-    new AntdScssThemePlugin(path.join(__dirname, "src", "colors.scss"))
+    new AntdScssThemePlugin(path.join(__dirname, "src", "colors.scss")),
+    new Dotenv()
   ),
   adjustStyleLoaders((rule) => {
     const loaders = rule.use;

@@ -20,6 +20,7 @@
     "deepmerge": "^4.2.2",
     "diff": "^4.0.2",
     "dotenv": "^8.2.0",
+    "dotenv-webpack": "^1.7.0",
     "electron-is-dev": "^1.1.0",
     "electron-reload": "^1.5.0",
     "end-of-stream": "^1.4.4",
@@ -80,7 +81,8 @@
     "react:build": "react-app-rewired build",
     "react:test": "react-app-rewired test",
     "react:eject": "react-scripts eject",
-    "electron:dev": "ELECTRON_IS_DEV=1 concurrently \"BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:all": "concurrently \"BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:dev": "NODE_ENV=development npm run electron:all",
     "electron:build": "npm run react-build && npm run node-build && electron-builder",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },

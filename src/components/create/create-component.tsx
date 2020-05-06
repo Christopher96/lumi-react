@@ -29,10 +29,14 @@ export default class CreateComponent extends Component<IProps, IState> {
       .invoke("create-room", this.state.selectedPath)
       .then((res: any) => {
         console.log(res);
+      })
+      .catch((e: any) => {
+        console.error(e);
       });
   };
 
   render() {
+    console.log(process.env);
     return (
       <>
         <Search
