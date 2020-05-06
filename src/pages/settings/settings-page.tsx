@@ -48,17 +48,17 @@ export default class SettingsPage extends Component<IProps, IState> {
   render() {
     const { activeItem } = this.state;
     return (
-      <div className="center">
+      <div>
         <h2>Settings</h2>
         <Row>
-          <Col span={10} pull={4}>
+          <Col span={4} className="settingsMenu">
             <Menu mode="inline" onClick={this.onItemClick}>
               {this.settingsMenuItems.map((element) => {
                 return this.createMenuItems(element);
               })}
             </Menu>
           </Col>
-          <Col span={14}>
+          <Col span={16} push={2}>
             <div className="option-box">{activeItem}</div>
           </Col>
         </Row>
