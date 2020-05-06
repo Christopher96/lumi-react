@@ -24,7 +24,7 @@ export default class App extends Component {
             <Route path={Paths.LOADING} component={LoadingPage} />
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
-            <Redirect to={Paths.START}></Redirect>
+            <Redirect to={Paths.SETTINGS}></Redirect>
           </Switch>
         </Router>
       </>
