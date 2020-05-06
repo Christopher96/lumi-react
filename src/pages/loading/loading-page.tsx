@@ -13,7 +13,7 @@ export default class LoadingPage extends Component<IProps, IState> {
   onCancel = () => {
     console.log("managed to cancel the loading screen");
   };
-  //<img src="/lumi_fisk02.gif" />
+
   render() {
     const {} = this.state;
     return (
