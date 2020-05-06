@@ -13,3 +13,60 @@
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+//fish loading screen:
+.loadingZone {
+  width: 400px;
+  height: 400px;
+}
+
+.lumiFish {
+  animation-name: lumiFishAnim;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  left: 50%;
+  top: 50%;
+  position: absolute;
+  width: 300px;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.lumiShade {
+  animation-name: lumiShadeAnim;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  left: 50%;
+  top: 50%;
+  position: absolute;
+  width: 300px;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes lumiFishAnim {
+  0% {
+    width: 200px;
+  }
+  50% {
+    width: 300px;
+  }
+  100% {
+    width: 200px;
+  }
+}
+
+@keyframes lumiShadeAnim {
+  0% {
+    width: 210px;
+    opacity: 1;
+  }
+  50% {
+    width: 330px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 210px;
+    opacity: 1;
+  }
+}
