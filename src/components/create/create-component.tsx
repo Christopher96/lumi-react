@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Input, Button } from "antd";
 
+const { Search } = Input;
 const { ipcRenderer } = window.require("electron");
 
 interface IProps {}
@@ -22,16 +23,32 @@ export default class CreateComponent extends Component<IProps, IState> {
     });
   };
 
+  createRoom = () => {
+    console.log(this.state);
+    ipcRenderer
+      .invoke("create-room", this.state.selectedPath)
+      .then((res: any) => {
+        console.log(res);
+      });
+  };
+
   render() {
     return (
       <>
-        <Input
-          size="large"
-          onClick={this.selectDir}
+        <Search
+          enterButton={
+            <>
+              <span>Open</span>
+              <FolderOpenOutlined />
+            </>
+          }
+          placeholder="Enter a folder path..."
           value={this.state.selectedPath}
-          placeholder="Select a folder..."
-          suffix={<FolderOpenOutlined />}
+          onSearch={this.selectDir}
         />
+        <Button onClick={this.createRoom} type="primary">
+          Create room
+        </Button>
       </>
     );
   }

@@ -1,9 +1,8 @@
 const ipcInit = require("./ipc");
 const electron = require("electron");
-const { ipcMain, app, BrowserWindow } = electron;
+const { app, BrowserWindow } = electron;
 
 const path = require("path");
-const url = require("url");
 const isDev = require("electron-is-dev");
 
 if (isDev !== true) {
@@ -15,6 +14,7 @@ if (isDev !== true) {
 let mainWindow;
 
 function createWindow() {
+  console.log("asd");
   mainWindow = new BrowserWindow({
     width: 900,
     height: 680,
