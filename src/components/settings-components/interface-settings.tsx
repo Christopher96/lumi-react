@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Cascader, Row, Col, InputNumber } from "antd";
+import "./settings-components.scss";
 
 interface IProps {}
 interface IState {}

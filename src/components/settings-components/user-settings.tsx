@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Row, Col, Input, Tooltip, Upload } from "antd";
-//import "./settings-components.scss";
+import { Row, Col, Input, Upload } from "antd";
+import "./settings-components.scss";
 
 interface IProps {}
 interface IState {}
@@ -76,14 +76,14 @@ export default class UserSettings extends Component<IProps, IState> {
         <Row>
           <Col span={10}>Change username:</Col>
           <Col span={14}>
-            <Input placeholder="default size" />
+            <Input placeholder="new username" />
           </Col>
         </Row>
         <br />
         <Row>
           <Col span={10}>Change password:</Col>
           <Col span={14}>
-            <Input.Password placeholder="input password" />
+            <Input.Password placeholder="new password" />
           </Col>
         </Row>
       </div>
