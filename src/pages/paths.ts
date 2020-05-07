@@ -5,4 +5,5 @@ export const Paths = {
   LOADING: "/loading",
   INVITE: "/invite",
   SETTINGS: "/settings",
+  SERVER_LOG: "/serverlog",
 };
