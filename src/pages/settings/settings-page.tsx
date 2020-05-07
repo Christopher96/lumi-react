@@ -5,7 +5,6 @@ import UserSettings from "src/components/settings-components/user-settings";
 import { ClickParam } from "antd/lib/menu";
 import InterfaceSettings from "src/components/settings-components/interface-settings";
 import SystemSettings from "src/components/settings-components/system-settings";
-import { Link } from "react-router-dom";
 import HelpSettings from "src/components/settings-components/help-settings";
 
 interface IProps {}
