@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Row, Col, Input, Tooltip, Upload } from "antd";
-import "./settings-components.scss";
+//import "./settings-components.scss";
 
 interface IProps {}
 interface IState {}
@@ -52,7 +52,7 @@ export default class UserSettings extends Component<IProps, IState> {
         <Row>
           <Col span={10}>Change Avatar:</Col>
           <Col span={14}>
-            <div className="hello">
+            <div className="change-avatar">
               <Upload
                 name="avatar"
                 listType="picture-card"

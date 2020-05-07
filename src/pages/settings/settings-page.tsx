@@ -5,6 +5,7 @@ import UserSettings from "src/components/settings-components/user-settings";
 import { ClickParam } from "antd/lib/menu";
 import InterfaceSettings from "src/components/settings-components/interface-settings";
 import SystemSettings from "src/components/settings-components/system-settings";
+import { Link } from "react-router-dom";
 
 interface IProps {}
 interface IState {
@@ -37,6 +38,14 @@ export default class SettingsPage extends Component<IProps, IState> {
       case "System":
         return this.setState({
           activeItem: <SystemSettings />,
+        });
+      case "Help":
+        return this.setState({
+          activeItem: (
+            <div>
+              <Link to={"/loading"}>Link to loading</Link>
+            </div>
+          ),
         });
       default:
         return this.setState({
