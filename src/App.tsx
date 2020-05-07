@@ -9,6 +9,7 @@ import LoadingPage from "./pages/loading/loading-page";
 import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
+import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
 
@@ -24,7 +25,8 @@ export default class App extends Component {
             <Route path={Paths.LOADING} component={LoadingPage} />
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
-            <Redirect to={Paths.SETTINGS}></Redirect>
+            <Route path={Paths.LEAVE} component={LeavePage} />
+            <Redirect to={Paths.LEAVE}></Redirect>
           </Switch>
         </Router>
       </>
