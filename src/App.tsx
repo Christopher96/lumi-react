@@ -12,6 +12,7 @@ import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
+import RoomFolderPage from "./pages/room-folder/room-folder-page";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -31,7 +32,8 @@ export default class App extends Component {
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
-            <Redirect to={Paths.LEAVE}></Redirect>
+            <Route path={Paths.ROOM_FOLDER} component={RoomFolderPage} />
+            <Redirect to={Paths.ROOM_FOLDER}></Redirect>
           </Switch>
         </Router>
       </>

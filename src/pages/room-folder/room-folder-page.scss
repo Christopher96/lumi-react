@@ -2,14 +2,17 @@
 
 .center {
   position: absolute;
-  left: 30%;
-  top: 30%;
-  transform: translate(-30%, -30%);
-}
-
-.center-text {
-  position: relative;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+.bottom-menu {
+  position: absolute;
+  right: 5%;
+  bottom: 2%;
+}
+
+.tooltip {
+  margin: 3px;
 }

@@ -6,6 +6,7 @@ enum Paths {
   INVITE = "/invite",
   SETTINGS = "/settings",
   LEAVE = "/leave",
+  ROOM_FOLDER = "/roomfolder",
 }
 
 export default Paths;
