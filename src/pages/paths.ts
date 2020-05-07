@@ -3,4 +3,6 @@ export const Paths = {
   HOME: "/home",
   START: "/start",
   LOADING: "/loading",
+  INVITE: "/invite",
+  SETTINGS: "/settings",
 };
