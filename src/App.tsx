@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Route, Router, Redirect, Switch } from "react-router-dom";
-import { Paths } from "src/pages/paths";
+import Paths from "src/pages/paths";
 import { history } from "./history";
 
 import TopBar from "./components/topbar/top-bar";
@@ -13,8 +13,13 @@ import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
 
+const { ipcRenderer } = window.require("electron");
+
 export default class App extends Component {
   render() {
+    ipcRenderer.on("navigate", (page: any) => {
+      console.log(page);
+    });
     return (
       <>
         <Router history={history}>
