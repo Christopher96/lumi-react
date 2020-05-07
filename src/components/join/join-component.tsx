@@ -4,7 +4,6 @@ import IPCEvents from "src/events";
 import { FolderOutlined } from "@ant-design/icons";
 import Form from "antd/lib/form/Form";
 import FormItem from "antd/lib/form/FormItem";
-import LumiContext from "src/context/lumi-context";
 
 const { Search } = Input;
 const { ipcRenderer } = window.require("electron");
@@ -13,15 +12,7 @@ interface IProps {}
 interface IState {}
 
 export default class JoinComponent extends Component<IProps, IState> {
-  static contextType = LumiContext;
-
   form: any = React.createRef();
-
-  componentDidMount() {
-    this.context.update({
-      title: "Join room",
-    });
-  }
 
   selectDir = () => {
     ipcRenderer.invoke(IPCEvents.SELECT_DIR).then((res: any) => {
@@ -34,8 +25,8 @@ export default class JoinComponent extends Component<IProps, IState> {
   joinRoom = (roomID: string, sourceFolderPath: string) => {
     ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, sourceFolderPath)
-      .then((res: any) => {
-        console.log(res);
+      .then((socket: SocketIOClient.Socket) => {
+        console.log(socket);
       })
       .catch((e: any) => {
         console.error(e);

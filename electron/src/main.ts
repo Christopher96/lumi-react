@@ -53,8 +53,6 @@ export default class Main {
     if (!process.env.SERVER_ENDPOINT)
       throw new Error("You need to configure host and port.");
 
-    console.log("hi");
-
     Main.app = app;
     Main.app.on("window-all-closed", Main.onWindowAllClosed);
     Main.app.on("ready", Main.onReady);

@@ -24,7 +24,9 @@ export default class IPC {
       const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
       await FS.createShadow(sourceFolderPath, zippedRoom);
 
-      const socket = await API.RoomRequest.joinRoom(roomId);
+      console.log(roomId, sourceFolderPath);
+
+      const socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
       // Tell the server we would like to join.
       socket.on(
@@ -39,7 +41,7 @@ export default class IPC {
       );
 
       socket.emit(Events.room_join, roomId);
-      return true;
+      return socket;
     });
   }
 }

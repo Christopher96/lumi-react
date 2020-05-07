@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import { Input, Button, Row, Col } from "antd";
 import IPCEvents from "src/events";
-import LumiContext from "src/context/lumi-context";
 import FormItem from "antd/lib/form/FormItem";
 import Form from "antd/lib/form/Form";
 
@@ -13,15 +12,7 @@ interface IProps {}
 interface IState {}
 
 export default class CreateComponent extends Component<IProps, IState> {
-  static contextType = LumiContext;
-
   form: any = React.createRef();
-
-  componentDidMount() {
-    this.context.update({
-      title: "Create room",
-    });
-  }
 
   selectDir = () => {
     ipcRenderer.invoke(IPCEvents.SELECT_DIR).then((res: any) => {
