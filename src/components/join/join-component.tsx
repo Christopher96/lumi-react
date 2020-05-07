@@ -5,6 +5,6 @@ interface IState {}
 
 export default class JoinComponent extends Component<IProps, IState> {
   render() {
-    return <div>hello join</div>;
+    return <div></div>;
   }
 }

@@ -1,6 +1,8 @@
-export const Paths = {
-  TOP_BAR: "/",
-  HOME: "/home",
-  START: "/start",
-  LOADING: "/loading",
-};
+enum Paths {
+  TOP_BAR = "/",
+  HOME = "/home",
+  START = "/start",
+  LOADING = "/loading",
+}
+
+export default Paths;
