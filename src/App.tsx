@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect, Component } from "react";
 import { Route, Router, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 import { history } from "./history";
@@ -12,16 +12,33 @@ import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
+import { LumiProvider } from "./context/lumi-context";
+import IPCEvents from "./events";
 
 const { ipcRenderer } = window.require("electron");
 
-export default class App extends Component {
-  render() {
-    ipcRenderer.on("navigate", (page: any) => {
-      console.log(page);
+interface IState {
+  title: string;
+  update: (obj: any) => void;
+}
+
+export default class App extends Component<{}, IState> {
+  state = {
+    title: "",
+    update: (obj: any) => {
+      this.setState({ ...obj });
+    },
+  };
+
+  componentDidMount() {
+    ipcRenderer.on(IPCEvents.NAVIGATE, (_: any, route: string) => {
+      history.push(route);
     });
+  }
+
+  render() {
     return (
-      <>
+      <LumiProvider value={this.state}>
         <Router history={history}>
           <Route path={Paths.TOP_BAR} component={TopBar} />
           <Switch>
@@ -31,10 +48,10 @@ export default class App extends Component {
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
-            <Redirect to={Paths.LEAVE}></Redirect>
+            <Redirect to={Paths.START}></Redirect>
           </Switch>
         </Router>
-      </>
+      </LumiProvider>
     );
   }
 }

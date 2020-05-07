@@ -1,7 +1,8 @@
 import Paths from "../../src/pages/paths";
-import { Menu, MenuItem, ipcMain } from "electron";
+import { Menu, MenuItem, BrowserWindow } from "electron";
+import IPCEvents from "../../src/events";
 
-const navMenu = (): any => {
+const navMenu = (win: BrowserWindow): any => {
   const menu: Menu = Menu.getApplicationMenu();
 
   const submenu: any = [];
@@ -10,7 +11,7 @@ const navMenu = (): any => {
       label: key,
       click() {
         // TODO respond on react side and redirect
-        ipcMain.emit("navigate", value);
+        win.webContents.send(IPCEvents.NAVIGATE, value);
       },
     });
   }

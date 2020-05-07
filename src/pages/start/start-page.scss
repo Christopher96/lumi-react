@@ -1,6 +1,17 @@
-.center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+@import "../../colors";
+
+.ant-tabs-nav-container-scrolling {
+  padding: 0;
 }
+.ant-tabs-tab-arrow-show {
+  display: none;
+}
+
+.ant-tabs-nav {
+  width: 100%;
+}
+.ant-tabs-tab {
+  text-align: center;
+  width: 50%;
+}
+

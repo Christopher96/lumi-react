@@ -1,31 +1,39 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input, Button } from "antd";
+import { Input, Button, Row, Col } from "antd";
+import IPCEvents from "src/events";
+import LumiContext from "src/context/lumi-context";
+import FormItem from "antd/lib/form/FormItem";
+import Form from "antd/lib/form/Form";
 
 const { Search } = Input;
 const { ipcRenderer } = window.require("electron");
 
 interface IProps {}
-interface IState {
-  selectedPath: string;
-}
+interface IState {}
 
 export default class CreateComponent extends Component<IProps, IState> {
-  state = {
-    selectedPath: "",
-  };
+  static contextType = LumiContext;
+
+  form: any = React.createRef();
+
+  componentDidMount() {
+    this.context.update({
+      title: "Create room",
+    });
+  }
 
   selectDir = () => {
-    ipcRenderer.invoke("select-dir").then((res: any) => {
-      this.setState({
-        selectedPath: res,
+    ipcRenderer.invoke(IPCEvents.SELECT_DIR).then((res: any) => {
+      this.form.current.setFieldsValue({
+        source: res,
       });
     });
   };
 
-  createRoom = () => {
+  createRoom = (source: string) => {
     ipcRenderer
-      .invoke("create-room", this.state.selectedPath)
+      .invoke(IPCEvents.CREATE_ROOM, source)
       .then((res: any) => {
         console.log(res);
       })
@@ -34,23 +42,56 @@ export default class CreateComponent extends Component<IProps, IState> {
       });
   };
 
+  onFinish = (values: any) => {
+    this.createRoom(values.source);
+  };
+
+  onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+  };
+
   render() {
     return (
       <>
-        <Search
-          enterButton={
-            <>
-              <span>Open</span>
-              <FolderOpenOutlined />
-            </>
-          }
-          placeholder="Enter a folder path..."
-          value={this.state.selectedPath}
-          onSearch={this.selectDir}
-        />
-        <Button onClick={this.createRoom} type="primary">
-          Create room
-        </Button>
+        <Row style={{ marginTop: "2em" }} justify="start">
+          <Col span={4}></Col>
+          <Col span={16}>
+            <Form
+              ref={this.form}
+              name="basic"
+              initialValues={{ remember: true }}
+              onFinish={this.onFinish}
+              onFinishFailed={this.onFinishFailed}
+            >
+              <FormItem
+                name="source"
+                rules={[
+                  {
+                    required: true,
+                    message: "You need to select a source folder",
+                  },
+                ]}
+              >
+                <Search
+                  enterButton={
+                    <>
+                      <span>Open</span>
+                      <FolderOpenOutlined />
+                    </>
+                  }
+                  placeholder="Enter a folder path..."
+                  onSearch={this.selectDir}
+                />
+              </FormItem>
+              <FormItem>
+                <Button htmlType="submit" type="primary">
+                  Create room
+                </Button>
+              </FormItem>
+            </Form>
+          </Col>
+          <Col span={4}></Col>
+        </Row>
       </>
     );
   }
