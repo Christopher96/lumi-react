@@ -5,8 +5,6 @@ import "./settings-components.scss";
 interface IProps {}
 interface IState {}
 
-const { Search } = Input;
-
 function getBase64(img: Blob, callback: any) {
   const reader = new FileReader();
   reader.addEventListener("load", () => callback(reader.result));

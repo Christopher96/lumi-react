@@ -24,7 +24,6 @@ export default class CreateComponent extends Component<IProps, IState> {
   };
 
   createRoom = () => {
-    console.log(this.state);
     ipcRenderer
       .invoke("create-room", this.state.selectedPath)
       .then((res: any) => {
@@ -36,7 +35,6 @@ export default class CreateComponent extends Component<IProps, IState> {
   };
 
   render() {
-    console.log(process.env);
     return (
       <>
         <Search
