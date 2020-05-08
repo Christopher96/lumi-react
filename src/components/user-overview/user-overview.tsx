@@ -15,8 +15,8 @@ interface IProps {
 interface IState {}
 
 const layout = {
-  labelCol: {span: 8},
-  wrapperCol: {span: 16},
+  labelCol: {span: 6},
+  wrapperCol: {span: 14},
 };
 
 const tailLayout = {
