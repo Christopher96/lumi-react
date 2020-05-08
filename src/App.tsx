@@ -13,7 +13,7 @@ import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
 import { LumiState, LumiProvider } from "./context/lumi-context";
-import IPCListener from "./context/ipc-listener";
+import IPC from "./context/ipc";
 
 export default class App extends Component<{}, LumiState> {
   state = {
@@ -26,7 +26,7 @@ export default class App extends Component<{}, LumiState> {
   };
 
   componentDidMount() {
-    new IPCListener(this.context, history);
+    new IPC(this.context, history);
   }
 
   render() {
