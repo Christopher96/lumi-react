@@ -5,6 +5,8 @@ enum IPCEvents {
   NAVIGATE = "navigate",
   DISCONNECTED = "disconnected",
   CHECK_CONNECTION = "check_connection",
+  FETCH_LOG = "fetch_log",
+  CREATE_WINDOW = "create_window",
 }
 
 export default IPCEvents;

@@ -28,14 +28,14 @@ export default class Main {
     });
 
     if (process.env.NODE_ENV === "production") {
-      Main.mainWindow.loadURL(
-        `file://${path.join(__dirname, "../build/index.html")}`
-      );
+      process.env.URL = `file://${path.join(__dirname, "../build/index.html")}`;
     } else {
-      Main.mainWindow.loadURL("http://localhost:3000");
+      process.env.URL = "http://localhost:3000";
       navMenu(Main.mainWindow);
     }
     Main.mainWindow.on("closed", Main.onClose);
+    Main.mainWindow.loadURL(process.env.URL);
+
     IPC.init(Main.mainWindow);
   }
 

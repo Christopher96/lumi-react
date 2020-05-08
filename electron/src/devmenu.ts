@@ -1,6 +1,6 @@
 import Paths from "../../src/pages/paths";
-import { Menu, MenuItem, BrowserWindow } from "electron";
-import IPCEvents from "../../src/context/events";
+import { dialog, Menu, MenuItem, BrowserWindow } from "electron";
+import IPCEvents from "../../src/context/ipc-events";
 
 const navMenu = (win: BrowserWindow): any => {
   const menu: Menu = Menu.getApplicationMenu();
@@ -16,12 +16,27 @@ const navMenu = (win: BrowserWindow): any => {
     });
   }
 
-  const menuItem: MenuItem = new MenuItem({
+  const navItem: MenuItem = new MenuItem({
     label: "Navigate",
     submenu,
   });
 
-  menu.append(menuItem);
+  const devItem: MenuItem = new MenuItem({
+    label: "Dev",
+    submenu: [
+      {
+        label: "Dialog",
+        click() {
+          dialog.showOpenDialog({
+            properties: ["openFile", "multiSelections"],
+          });
+        },
+      },
+    ],
+  });
+
+  menu.append(navItem);
+  menu.append(devItem);
   Menu.setApplicationMenu(menu);
 };
 

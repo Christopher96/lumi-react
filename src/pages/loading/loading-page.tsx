@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Input } from "antd";
 import "./loading-page.scss";
 
 import { Button } from "antd";

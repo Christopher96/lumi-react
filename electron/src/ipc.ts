@@ -1,9 +1,10 @@
-import { ipcMain, dialog } from "electron";
+import { ipcMain, dialog, BrowserWindow } from "electron";
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
 import { FileEvent, FileEventRequest } from "lumi-cli/dist/lib/common/types";
-import IPCEvents from "../../src/context/events";
+import IPCEvents from "../../src/context/ipc-events";
+import { Window } from "../../src/context/interfaces";
 
 export default class IPC {
   static socket: SocketIOClient.Socket;
@@ -23,7 +24,7 @@ export default class IPC {
     ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, path) => {
       const buffer = await FS.zip(path);
       const serverResponse = await API.RoomRequest.create(buffer);
-      return serverResponse;
+      return serverResponse.roomId;
     });
 
     ipcMain.handle(IPCEvents.JOIN_ROOM, async (_, roomId, sourceFolderPath) => {
@@ -36,6 +37,7 @@ export default class IPC {
 
       const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
       await FS.createShadow(sourceFolderPath, zippedRoom);
+
       IPC.socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
       // Tell the server we would like to join.
@@ -57,6 +59,39 @@ export default class IPC {
       IPC.socket.emit(Events.room_join, roomId);
 
       return true;
+    });
+
+    ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
+      const allLogs = await API.LogsRequest.getAllLogs(amount);
+      const list = allLogs.logs.map(
+        (v) =>
+          `> ${v.event}, ${new Date(v.date).toLocaleString()} in room ${
+            v.roomId
+          } by ${v.byWhom?.username || "unknown"}`
+      );
+
+      const list2: string[][] = allLogs.logs.map((v) => [
+        new Date(v.date).toLocaleString(),
+        `> ${v.event}, in room ${v.roomId} by ${v.byWhom?.username ||
+          "unknown"}`,
+      ]);
+
+      return list2;
+    });
+
+    ipcMain.handle(IPCEvents.CREATE_WINDOW, async (_, window: Window) => {
+      let win = new BrowserWindow({
+        width: window.width,
+        height: window.height,
+        webPreferences: {
+          nodeIntegration: true,
+        },
+      });
+      win.on("close", () => {
+        win = null;
+      });
+      win.loadURL(process.env.URL + window.path);
+      win.show();
     });
   }
 }
