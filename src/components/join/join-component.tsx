@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Input, Button, Col, Row } from "antd";
-import IPCEvents from "src/events";
+import IPCEvents from "src/context/events";
 import { FolderOutlined } from "@ant-design/icons";
 import Form from "antd/lib/form/Form";
 import FormItem from "antd/lib/form/FormItem";

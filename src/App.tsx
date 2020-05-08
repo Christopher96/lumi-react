@@ -1,4 +1,4 @@
-import React, { useEffect, Component } from "react";
+import React, { Component } from "react";
 import { Route, Router, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 import { history } from "./history";
@@ -12,28 +12,21 @@ import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
 
 import "./colors.scss";
-import { LumiProvider } from "./context/lumi-context";
-import IPCEvents from "./events";
+import { LumiState, LumiProvider } from "./context/lumi-context";
+import IPCListener from "./context/ipc-listener";
 
-const { ipcRenderer } = window.require("electron");
-
-interface IState {
-  title: string;
-  update: (obj: any) => void;
-}
-
-export default class App extends Component<{}, IState> {
+export default class App extends Component<{}, LumiState> {
   state = {
     title: "",
+    connected: false,
+    loading: false,
     update: (obj: any) => {
       this.setState({ ...obj });
     },
   };
 
   componentDidMount() {
-    ipcRenderer.on(IPCEvents.NAVIGATE, (_: any, route: string) => {
-      history.push(route);
-    });
+    new IPCListener(this.context, history);
   }
 
   render() {

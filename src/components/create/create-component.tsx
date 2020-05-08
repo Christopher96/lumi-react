@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import { Input, Button, Row, Col } from "antd";
-import IPCEvents from "src/events";
+import IPCEvents from "src/context/events";
 import FormItem from "antd/lib/form/FormItem";
 import Form from "antd/lib/form/Form";
+import LumiContext from "src/context/lumi-context";
 
 const { Search } = Input;
 const { ipcRenderer } = window.require("electron");
@@ -12,6 +13,8 @@ interface IProps {}
 interface IState {}
 
 export default class CreateComponent extends Component<IProps, IState> {
+  static contextType = LumiContext;
+
   form: any = React.createRef();
 
   selectDir = () => {
@@ -23,13 +26,28 @@ export default class CreateComponent extends Component<IProps, IState> {
   };
 
   createRoom = (source: string) => {
+    if (this.context.loading || this.context.connected) return;
+
+    this.context.update({
+      loading: true,
+      connected: false,
+    });
+
+    let connected = false;
+
     ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
-      .then((res: any) => {
-        console.log(res);
+      .then(() => {
+        connected = true;
       })
-      .catch((e: any) => {
-        console.error(e);
+      .catch(() => {
+        connected = false;
+      })
+      .finally(() => {
+        this.context.update({
+          connected,
+          loading: false,
+        });
       });
   };
 

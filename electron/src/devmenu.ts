@@ -1,6 +1,6 @@
 import Paths from "../../src/pages/paths";
 import { Menu, MenuItem, BrowserWindow } from "electron";
-import IPCEvents from "../../src/events";
+import IPCEvents from "../../src/context/events";
 
 const navMenu = (win: BrowserWindow): any => {
   const menu: Menu = Menu.getApplicationMenu();

@@ -3,7 +3,7 @@ import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
 import { FileEvent, FileEventRequest } from "lumi-cli/dist/lib/common/types";
-import IPCEvents from "../../src/events";
+import IPCEvents from "../../src/context/events";
 
 export default class IPC {
   static init(mainWindow: Electron.BrowserWindow) {
@@ -39,6 +39,10 @@ export default class IPC {
           }
         }
       );
+
+      socket.on("disconnect", () => {
+        mainWindow.webContents.send(IPCEvents.DISCONNECTED);
+      });
 
       socket.emit(Events.room_join, roomId);
       return socket;
