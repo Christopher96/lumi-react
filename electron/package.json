@@ -19,7 +19,5 @@
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-    "lumi-cli": "0.0.30"
-  }
+  "dependencies": {}
 }

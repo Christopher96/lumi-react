@@ -23,7 +23,7 @@ export default class IPC {
     ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, path) => {
       const buffer = await FS.zip(path);
       const serverResponse = await API.RoomRequest.create(buffer);
-      return serverResponse;
+      return serverResponse.roomId;
     });
 
     ipcMain.handle(IPCEvents.JOIN_ROOM, async (_, roomId, sourceFolderPath) => {
@@ -36,6 +36,7 @@ export default class IPC {
 
       const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
       await FS.createShadow(sourceFolderPath, zippedRoom);
+
       IPC.socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
       // Tell the server we would like to join.
