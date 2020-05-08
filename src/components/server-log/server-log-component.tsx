@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Button, Timeline, message } from "antd";
+import { Button, Timeline, message, Tooltip } from "antd";
 import IPC from "src/context/ipc";
+import { ExportOutlined } from "@ant-design/icons";
 
 interface IProps {}
 interface IState {
@@ -44,6 +45,25 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     }, 1000);
   };
 
+  exportButton = (
+    <div className="exportButtonIcon">
+      <Tooltip title="Export" className="tooltip">
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<ExportOutlined />}
+          onClick={this.onExport}
+        />
+      </Tooltip>
+    </div>
+  );
+
+  exportButtonOld = (
+    <div className="footer">
+      <Button onClick={this.onExport}>Export Log</Button>
+    </div>
+  );
+
   render() {
     const { logs } = this.state;
     return (
@@ -56,9 +76,7 @@ export default class ServerLogComponent extends Component<IProps, IState> {
             })}
           </Timeline>
         </div>
-        <div className="footer">
-          <Button onClick={this.onExport}>Export Log</Button>
-        </div>
+        {this.exportButton}
       </>
     );
   }

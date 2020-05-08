@@ -14,6 +14,22 @@ export default class InvitePage extends Component<IProps, IState> {
     roomID: "1802471964798179042168",
   };
 
+  inviteText = (
+    <div className="warning-text">
+      <br />
+      <div>
+        <h3>Warning:</h3>
+      </div>
+      <p>
+        Anyone with the session ID can join the session and introduce changes.
+      </p>
+      <p>
+        Make sure to keep your session ID secret from the rest of the internet
+        to keep your work safe.
+      </p>
+    </div>
+  );
+
   onCopy = () => {
     alert("to add some copy to clipboard feature");
   };
@@ -24,24 +40,10 @@ export default class InvitePage extends Component<IProps, IState> {
   render() {
     const { roomID } = this.state;
     return (
-      <div>
-        <div className="center-text">
-          <h2>Session ID:</h2>
-          <Input placeholder={roomID} />
-          <div>
-            <h3>Warning</h3>
-          </div>
-
-          <p>
-            Anyone with the session ID can join the session and introduce
-            changes.
-          </p>
-          <p>
-            Make sure to keep your session ID secret from the rest of the
-            internet to keep your work safe.
-          </p>
-        </div>
-
+      <div className="center">
+        <h2>Session ID:</h2>
+        <Input placeholder={roomID} />
+        {this.inviteText}
         <div className="stick-to-bottom">
           <Row className="bottomButtons">
             <Col span={12}>

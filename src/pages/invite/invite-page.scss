@@ -1,13 +1,14 @@
 @import "../../colors";
 
 .center {
-  position: relative;
-  left: 70%;
-  top: 70%;
-  transform: translate(-70%, -70%);
+  position: absolute;
+  left: 10%;
+  width: 80%;
+  top: 10%;
+  height: 80%;
 }
 
-.center-text {
+.warning-text {
   text-align: center;
 }
 

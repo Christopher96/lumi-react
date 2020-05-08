@@ -51,7 +51,12 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         />
       </Tooltip>
       <Tooltip title="Log" className="tooltip">
-        <Button type="primary" shape="circle" icon={<FileTextOutlined />} />
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<FileTextOutlined />}
+          href={Paths.SERVER_LOG}
+        />
       </Tooltip>
       <Tooltip title="Leave" className="tooltip">
         <Button
