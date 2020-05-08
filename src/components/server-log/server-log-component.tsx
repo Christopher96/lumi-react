@@ -5,13 +5,13 @@ import IPC from "src/context/ipc";
 interface IProps {}
 interface IState {
   timestamp: string;
-  log: any;
+  logs: any;
 }
 
 const key = "updatable";
 
 export default class ServerLogComponent extends Component<IProps, IState> {
-  state = { timestamp: "2020-01-01", log: "_" };
+  state = { timestamp: "2020-01-01", logs: [["a", "b", "c"]] };
 
   val1 = [
     "2020-01-01 20:20:0:0",
@@ -22,10 +22,9 @@ export default class ServerLogComponent extends Component<IProps, IState> {
   testTree = [this.val1, this.val2, this.val3, this.val1, this.val3];
 
   componentDidMount = () => {
-    IPC.fetchLogs(1).then((logs) => {
-      console.log(logs);
+    IPC.fetchLogs(10).then((fetchedLogs) => {
       this.setState({
-        log: logs,
+        logs: fetchedLogs,
       });
     });
   };
@@ -46,14 +45,14 @@ export default class ServerLogComponent extends Component<IProps, IState> {
   };
 
   render() {
-    const { timestamp, log } = this.state;
+    const { logs } = this.state;
     return (
       <>
         <h2>Server Log:</h2>
         <div className="log-window">
           <Timeline mode="left">
-            {this.testTree.map((element, index) => {
-              return this.makeLog(timestamp, log, index);
+            {logs.map((element, index) => {
+              return this.makeLog(element[0], element[1], index);
             })}
           </Timeline>
         </div>
