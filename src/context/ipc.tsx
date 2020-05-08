@@ -15,6 +15,10 @@ export default class IPC {
     this.register();
   }
 
+  static fetchLogs = (amount: number): Promise<void> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
+  };
+
   static createRoom = (source: string): Promise<void> => {
     return new Promise<void>((_, rej) => {
       ipcRenderer

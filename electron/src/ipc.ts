@@ -59,5 +59,19 @@ export default class IPC {
 
       return true;
     });
+
+    ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
+      const allLogs = await API.LogsRequest.getAllLogs(amount);
+      const list = allLogs.logs
+        .map(
+          (v) =>
+            `> ${v.event}, ${new Date(v.date).toLocaleString()} in room ${
+              v.roomId
+            } by ${v.byWhom?.username || "unknown"}`
+        )
+        .join("\n");
+
+      return list;
+    });
   }
 }
