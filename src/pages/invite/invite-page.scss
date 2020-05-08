@@ -1,17 +1,18 @@
 @import "../../colors";
 
 .center {
+  position: relative;
+  left: 70%;
+  top: 70%;
+  transform: translate(-70%, -70%);
+}
+
+.center-text {
+  text-align: center;
+}
+
+.stick-to-bottom {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-h3 {
-  text-align: center;
-  color: #cf1322;
-}
-
-p {
-  text-align: center;
+  bottom: 0%;
+  width: 100%;
 }
