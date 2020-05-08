@@ -6,7 +6,7 @@ enum Paths {
   INVITE = "/invite",
   SETTINGS = "/settings",
   LEAVE = "/leave",
-  ROOM_FOLDER = "/roomfolder",
+  ROOM = "/room",
   SERVER_LOG = "/serverlog",
 }
 

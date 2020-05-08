@@ -32,18 +32,16 @@ export default class CreateComponent extends Component<IProps, IState> {
       loading: true,
     });
 
-    let connected = false;
-
     IPC.createRoom(values.source)
       .then(() => {
-        connected = true;
+        this.context.update({
+          source: values.source,
+          connected: true,
+          loading: false,
+        });
       })
       .catch(() => {
-        connected = false;
-      })
-      .finally(() => {
         this.context.update({
-          connected,
           loading: false,
         });
       });

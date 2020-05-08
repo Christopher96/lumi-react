@@ -1,45 +1,35 @@
 import React, { Component } from "react";
 import "./room-folder-page.scss";
 import DirectoryTree from "antd/lib/tree/DirectoryTree";
-import { Button, Tooltip, Col, Row } from "antd";
+import { Button, Tooltip, Row } from "antd";
 import {
   UserAddOutlined,
   FileTextOutlined,
   ArrowRightOutlined,
 } from "@ant-design/icons";
 import Paths from "../paths";
-
-const treeData = [
-  {
-    title: "lumi_client",
-    key: "0",
-    children: [
-      { title: "env", key: "0-0", isLeaf: true },
-      {
-        title: "src",
-        key: "0-1",
-        isLeaf: false,
-        children: [
-          { title: "index.html", key: "0-1-0", isLeaf: true },
-          { title: "index.css", key: "0-1-1", isLeaf: true },
-        ],
-      },
-    ],
-  },
-  {
-    title: "lumi_server",
-    key: "1",
-    children: [
-      { title: "leaf 1-0", key: "1-0", isLeaf: true },
-      { title: "leaf 1-1", key: "1-1", isLeaf: true },
-    ],
-  },
-];
+import TopBar from "src/components/topbar/top-bar";
+import LumiContext from "src/context/lumi-context";
+import IPC from "src/context/ipc";
+import { Redirect } from "react-router-dom";
 
 interface IProps {}
 interface IState {}
 
 export default class RoomFolderPage extends Component<IProps, IState> {
+  static contextType = LumiContext;
+
+  componentDidMount() {
+    this.context.update({
+      title: "Room",
+    });
+
+    IPC.fetchFolder(this.context.source).then((treeData) => {
+      this.context.update({
+        treeData,
+      });
+    });
+  }
   bottomMenuButtons = (
     <Row className="bottom-menu">
       <Tooltip title="Invite" className="tooltip">
@@ -78,8 +68,13 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    return (
+    const { treeData } = this.context;
+
+    return !this.context.connected ? (
+      <Redirect to={Paths.START} />
+    ) : (
       <>
+        <TopBar />
         <DirectoryTree
           multiple
           defaultExpandAll

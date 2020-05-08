@@ -5,6 +5,8 @@ import CreateComponent from "src/components/create/create-component";
 import JoinComponent from "src/components/join/join-component";
 import LumiContext from "src/context/lumi-context";
 import TopBar from "src/components/topbar/top-bar";
+import { Redirect } from "react-router-dom";
+import Paths from "../paths";
 
 const { TabPane } = Tabs;
 
@@ -41,7 +43,9 @@ export default class StartPage extends Component<IProps, IState> {
   };
 
   render() {
-    return (
+    return this.context.connected ? (
+      <Redirect to={Paths.ROOM} />
+    ) : (
       <>
         <TopBar />
         <Tabs onChange={this.onChange} type="card" defaultActiveKey="1">

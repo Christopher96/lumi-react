@@ -33,18 +33,16 @@ export default class JoinComponent extends Component<IProps, IState> {
       loading: true,
     });
 
-    let connected = false;
-
     IPC.joinRoom(values.roomID, values.source)
       .then(() => {
-        connected = true;
+        this.context.update({
+          source: values.source,
+          connected: true,
+          loading: false,
+        });
       })
       .catch(() => {
-        connected = false;
-      })
-      .finally(() => {
         this.context.update({
-          connected,
           loading: false,
         });
       });

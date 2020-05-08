@@ -6,7 +6,9 @@ enum IPCEvents {
   DISCONNECTED = "disconnected",
   CHECK_CONNECTION = "check_connection",
   FETCH_LOG = "fetch_log",
+  FETCH_FOLDER = "fetch_folder",
   CREATE_WINDOW = "create_window",
+  FOLDER_UPDATE = "folder_update",
 }
 
 export default IPCEvents;
