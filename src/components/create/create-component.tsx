@@ -18,7 +18,7 @@ export default class CreateComponent extends Component<IProps, IState> {
 
   selectDir = () => {
     IPC.selectDir().then((path) => {
-      this.form.setFieldsValue({
+      this.form.current.setFieldsValue({
         source: path,
       });
     });
