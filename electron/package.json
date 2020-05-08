@@ -13,12 +13,13 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^12.12.21",
+    "@types/socket.io-client": "^1.4.32",
     "electron": "^8.2.5",
     "rimraf": "^3.0.2",
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "lumi-cli": "0.0.28"
+    "lumi-cli": "0.0.30"
   }
 }

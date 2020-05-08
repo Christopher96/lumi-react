@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "typeRoots": ["@types/*"],
+    "typeRoots": ["./node_modules/@types", "./src/types/cdk.d.ts"],
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -18,13 +18,8 @@
     "baseUrl": ".",
     "strictNullChecks": true
   },
-  "include": [
-    "src",
-    "node_modules/@types/jest/index.d.ts"
-  ],
+  "include": ["src", "node_modules/@types/jest/index.d.ts"],
   "paths": {
-    "src/*": [
-      "./src/*"
-    ]
+    "src/*": ["./src/*"]
   }
 }
