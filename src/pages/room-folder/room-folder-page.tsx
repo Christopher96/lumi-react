@@ -11,27 +11,27 @@ import Paths from "../paths";
 
 const treeData = [
   {
-    title: "parent 0",
-    key: "0-0",
+    title: "lumi_client",
+    key: "0",
     children: [
-      { title: "leaf 0-0", key: "0-0-0", isLeaf: true },
+      { title: "env", key: "0-0", isLeaf: true },
       {
-        title: "parent 3",
-        key: "0-0-9",
+        title: "src",
+        key: "0-1",
         isLeaf: false,
         children: [
-          { title: "leaf 0-0", key: "0-0-8", isLeaf: true },
-          { title: "leaf 0-1", key: "0-0-1", isLeaf: true },
+          { title: "index.html", key: "0-1-0", isLeaf: true },
+          { title: "index.css", key: "0-1-1", isLeaf: true },
         ],
       },
     ],
   },
   {
-    title: "parent 1",
-    key: "0-1",
+    title: "lumi_server",
+    key: "1",
     children: [
-      { title: "leaf 1-0", key: "0-1-0", isLeaf: true },
-      { title: "leaf 1-1", key: "0-1-1", isLeaf: true },
+      { title: "leaf 1-0", key: "1-0", isLeaf: true },
+      { title: "leaf 1-1", key: "1-1", isLeaf: true },
     ],
   },
 ];

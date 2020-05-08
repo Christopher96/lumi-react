@@ -5,6 +5,7 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  box-shadow: green($color: red);
 }
 
 .bottomCenter {
@@ -21,52 +22,40 @@
 }
 
 .lumiFish {
-  animation-name: lumiFishAnim;
+  animation-name: lumiAnim;
   animation-duration: 4s;
   animation-iteration-count: infinite;
   left: 50%;
-  top: 50%;
+  top: 60%;
   position: absolute;
   width: 300px;
-  height: auto;
   transform: translate(-50%, -50%);
+  background: url(../../assets/Lumi_Logo.svg) 0 0 no-repeat transparent;
+  height: 400px;
+  overflow: hidden;
+  color: #ffffff;
 }
 
-.lumiShade {
-  animation-name: lumiShadeAnim;
-  animation-duration: 4s;
-  animation-iteration-count: infinite;
-  left: 50%;
-  top: 50%;
-  position: absolute;
-  width: 300px;
-  height: auto;
-  transform: translate(-50%, -50%);
-}
-
-@keyframes lumiFishAnim {
+@keyframes lumiAnim {
   0% {
-    width: 200px;
+    width: 240px;
+    height: 240px;
+    -webkit-filter: drop-shadow(3px 3px 2px black);
+    filter: drop-shadow(3px 3px 2px black);
+    top: 50%;
   }
   50% {
-    width: 300px;
+    width: 400px;
+    height: 400px;
+    -webkit-filter: drop-shadow(10px 10px 10px black);
+    filter: drop-shadow(10px 10px 10px black);
+    top: 45%;
   }
   100% {
-    width: 200px;
-  }
-}
-
-@keyframes lumiShadeAnim {
-  0% {
-    width: 210px;
-    opacity: 1;
-  }
-  50% {
-    width: 330px;
-    opacity: 0.5;
-  }
-  100% {
-    width: 210px;
-    opacity: 1;
+    width: 240px;
+    height: 240px;
+    -webkit-filter: drop-shadow(3px 3px 2px black);
+    filter: drop-shadow(3px 3px 2px black);
+    top: 50%;
   }
 }

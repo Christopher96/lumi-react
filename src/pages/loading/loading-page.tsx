@@ -15,21 +15,12 @@ export default class LoadingPage extends Component<IProps, IState> {
   };
 
   render() {
-    const {} = this.state;
     return (
       <div className="center">
         <div className="loadingZone">
-          <img
-            className="lumiShade"
-            src="/lumi_loading_fisk01_shade.png"
-            alt="a shadow"
-          />
-          <img
-            className="lumiFish"
-            src="/lumi_loading_fisk01.png"
-            alt="a fish"
-          />
+          <div className="lumiFish"></div>
         </div>
+
         <div>
           <Button
             className="bottomCenter"

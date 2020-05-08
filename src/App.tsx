@@ -33,7 +33,7 @@ export default class App extends Component {
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
             <Route path={Paths.ROOM_FOLDER} component={RoomFolderPage} />
-            <Redirect to={Paths.ROOM_FOLDER}></Redirect>
+            <Redirect to={Paths.LOADING}></Redirect>
           </Switch>
         </Router>
       </>
