@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { Button, Timeline, message } from "antd";
+import IPC from "src/context/ipc";
 
 interface IProps {}
 interface IState {
   timestamp: string;
-  log: string;
+  log: any;
 }
 
 const key = "updatable";
@@ -18,26 +19,23 @@ export default class ServerLogComponent extends Component<IProps, IState> {
   ];
   val2 = ["2020-01-01 20:20:0:0", "hej jag testar skriva"];
   val3 = ["2020-01-01 20:20:0:0", "hej äter mat"];
-  testTree = [
-    this.val1,
-    this.val2,
-    this.val3,
-    this.val1,
-    this.val2,
-    this.val3,
-    this.val1,
-    this.val2,
-    this.val3,
-    this.val1,
-    this.val2,
-    this.val3,
-    this.val1,
-    this.val2,
-    this.val3,
-  ];
+  testTree = [this.val1, this.val2, this.val3, this.val1, this.val3];
 
-  makeLog = (time: string, text: string) => {
-    return <Timeline.Item label={time}>{text}</Timeline.Item>;
+  componentDidMount = () => {
+    IPC.fetchLogs(1).then((logs) => {
+      console.log(logs);
+      this.setState({
+        log: logs,
+      });
+    });
+  };
+
+  makeLog = (time: string, text: string, index: number) => {
+    return (
+      <Timeline.Item key={index} label={time}>
+        {text}
+      </Timeline.Item>
+    );
   };
 
   onExport = () => {
@@ -48,13 +46,14 @@ export default class ServerLogComponent extends Component<IProps, IState> {
   };
 
   render() {
+    const { timestamp, log } = this.state;
     return (
       <>
         <h2>Server Log:</h2>
         <div className="log-window">
           <Timeline mode="left">
-            {this.testTree.map((element) => {
-              return this.makeLog(element[0], element[1]);
+            {this.testTree.map((element, index) => {
+              return this.makeLog(timestamp, log, index);
             })}
           </Timeline>
         </div>
