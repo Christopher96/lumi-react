@@ -12,8 +12,7 @@ import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
 import RoomFolderPage from "./pages/room-folder/room-folder-page";
 import { LumiState, LumiProvider } from "./context/lumi-context";
-import IPCListener from "./context/ipc-listener";
-import "./colors.scss";
+import IPC from "./context/ipc";
 
 export default class App extends Component<{}, LumiState> {
   state = {
@@ -26,7 +25,7 @@ export default class App extends Component<{}, LumiState> {
   };
 
   componentDidMount() {
-    new IPCListener(this.context, history);
+    new IPC(this.context, history);
   }
 
   render() {

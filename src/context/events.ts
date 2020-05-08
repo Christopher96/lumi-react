@@ -4,6 +4,7 @@ enum IPCEvents {
   JOIN_ROOM = "join_room",
   NAVIGATE = "navigate",
   DISCONNECTED = "disconnected",
+  CHECK_CONNECTION = "check_connection",
 }
 
 export default IPCEvents;

@@ -24,7 +24,7 @@ export default class InvitePage extends Component<IProps, IState> {
   render() {
     const { roomID } = this.state;
     return (
-      <>
+      <div>
         <div className="center-text">
           <h2>Session ID:</h2>
           <Input placeholder={roomID} />
@@ -57,7 +57,7 @@ export default class InvitePage extends Component<IProps, IState> {
             </Col>
           </Row>
         </div>
-      </>
+      </div>
     );
   }
 }

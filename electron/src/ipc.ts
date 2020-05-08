@@ -6,7 +6,13 @@ import { FileEvent, FileEventRequest } from "lumi-cli/dist/lib/common/types";
 import IPCEvents from "../../src/context/events";
 
 export default class IPC {
+  static socket: SocketIOClient.Socket;
+
   static init(mainWindow: Electron.BrowserWindow) {
+    ipcMain.handle(IPCEvents.CHECK_CONNECTION, async () => {
+      return IPC.socket !== undefined;
+    });
+
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
       const result = await dialog.showOpenDialog(mainWindow, {
         properties: ["openDirectory"],
@@ -21,15 +27,19 @@ export default class IPC {
     });
 
     ipcMain.handle(IPCEvents.JOIN_ROOM, async (_, roomId, sourceFolderPath) => {
-      const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-      await FS.createShadow(sourceFolderPath, zippedRoom);
-
+      console.log("JOINING ROOM");
       console.log(roomId, sourceFolderPath);
 
-      const socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
+      if (IPC.socket !== undefined) {
+        IPC.socket.disconnect();
+      }
+
+      const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
+      await FS.createShadow(sourceFolderPath, zippedRoom);
+      IPC.socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
       // Tell the server we would like to join.
-      socket.on(
+      IPC.socket.on(
         Events.room_file_change_res,
         async (fileEventRequest: FileEventRequest) => {
           if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
@@ -40,12 +50,13 @@ export default class IPC {
         }
       );
 
-      socket.on("disconnect", () => {
+      IPC.socket.on("disconnect", () => {
         mainWindow.webContents.send(IPCEvents.DISCONNECTED);
       });
 
-      socket.emit(Events.room_join, roomId);
-      return socket;
+      IPC.socket.emit(Events.room_join, roomId);
+
+      return true;
     });
   }
 }

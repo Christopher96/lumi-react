@@ -10,11 +10,16 @@ export default class TopBar extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   render() {
+    const { title, connected } = this.context;
     return (
       <PageHeader
-        tags={<Tag color="red">Offline</Tag>}
+        tags={
+          <Tag color={connected ? "green" : "red"}>
+            {connected ? "Online" : "Offline"}
+          </Tag>
+        }
         className="header"
-        title={this.context.title}
+        title={title}
       ></PageHeader>
     );
   }
