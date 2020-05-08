@@ -1,58 +1,107 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input, Button } from "antd";
+import { Input, Button, Row, Col } from "antd";
+import FormItem from "antd/lib/form/FormItem";
+import Form from "antd/lib/form/Form";
+import LumiContext from "src/context/lumi-context";
+import IPC from "src/context/ipc";
 
 const { Search } = Input;
-const { ipcRenderer } = window.require("electron");
 
 interface IProps {}
-interface IState {
-  selectedPath: string;
-}
+interface IState {}
 
 export default class CreateComponent extends Component<IProps, IState> {
-  state = {
-    selectedPath: "",
-  };
+  static contextType = LumiContext;
+
+  form: any = React.createRef();
 
   selectDir = () => {
-    ipcRenderer.invoke("select-dir").then((res: any) => {
-      this.setState({
-        selectedPath: res,
+    IPC.selectDir().then((path) => {
+      this.form.current.setFieldsValue({
+        source: path,
       });
     });
   };
 
-  createRoom = () => {
-    console.log(this.state);
-    ipcRenderer
-      .invoke("create-room", this.state.selectedPath)
-      .then((res: any) => {
-        console.log(res);
+  onFinish = (values: any) => {
+    if (this.context.loading || this.context.connected) return;
+
+    this.context.update({
+      connected: false,
+      loading: true,
+    });
+
+    let connected = false;
+
+    IPC.createRoom(values.source)
+      .then(() => {
+        connected = true;
       })
-      .catch((e: any) => {
-        console.error(e);
+      .catch(() => {
+        connected = false;
+      })
+      .finally(() => {
+        this.context.update({
+          connected,
+          loading: false,
+        });
       });
   };
 
+  onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+  };
+
   render() {
-    console.log(process.env);
+    const { connected, loading } = this.context;
+
     return (
       <>
-        <Search
-          enterButton={
-            <>
-              <span>Open</span>
-              <FolderOpenOutlined />
-            </>
-          }
-          placeholder="Enter a folder path..."
-          value={this.state.selectedPath}
-          onSearch={this.selectDir}
-        />
-        <Button onClick={this.createRoom} type="primary">
-          Create room
-        </Button>
+        <Row style={{ marginTop: "2em" }} justify="start">
+          <Col span={4}></Col>
+          <Col span={16}>
+            <Form
+              ref={this.form}
+              name="basic"
+              initialValues={{ remember: true }}
+              onFinish={this.onFinish}
+              onFinishFailed={this.onFinishFailed}
+            >
+              <FormItem
+                name="source"
+                rules={[
+                  {
+                    required: true,
+                    message: "You need to select a source folder",
+                  },
+                ]}
+              >
+                <Search
+                  enterButton={
+                    <>
+                      <span>Open</span>
+                      <FolderOpenOutlined />
+                    </>
+                  }
+                  placeholder="Enter a folder path..."
+                  onSearch={this.selectDir}
+                />
+              </FormItem>
+              <FormItem>
+                <Button
+                  disabled={connected}
+                  loading={loading}
+                  htmlType="submit"
+                  type="primary"
+                >
+                  Create room
+                </Button>
+              </FormItem>
+            </Form>
+          </Col>
+          <Col span={4}></Col>
+        </Row>
       </>
     );
   }
