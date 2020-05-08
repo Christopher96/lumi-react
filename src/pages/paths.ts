@@ -6,6 +6,7 @@ enum Paths {
   INVITE = "/invite",
   SETTINGS = "/settings",
   LEAVE = "/leave",
+  SERVER_LOG = "/serverlog",
 }
 
 export default Paths;

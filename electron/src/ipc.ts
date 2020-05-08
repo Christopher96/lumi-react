@@ -63,16 +63,20 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const allLogs = await API.LogsRequest.getAllLogs(amount);
-      const list = allLogs.logs
-        .map(
-          (v) =>
-            `> ${v.event}, ${new Date(v.date).toLocaleString()} in room ${
-              v.roomId
-            } by ${v.byWhom?.username || "unknown"}`
-        )
-        .join("\n");
+      const list = allLogs.logs.map(
+        (v) =>
+          `> ${v.event}, ${new Date(v.date).toLocaleString()} in room ${
+            v.roomId
+          } by ${v.byWhom?.username || "unknown"}`
+      );
 
-      return list;
+      const list2: string[][] = allLogs.logs.map((v) => [
+        new Date(v.date).toLocaleString(),
+        `> ${v.event}, in room ${v.roomId} by ${v.byWhom?.username ||
+          "unknown"}`,
+      ]);
+
+      return list2;
     });
 
     ipcMain.handle(IPCEvents.CREATE_WINDOW, async (_, window: Window) => {

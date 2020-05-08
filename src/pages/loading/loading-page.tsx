@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Input } from "antd";
 import "./loading-page.scss";
 
 import { Button } from "antd";
@@ -15,7 +14,6 @@ export default class LoadingPage extends Component<IProps, IState> {
   };
 
   render() {
-    const {} = this.state;
     return (
       <div className="center">
         <div className="loadingZone">

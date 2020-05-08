@@ -9,6 +9,7 @@ import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
+import ServerLogPage from "./pages/server-log/server-log-page";
 
 import "./colors.scss";
 import { LumiState, LumiProvider } from "./context/lumi-context";
@@ -39,6 +40,7 @@ export default class App extends Component<{}, LumiState> {
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
+            <Route path={Paths.SERVER_LOG} component={ServerLogPage} />
             <Redirect to={Paths.START}></Redirect>
           </Switch>
         </Router>

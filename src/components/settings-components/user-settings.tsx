@@ -87,4 +87,4 @@ export default class UserSettings extends Component<IProps, IState> {
       </div>
     );
   }
-} //<InfoCircleOutline style={{ color: "rgba(0,0,0,.45)" }} />
+}
