@@ -1,9 +1,11 @@
-import { Menu } from "antd";
+import { Tabs } from "antd";
 import React, { Component } from "react";
 import "./start-page.scss";
 import CreateComponent from "src/components/create/create-component";
 import JoinComponent from "src/components/join/join-component";
-import { SelectParam } from "antd/lib/menu";
+import LumiContext from "src/context/lumi-context";
+
+const { TabPane } = Tabs;
 
 interface IProps {}
 interface IState {
@@ -11,35 +13,42 @@ interface IState {
 }
 
 export default class StartPage extends Component<IProps, IState> {
+  static contextType = LumiContext;
+
   state = {
     isCreate: true,
+    selectedKeys: [],
   };
 
-  onSelect = (param: SelectParam) => {
-    this.setState({
-      isCreate: param.key === "1",
+  componentDidMount() {
+    this.updateTitle();
+  }
+
+  onChange = (key: string) => {
+    this.setState(
+      {
+        isCreate: key === "1",
+      },
+      this.updateTitle
+    );
+  };
+
+  updateTitle = () => {
+    this.context.update({
+      title: this.state.isCreate ? "Create room" : "Join room",
     });
   };
 
   render() {
-    const content = this.state.isCreate ? (
-      <CreateComponent />
-    ) : (
-      <JoinComponent />
-    );
-
     return (
-      <>
-        <Menu
-          onSelect={this.onSelect}
-          defaultSelectedKeys={["1"]}
-          mode="horizontal"
-        >
-          <Menu.Item key="1">Create</Menu.Item>
-          <Menu.Item key="2">Join</Menu.Item>
-        </Menu>
-        {content}
-      </>
+      <Tabs onChange={this.onChange} type="card" defaultActiveKey="1">
+        <TabPane tab={<span>Create</span>} key="1">
+          <CreateComponent />
+        </TabPane>
+        <TabPane tab={<span>Join</span>} key="2">
+          <JoinComponent />
+        </TabPane>
+      </Tabs>
     );
   }
 }

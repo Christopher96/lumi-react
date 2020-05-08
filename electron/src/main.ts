@@ -2,6 +2,7 @@ import path from "path";
 import dotenv from "dotenv";
 import { app, BrowserWindow, App } from "electron";
 import navMenu from "./devmenu";
+import IPC from "./ipc";
 
 export default class Main {
   static mainWindow: BrowserWindow;
@@ -32,9 +33,10 @@ export default class Main {
       );
     } else {
       Main.mainWindow.loadURL("http://localhost:3000");
-      navMenu();
+      navMenu(Main.mainWindow);
     }
     Main.mainWindow.on("closed", Main.onClose);
+    IPC.init(Main.mainWindow);
   }
 
   static init() {
@@ -50,8 +52,6 @@ export default class Main {
 
     if (!process.env.SERVER_ENDPOINT)
       throw new Error("You need to configure host and port.");
-
-    console.log("hi");
 
     Main.app = app;
     Main.app.on("window-all-closed", Main.onWindowAllClosed);

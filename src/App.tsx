@@ -10,19 +10,28 @@ import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
-
-import "./colors.scss";
 import RoomFolderPage from "./pages/room-folder/room-folder-page";
+import { LumiState, LumiProvider } from "./context/lumi-context";
+import IPCListener from "./context/ipc-listener";
+import "./colors.scss";
 
-const { ipcRenderer } = window.require("electron");
+export default class App extends Component<{}, LumiState> {
+  state = {
+    title: "",
+    connected: false,
+    loading: false,
+    update: (obj: any) => {
+      this.setState({ ...obj });
+    },
+  };
 
-export default class App extends Component {
+  componentDidMount() {
+    new IPCListener(this.context, history);
+  }
+
   render() {
-    ipcRenderer.on("navigate", (page: any) => {
-      console.log(page);
-    });
     return (
-      <>
+      <LumiProvider value={this.state}>
         <Router history={history}>
           <Route path={Paths.TOP_BAR} component={TopBar} />
           <Switch>
@@ -33,10 +42,10 @@ export default class App extends Component {
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
             <Route path={Paths.ROOM_FOLDER} component={RoomFolderPage} />
-            <Redirect to={Paths.LOADING}></Redirect>
+            <Redirect to={Paths.START}></Redirect>
           </Switch>
         </Router>
-      </>
+      </LumiProvider>
     );
   }
 }
