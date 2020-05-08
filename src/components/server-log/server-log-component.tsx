@@ -1,47 +1,33 @@
 import React, { Component } from "react";
-import { Button, Timeline, message, Tooltip } from "antd";
 import IPC from "src/context/ipc";
-import { ExportOutlined } from "@ant-design/icons";
+import { Typography, Button, List, Avatar, message, Tooltip, Tag } from "antd";
+import { ExportOutlined, UserOutlined } from "@ant-design/icons";
 
 interface IProps {}
 interface IState {
-  timestamp: string;
   logs: any;
 }
 
-const key = "updatable";
+const { Title } = Typography;
 
 export default class ServerLogComponent extends Component<IProps, IState> {
-  state = { timestamp: "2020-01-01", logs: [["a", "b", "c"]] };
-
-  val1 = [
-    "2020-01-01 20:20:0:0",
-    "hej jag heter Michael och kan skriva massa logs i en string",
-  ];
-  val2 = ["2020-01-01 20:20:0:0", "hej jag testar skriva"];
-  val3 = ["2020-01-01 20:20:0:0", "hej äter mat"];
-  testTree = [this.val1, this.val2, this.val3, this.val1, this.val3];
+  state = {
+    logs: [],
+  };
 
   componentDidMount = () => {
-    IPC.fetchLogs(10).then((fetchedLogs) => {
+    IPC.fetchLogs(10).then((logs) => {
+      console.log(logs);
       this.setState({
-        logs: fetchedLogs,
+        logs,
       });
     });
   };
 
-  makeLog = (time: string, text: string, index: number) => {
-    return (
-      <Timeline.Item key={index} label={time}>
-        {text}
-      </Timeline.Item>
-    );
-  };
-
   onExport = () => {
-    message.loading({ content: "Exporting...", key });
+    message.loading({ content: "Exporting..." });
     setTimeout(() => {
-      message.success({ content: "Exported!", key, duration: 2 });
+      message.success({ content: "Exported!", duration: 2 });
     }, 1000);
   };
 
@@ -58,26 +44,32 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     </div>
   );
 
-  exportButtonOld = (
-    <div className="footer">
-      <Button onClick={this.onExport}>Export Log</Button>
-    </div>
-  );
+  makeLog = (log: any) => {
+    return (
+      <List.Item>
+        <List.Item.Meta
+          avatar={<Avatar icon={<UserOutlined />} />}
+          title={
+            <div>
+              {log.user}
+              <br />
+              <code>{log.path}</code>
+            </div>
+          }
+          description={log.date}
+        />
+        <Tag color="blue">{log.event}</Tag>
+      </List.Item>
+    );
+  };
 
   render() {
     const { logs } = this.state;
     return (
-      <>
-        <h2>Server Log:</h2>
-        <div className="log-window">
-          <Timeline mode="left">
-            {logs.map((element, index) => {
-              return this.makeLog(element[0], element[1], index);
-            })}
-          </Timeline>
-        </div>
-        {this.exportButton}
-      </>
+      <div className="container">
+        <Title level={2}>Room logs</Title>
+        <List itemLayout="horizontal">{logs.map(this.makeLog)}</List>
+      </div>
     );
   }
 }

@@ -1,26 +1,38 @@
-import { Window } from "./interfaces";
+import { Window, Room } from "./interfaces";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
 const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
-  static createRoom = (source: string): Promise<void> => {
-    return new Promise<void>((_, rej) => {
-      ipcRenderer
-        .invoke(IPCEvents.CREATE_ROOM, source)
-        .then((_: any, roomID: string) => {
-          return IPC.joinRoom(roomID, source);
-        })
-        .catch(rej);
-    });
+  static createRoom = async (context: any, source: string) => {
+    return await ipcRenderer
+      .invoke(IPCEvents.CREATE_ROOM, source)
+      .then((_: any, roomID: string) => {
+        return IPC.joinRoom(context, roomID, source);
+      });
   };
 
-  static joinRoom = (
+  static joinRoom = async (
+    context: any,
     roomID: string,
     sourceFolderPath: string
-  ): Promise<void> => {
-    return ipcRenderer.invoke(IPCEvents.JOIN_ROOM, roomID, sourceFolderPath);
+  ) => {
+    return await ipcRenderer
+      .invoke(IPCEvents.JOIN_ROOM, roomID, sourceFolderPath)
+      .then((room: Room) => {
+        console.log(room);
+        context.update({
+          room,
+          connected: true,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        context.update({
+          loading: false,
+        });
+      });
   };
 
   static selectDir = (): Promise<void> => {
@@ -39,11 +51,11 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
 
-  static openSettings = () => {
+  static openInvite = () => {
     return IPC.createWindow({
-      width: 800,
+      width: 500,
       height: 400,
-      path: Paths.SETTINGS,
+      path: Paths.INVITE,
     });
   };
 
@@ -52,6 +64,22 @@ export default class IPC {
       width: 800,
       height: 800,
       path: Paths.SERVER_LOG,
+    });
+  };
+
+  static openLeave = () => {
+    return IPC.createWindow({
+      width: 300,
+      height: 200,
+      path: Paths.LEAVE,
+    });
+  };
+
+  static openSettings = () => {
+    return IPC.createWindow({
+      width: 800,
+      height: 400,
+      path: Paths.SETTINGS,
     });
   };
 }

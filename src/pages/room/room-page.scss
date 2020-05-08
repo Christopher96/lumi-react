@@ -1,0 +1,41 @@
+.ant-tree {
+  font-size: 1.2em;
+  .ant-tree-node-content-wrapper {
+    padding: 2px 5px;
+  }
+}
+
+.bottom-menu {
+  position: absolute;
+  right: 2em;
+  bottom: 2em;
+}
+
+.tooltip {
+  margin: .3em;
+}
+
+.users {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  .userItem {
+    cursor: pointer;
+    white-space: nowrap;
+    transition: width .5s;
+    width: 60px;
+  }
+  .userItem:hover {
+    width: 250px;
+  }
+}
+
+.ant-card-body {
+  padding: 12px;
+  .ant-card-meta-title {
+    margin: 0 !important;
+  }
+  .ant-card-meta-avatar {
+    padding-top: 8px;
+  }
+}

@@ -9,19 +9,22 @@ import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
-import RoomFolderPage from "./pages/room-folder/room-folder-page";
+import RoomFolderPage from "./pages/room/room-page";
 import ServerLogPage from "./pages/server-log/server-log-page";
 
-import { LumiState, LumiProvider } from "./context/lumi-context";
+import { LumiState } from "./context/interfaces";
+import { LumiProvider } from "./context/lumi-context";
 import IPCGlobal from "./context/ipc-global";
 
-import "./colors.scss";
+import "./base.scss";
 
 export default class App extends Component<{}, LumiState> {
   state = {
-    title: "",
+    room: null,
     connected: false,
+    title: "Lumi",
     loading: false,
+    treeData: [],
     update: (obj: any) => {
       this.setState({ ...obj });
     },

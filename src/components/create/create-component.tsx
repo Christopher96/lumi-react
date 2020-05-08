@@ -26,25 +26,12 @@ export default class CreateComponent extends Component<IProps, IState> {
 
   onFinish = (values: any) => {
     if (this.context.loading || this.context.connected) return;
-
     this.context.update({
       connected: false,
       loading: true,
     });
 
-    IPC.createRoom(values.source)
-      .then(() => {
-        this.context.update({
-          source: values.source,
-          connected: true,
-          loading: false,
-        });
-      })
-      .catch(() => {
-        this.context.update({
-          loading: false,
-        });
-      });
+    IPC.createRoom(this.context, values.source);
   };
 
   onFinishFailed = (errorInfo: any) => {
@@ -55,8 +42,8 @@ export default class CreateComponent extends Component<IProps, IState> {
     const { connected, loading } = this.context;
 
     return (
-      <>
-        <Row style={{ marginTop: "2em" }} justify="start">
+      <div className="container">
+        <Row justify="start">
           <Col span={4}></Col>
           <Col span={16}>
             <Form
@@ -100,7 +87,7 @@ export default class CreateComponent extends Component<IProps, IState> {
           </Col>
           <Col span={4}></Col>
         </Row>
-      </>
+      </div>
     );
   }
 }

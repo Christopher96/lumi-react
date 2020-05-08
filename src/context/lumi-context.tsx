@@ -1,13 +1,5 @@
 import React from "react";
-
-export interface LumiState {
-  title: string;
-  connected: boolean;
-  loading: boolean;
-  treeData?: [any];
-  sourceFolder?: string;
-  update: (obj: any) => void;
-}
+import { LumiState } from "./interfaces";
 
 const LumiContext = React.createContext<LumiState | null>(null);
 
