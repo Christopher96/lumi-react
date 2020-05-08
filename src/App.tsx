@@ -3,7 +3,6 @@ import { Route, Router, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 import { history } from "./history";
 
-import TopBar from "./components/topbar/top-bar";
 import MainPage from "./pages/main/main-page";
 import LoadingPage from "./pages/loading/loading-page";
 import InvitePage from "./pages/invite/invite-page";
@@ -33,7 +32,6 @@ export default class App extends Component<{}, LumiState> {
     return (
       <LumiProvider value={this.state}>
         <Router history={history}>
-          <Route path={Paths.TOP_BAR} component={TopBar} />
           <Switch>
             <Route path={Paths.HOME} component={MainPage} />
             <Route path={Paths.START} component={StartPage} />

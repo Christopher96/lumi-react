@@ -1,9 +1,10 @@
-import { ipcMain, dialog } from "electron";
+import { ipcMain, dialog, BrowserWindow } from "electron";
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
 import { FileEvent, FileEventRequest } from "lumi-cli/dist/lib/common/types";
-import IPCEvents from "../../src/context/events";
+import IPCEvents from "../../src/context/ipc-events";
+import { Window } from "../../src/context/interfaces";
 
 export default class IPC {
   static socket: SocketIOClient.Socket;
@@ -72,6 +73,21 @@ export default class IPC {
         .join("\n");
 
       return list;
+    });
+
+    ipcMain.handle(IPCEvents.CREATE_WINDOW, async (_, window: Window) => {
+      let win = new BrowserWindow({
+        width: window.width,
+        height: window.height,
+        webPreferences: {
+          nodeIntegration: true,
+        },
+      });
+      win.on("close", () => {
+        win = null;
+      });
+      win.loadURL(process.env.URL + window.path);
+      win.show();
     });
   }
 }

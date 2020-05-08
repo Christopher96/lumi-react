@@ -1,5 +1,7 @@
-import IPCEvents from "./events";
+import { Window } from "./interfaces";
+import IPCEvents from "./ipc-events";
 import LumiContext from "src/context/lumi-context";
+import Paths from "src/pages/paths";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -14,10 +16,6 @@ export default class IPC {
     });
     this.register();
   }
-
-  static fetchLogs = (amount: number): Promise<void> => {
-    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
-  };
 
   static createRoom = (source: string): Promise<void> => {
     return new Promise<void>((_, rej) => {
@@ -41,6 +39,22 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
+  static fetchLogs = (amount: number): Promise<void> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
+  };
+
+  static createWindow = (window: Window) => {
+    return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
+  };
+
+  static openSettings = () => {
+    return IPC.createWindow({
+      width: 800,
+      height: 400,
+      path: Paths.SETTINGS,
+    });
+  };
+
   register = () => {
     ipcRenderer.on(IPCEvents.NAVIGATE, (_: any, route: string) => {
       this.history.push(route);
@@ -50,7 +64,7 @@ export default class IPC {
       this.context.update({
         connected: false,
       });
-      this.history.push("/start");
+      this.history.push(Paths.START);
     });
   };
 }
