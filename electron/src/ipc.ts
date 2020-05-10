@@ -161,7 +161,7 @@ export default class IPC {
       win.on("close", () => {
         win = null;
       });
-      win.loadURL(process.env.URL + winProps.path);
+      win.loadURL(`${process.env.URL}${winProps.path}`);
       win.show();
 
       return true;

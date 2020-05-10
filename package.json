@@ -60,18 +60,7 @@
     "rxjs": "^6.5.4",
     "socket.io-client": "^2.3.0"
   },
-  "main": "public/electron.js",
-  "build": {
-    "appId": "com.example.repo-app",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    }
-  },
-  "postinstall": "electron-builder install-app-deps && cd electron && npm i",
+  "postinstall": "cd electron && npm i",
   "homepage": "./",
   "scripts": {
     "start": "npm run electron:dev",
@@ -81,7 +70,8 @@
     "react:eject": "react-scripts eject",
     "electron:all": "concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && cd electron && npm run start\"",
     "electron:dev": "cross-env NODE_ENV=local npm run electron:all",
-    "electron:build": "npm run react-build && cd electron && cross-env NODE_ENV=production npm run build",
+    "electron:build": "npm run react:build && cd electron && cross-env NODE_ENV=production npm run pack",
+    "electron:prod": "npm run react:build && cd electron && cross-env NODE_ENV=production npm run start",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },
   "eslintConfig": {
