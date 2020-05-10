@@ -7,8 +7,10 @@ enum IPCEvents {
   CHECK_CONNECTION = "check_connection",
   FETCH_LOG = "fetch_log",
   FETCH_FOLDER = "fetch_folder",
+  FETCH_USERS = "fetch_users",
   CREATE_WINDOW = "create_window",
-  FOLDER_UPDATE = "folder_update",
+  UPDATE_FOLDER = "update_folder",
+  UPDATE_USERS = "update_users",
 }
 
 export default IPCEvents;

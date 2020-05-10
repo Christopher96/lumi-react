@@ -109,10 +109,10 @@ export default class IPC {
             }
           );
 
-          socket.on(Events.room_new_user, (user: any) => {
-            console.log(user);
-            // mainWindow.webContents.send(IPCEvents.UPDATE_USERS, treeData);
-          });
+          // socket.on(Events.room_new_user, (user: any) => {
+          //   console.log(user);
+          //   // mainWindow.webContents.send(IPCEvents.UPDATE_USERS, treeData);
+          // });
 
           IPC.connection = {
             socket,

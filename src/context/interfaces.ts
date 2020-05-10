@@ -11,7 +11,6 @@ export interface LumiState {
 export interface Room {
   source: string;
   roomId: string;
-  users: any;
 }
 
 export interface Window {

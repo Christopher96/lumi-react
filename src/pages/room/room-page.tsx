@@ -19,6 +19,7 @@ import Meta from "antd/lib/card/Meta";
 interface IProps {}
 interface IState {
   treeData: any;
+  users: any;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
@@ -26,6 +27,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
 
   state = {
     treeData: [],
+    users: [],
   };
 
   componentDidMount() {
@@ -35,7 +37,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       title: "Room",
     });
 
-    IPC.listenFolder((treeData: any) => {
+    IPC.updateFolder((treeData: any) => {
       this.setState({
         treeData,
       });
@@ -44,6 +46,20 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
+      });
+    });
+
+    IPC.updateUsers((users: any) => {
+      console.log(users);
+      this.setState({
+        users,
+      });
+    });
+
+    IPC.fetchUsers(this.context.room.roomId).then((users) => {
+      console.log(users);
+      this.setState({
+        users,
       });
     });
   }
@@ -113,15 +129,14 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    const { room } = this.context;
-    const { treeData } = this.state;
+    const { users, treeData } = this.state;
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
     ) : (
       <>
         <TopBar />
-        <div className="users">{room.users.map(this.makeUser)}</div>
+        <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">
           <DirectoryTree
             multiple

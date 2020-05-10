@@ -47,8 +47,18 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
   };
 
-  static listenFolder = (callback: (treeData: any) => any) => {
-    ipcRenderer.on(IPCEvents.FOLDER_UPDATE, (_: any, treeData: any) => {
+  static fetchUsers = (roomId: string): Promise<void> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_USERS, roomId);
+  };
+
+  static updateFolder = (callback: (treeData: any) => any) => {
+    ipcRenderer.on(IPCEvents.UPDATE_FOLDER, (_: any, treeData: any) => {
+      callback(treeData);
+    });
+  };
+
+  static updateUsers = (callback: (users: any) => any) => {
+    ipcRenderer.on(IPCEvents.UPDATE_USERS, (_: any, treeData: any) => {
       callback(treeData);
     });
   };
