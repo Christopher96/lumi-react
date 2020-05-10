@@ -71,7 +71,7 @@
       "buildResources": "assets"
     }
   },
-  "postinstall": "electron-builder install-app-deps",
+  "postinstall": "electron-builder install-app-deps && cd electron && npm i",
   "homepage": "./",
   "scripts": {
     "start": "npm run electron:dev",
