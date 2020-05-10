@@ -102,21 +102,23 @@ export default class IPC {
                 await FS.applyFileChange(source, fileChange);
 
                 const treeData = IPC.getTreeData(source);
-                mainWindow.webContents.send(IPCEvents.FOLDER_UPDATE, treeData);
+                mainWindow.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
                 console.log(`File changed: ${fileEventRequest.change.path}`);
               }
             }
           );
 
-          const users = await IPC.getUsers(roomId);
+          socket.on(Events.room_new_user, (user: any) => {
+            console.log(user);
+            // mainWindow.webContents.send(IPCEvents.UPDATE_USERS, treeData);
+          });
 
           IPC.connection = {
             socket,
             room: {
               roomId,
               source,
-              users,
             },
           };
 
@@ -141,6 +143,11 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.FETCH_FOLDER, async (_, path: string) => {
       return IPC.getTreeData(path);
+    });
+
+    ipcMain.handle(IPCEvents.FETCH_USERS, async (_, roomId: string) => {
+      const res = await API.RoomRequest.listUsersInRoom(roomId);
+      return res.users;
     });
 
     ipcMain.handle(IPCEvents.CREATE_WINDOW, async (_, winProps: Window) => {
