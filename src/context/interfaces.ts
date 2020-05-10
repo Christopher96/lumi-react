@@ -5,7 +5,6 @@ export interface LumiState {
   connected: boolean;
   title: string;
   loading: boolean;
-  treeData: any;
   update: (obj: any) => void;
 }
 

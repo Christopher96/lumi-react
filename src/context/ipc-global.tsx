@@ -29,12 +29,6 @@ export default class IPCGlobal extends Component<IProps, IState> {
         }
       });
 
-    ipcRenderer.on(IPCEvents.FOLDER_UPDATE, (_: any, treeData: any) => {
-      this.context.update({
-        treeData,
-      });
-    });
-
     ipcRenderer.on(IPCEvents.NAVIGATE, (_: any, route: string) => {
       this.props.history.push(route);
     });

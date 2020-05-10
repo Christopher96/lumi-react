@@ -47,6 +47,12 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
   };
 
+  static listenFolder = (callback: (treeData: any) => any) => {
+    ipcRenderer.on(IPCEvents.FOLDER_UPDATE, (_: any, treeData: any) => {
+      callback(treeData);
+    });
+  };
+
   static createWindow = (window: Window) => {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };

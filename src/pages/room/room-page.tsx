@@ -17,10 +17,16 @@ import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
 
 interface IProps {}
-interface IState {}
+interface IState {
+  treeData: any;
+}
 
 export default class RoomFolderPage extends Component<IProps, IState> {
   static contextType = LumiContext;
+
+  state = {
+    treeData: [],
+  };
 
   componentDidMount() {
     if (!this.context.connected) return;
@@ -29,8 +35,14 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       title: "Room",
     });
 
+    IPC.listenFolder((treeData: any) => {
+      this.setState({
+        treeData,
+      });
+    });
+
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
-      this.context.update({
+      this.setState({
         treeData,
       });
     });
@@ -101,7 +113,8 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    const { room, treeData } = this.context;
+    const { room } = this.context;
+    const { treeData } = this.state;
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
