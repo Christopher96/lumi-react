@@ -26,12 +26,21 @@ export default class Main {
       },
     });
 
-    if (process.env.NODE_ENV === "production") {
-      process.env.URL = `file://${path.join(__dirname, "../build/index.html")}`;
-    } else {
-      process.env.URL = "http://localhost:3000";
-      navMenu(Main.mainWindow);
+    switch(process.env.NODE_ENV) {
+      case "dev":
+        process.env.URL = "http://localhost:3000";
+        process.env.SERVER_ENDPOINT = "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
+      break;
+      case "local":
+        process.env.URL = "http://localhost:3000";
+        process.env.SERVER_ENDPOINT = "http://localhost:4200";
+      break;
+      case "dist":
+        process.env.URL = `file://${path.join(__dirname, "../build/index.html")}`;
+        process.env.SERVER_ENDPOINT = "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
+      break;
     }
+
     Main.mainWindow.on("closed", Main.onClose);
     Main.mainWindow.loadURL(process.env.URL);
 
@@ -39,13 +48,6 @@ export default class Main {
   }
 
   static init() {
-    if (process.env.NODE_ENV === "local") {
-      process.env.SERVER_ENDPOINT = "http://localhost:4200";
-    } else {
-      process.env.SERVER_ENDPOINT =
-        "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
-    }
-
     Main.app = app;
     Main.app.on("window-all-closed", Main.onWindowAllClosed);
     Main.app.on("ready", Main.onReady);
