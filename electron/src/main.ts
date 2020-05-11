@@ -58,3 +58,5 @@ export default class Main {
     Main.app.on("ready", Main.onReady);
   }
 }
+
+Main.init();
