@@ -1,39 +1,35 @@
 {
-  "name": "main",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/electron/src/main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist/ && tsc",
-    "start": "npm run build && electron ./dist/electron/src/main.js",
-    "dist": "npm run build && mv ../build dist/electron && electron-builder --dir"
-  },
-  "postinstall": "electron-builder install-app-deps",
-  "build": {
-    "appId": "com.example.repo-app",
-    "files": [
-      "dist/**/*",
-      "node_modules/**/*",
-      "../node_modules/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets"
+    "name": "main",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/electron/src/main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "rimraf dist/ && tsc",
+        "start": "npm run build && electron ./dist/electron/src/main.js",
+        "dist": "npm run build && mv ../build dist/electron && electron-builder --dir"
     },
-    "extends": null
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^12.12.21",
-    "@types/socket.io-client": "^1.4.32",
-    "rimraf": "^3.0.2",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.8.3",
-    "electron": "^8.2.5",
-    "electron-builder": "^22.6.0"
-  },
-  "dependencies": {
-    "lumi-cli": "0.0.37"
-  }
+    "postinstall": "electron-builder install-app-deps",
+    "build": {
+        "appId": "com.example.repo-app",
+        "files": [
+            "dist/**/*",
+            "node_modules/**/*",
+            "../node_modules/**/*"
+        ]
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^12.12.21",
+        "@types/socket.io-client": "^1.4.32",
+        "rimraf": "^3.0.2",
+        "ts-node": "^8.10.1",
+        "typescript": "^3.8.3",
+        "electron": "^8.2.5",
+        "electron-builder": "^22.6.0"
+    },
+    "dependencies": {
+        "lumi-cli": "0.0.37"
+    }
 }
