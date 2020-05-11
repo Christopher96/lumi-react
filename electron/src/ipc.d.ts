@@ -6,8 +6,8 @@ interface Connection {
 }
 export default class IPC {
     static connection: Connection;
-    static getUsers: (roomId: string) => Promise<false | any[]>;
-    static getTreeData: (path: string) => import("../../../lumi-cli/dist/lib/common/types").Tree[];
+    static getUsers: (roomId: string) => Promise<any>;
+    static getTreeData: (path: string) => any;
     static init(mainWindow: any): void;
 }
 export {};
