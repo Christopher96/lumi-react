@@ -28,10 +28,7 @@ export default class Main {
     });
 
     if (process.env.NODE_ENV === "production") {
-      process.env.URL = `file://${path.join(
-        __dirname,
-        "../build/index.html/#/start"
-      )}`;
+      process.env.URL = `file://${path.join(__dirname, "../build/index.html")}`;
     } else {
       process.env.URL = "http://localhost:3000";
       navMenu(Main.mainWindow);

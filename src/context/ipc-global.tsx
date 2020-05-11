@@ -2,15 +2,18 @@ import React, { Component } from "react";
 import LumiContext from "./lumi-context";
 import IPCEvents from "./ipc-events";
 import { Room } from "./interfaces";
+import { withRouter } from "react-router";
 
 const { ipcRenderer } = window.require("electron");
 
 interface IProps {
   history: any;
+  location: any;
+  match: any;
 }
 interface IState {}
 
-export default class IPCGlobal extends Component<IProps, IState> {
+class IPCGlobal extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   componentDidMount() {
@@ -44,3 +47,6 @@ export default class IPCGlobal extends Component<IProps, IState> {
     return <></>;
   }
 }
+
+const IPCGlobalWithRouter = withRouter(IPCGlobal);
+export default IPCGlobalWithRouter;

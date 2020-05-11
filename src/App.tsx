@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Route, Router, Redirect, Switch } from "react-router-dom";
+import { Route, HashRouter, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
-import { history } from "./history";
 
 import MainPage from "./pages/main/main-page";
 import LoadingPage from "./pages/loading/loading-page";
@@ -14,7 +13,7 @@ import ServerLogPage from "./pages/server-log/server-log-page";
 
 import { LumiState } from "./context/interfaces";
 import { LumiProvider } from "./context/lumi-context";
-import IPCGlobal from "./context/ipc-global";
+import IPCGlobalWithRouter from "./context/ipc-global";
 
 import "./base.scss";
 
@@ -33,8 +32,8 @@ export default class App extends Component<{}, LumiState> {
   render() {
     return (
       <LumiProvider value={this.state}>
-        <Router history={history}>
-          <Route path="/" history={history} component={IPCGlobal} />
+        <HashRouter hashType="slash">
+          <Route path="/" component={IPCGlobalWithRouter} />
           <Switch>
             <Route path={Paths.START} component={StartPage} />
             <Route path={Paths.ROOM} component={RoomFolderPage} />
@@ -46,7 +45,7 @@ export default class App extends Component<{}, LumiState> {
             <Route path={Paths.SERVER_LOG} component={ServerLogPage} />
             <Redirect to={Paths.START}></Redirect>
           </Switch>
-        </Router>
+        </HashRouter>
       </LumiProvider>
     );
   }

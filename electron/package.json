@@ -7,8 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist/ && tsc",
     "move": "mv ../build dist/electron",
-    "pack": "npm run move && npm run build && electron-builder --dir",
-    "dist": "npm run move && npm run build && electron-builder",
+    "pack": "npm run build && npm run move && electron-builder --dir",
+    "dist": "npm run build && npm run move && electron-builder",
+    "prod": "npm run build && npm run move && electron ./dist/electron/src/index.js",
     "start": "npm run build && electron ./dist/electron/src/index.js"
   },
   "postinstall": "electron-builder install-app-deps",
