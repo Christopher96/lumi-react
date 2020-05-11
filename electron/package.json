@@ -5,7 +5,7 @@
   "main": "build/bundle.js",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "clean": "rimraf node_modules && npm i",
+    "clean": "rimraf node_modules/lumi-cli && npm i",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "rimraf build && cross-env NODE_ENV=development webpack && electron ./build/bundle.js",
     "dist": "rimraf build && mv ../build . && cross-env NODE_ENV=production webpack && electron-builder --dir"
