@@ -70,7 +70,7 @@
     "react:eject": "react-scripts eject",
     "electron:all": "concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && cd electron && npm run start\"",
     "electron:dev": "cross-env NODE_ENV=local npm run electron:all",
-    "electron:build": "npm run react:build && cd electron && cross-env NODE_ENV=production npm run pack",
+    "electron:pack": "npm run react:build && cd electron && cross-env NODE_ENV=production npm run pack",
     "electron:prod": "npm run react:build && cd electron && cross-env NODE_ENV=production npm run prod",
     "lint:fix": "eslint './src/**/*.{ts,tsx}'"
   },
