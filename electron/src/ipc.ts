@@ -1,4 +1,3 @@
-import { ipcMain, dialog, BrowserWindow } from "electron";
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
@@ -11,6 +10,8 @@ import {
 import { FileTree } from "lumi-cli/dist/lib/common/FileTree";
 import { Window, Room } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+
+const { ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -33,7 +34,7 @@ export default class IPC {
     return new FileTree().make(path);
   };
 
-  static init(mainWindow: Electron.BrowserWindow) {
+  static init(mainWindow: any) {
     ipcMain.handle(IPCEvents.CHECK_CONNECTION, () => {
       if (IPC.connection !== undefined) {
         return IPC.connection.room;

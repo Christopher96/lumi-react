@@ -1,11 +1,12 @@
 import path from "path";
-import { app, BrowserWindow, App } from "electron";
-import navMenu from "./devmenu";
+import navMenu from "./navmenu";
 import IPC from "./ipc";
 
+const { app, BrowserWindow } = require("electron");
+
 export default class Main {
-  static mainWindow: BrowserWindow;
-  static app: App;
+  static mainWindow: any;
+  static app: any;
 
   private static onWindowAllClosed() {
     if (process.platform !== "darwin") {
@@ -26,23 +27,22 @@ export default class Main {
       },
     });
 
-    switch(process.env.NODE_ENV) {
-      case "dev":
-        process.env.URL = "http://localhost:3000";
-        process.env.SERVER_ENDPOINT = "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
-      break;
-      case "local":
-        process.env.URL = "http://localhost:3000";
-        process.env.SERVER_ENDPOINT = "http://localhost:4200";
-      break;
-      case "dist":
-        process.env.URL = `file://${path.join(__dirname, "../build/index.html")}`;
-        process.env.SERVER_ENDPOINT = "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
-      break;
+    if (process.env.NODE_ENV === "development") {
+      process.env.URL = "http://localhost:3000";
+      navMenu(Main.mainWindow);
+    } else {
+      process.env.URL = `file://${path.resolve(
+        "resources/app.asar/build/index.html"
+      )}`;
     }
 
-    Main.mainWindow.on("closed", Main.onClose);
+    const local = false;
+    process.env.SERVER_ENDPOINT = local
+      ? "http://localhost:3000"
+      : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
+
     Main.mainWindow.loadURL(process.env.URL);
+    Main.mainWindow.on("closed", Main.onClose);
 
     IPC.init(Main.mainWindow);
   }
@@ -53,5 +53,3 @@ export default class Main {
     Main.app.on("ready", Main.onReady);
   }
 }
-
-Main.init();
