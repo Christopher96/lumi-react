@@ -17,7 +17,8 @@
     "appId": "com.example.repo-app",
     "files": [
       "dist/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "../node_modules/**/*"
     ],
     "directories": {
       "buildResources": "assets"

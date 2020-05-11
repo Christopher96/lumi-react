@@ -1,5 +1,4 @@
 import path from "path";
-import dotenv from "dotenv";
 import { app, BrowserWindow, App } from "electron";
 import navMenu from "./devmenu";
 import IPC from "./ipc";
@@ -41,17 +40,11 @@ export default class Main {
 
   static init() {
     if (process.env.NODE_ENV === "local") {
-      dotenv.config({
-        path: path.resolve(process.cwd(), ".env.local"),
-      });
+      process.env.SERVER_ENDPOINT = "http://localhost:4200";
     } else {
-      dotenv.config({
-        path: path.resolve(process.cwd(), ".env"),
-      });
+      process.env.SERVER_ENDPOINT =
+        "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
     }
-
-    if (!process.env.SERVER_ENDPOINT)
-      throw new Error("You need to configure host and port.");
 
     Main.app = app;
     Main.app.on("window-all-closed", Main.onWindowAllClosed);
