@@ -5,9 +5,10 @@
   "main": "dist/electron/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist/ && tsc && mv ../build dist/electron",
-    "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
+    "build": "rimraf dist/ && tsc",
+    "move": "mv ../build dist/electron",
+    "pack": "npm run move && npm run build && electron-builder --dir",
+    "dist": "npm run move && npm run build && electron-builder",
     "start": "npm run build && electron ./dist/electron/src/index.js"
   },
   "postinstall": "electron-builder install-app-deps",
