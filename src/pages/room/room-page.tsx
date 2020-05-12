@@ -15,6 +15,7 @@ import { Redirect } from "react-router-dom";
 
 import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
+import { UserData } from "src/context/interfaces";
 
 interface IProps {}
 interface IState {
@@ -43,25 +44,26 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
+    console.log(this.context);
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
       });
     });
 
-    IPC.updateUsers((users: any) => {
-      console.log(users);
+    /*
+    IPC.updateUsers((users: [UserData]) => {
       this.setState({
         users,
       });
     });
 
-    IPC.fetchUsers(this.context.room.roomId).then((users) => {
-      console.log(users);
+    IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
       this.setState({
         users,
       });
     });
+     */
   }
 
   openInvite() {
@@ -119,7 +121,17 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       <div className="userItem">
         <Card>
           <Meta
-            avatar={<Avatar icon={<UserOutlined />} />}
+            avatar={
+              <Avatar
+                icon={
+                  user.avatar ? (
+                    <img alt="avatar" src={user.avatar} />
+                  ) : (
+                    <UserOutlined />
+                  )
+                }
+              />
+            }
             title={user.username}
             description={user.id}
           />

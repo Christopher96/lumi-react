@@ -1,4 +1,4 @@
-import { Window, Room } from "./interfaces";
+import { Window, RoomData, UserData } from "./interfaces";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
@@ -13,22 +13,19 @@ export default class IPC {
       });
   };
 
-  static joinRoom = async (
-    context: any,
-    roomID: string,
-    sourceFolderPath: string
-  ) => {
+  static joinRoom = async (context: any, roomID: string, source: string) => {
     return await ipcRenderer
-      .invoke(IPCEvents.JOIN_ROOM, roomID, sourceFolderPath)
-      .then((room: Room) => {
-        console.log(room);
-        context.update({
-          room,
-          connected: true,
-          loading: false,
-        });
+      .invoke(IPCEvents.JOIN_ROOM, roomID, source)
+      .then((room: RoomData) => {
+        if (room) {
+          context.update({
+            room,
+            connected: true,
+            loading: false,
+          });
+        }
       })
-      .catch(() => {
+      .finally(() => {
         context.update({
           loading: false,
         });
@@ -47,18 +44,18 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
   };
 
-  static fetchUsers = (roomId: string): Promise<void> => {
+  static fetchUsers = (roomId: string): Promise<[UserData]> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_USERS, roomId);
+  };
+
+  static updateUsers = (callback: (users: [UserData]) => void) => {
+    ipcRenderer.on(IPCEvents.UPDATE_USERS, (_: any, users: [UserData]) => {
+      callback(users);
+    });
   };
 
   static updateFolder = (callback: (treeData: any) => any) => {
     ipcRenderer.on(IPCEvents.UPDATE_FOLDER, (_: any, treeData: any) => {
-      callback(treeData);
-    });
-  };
-
-  static updateUsers = (callback: (users: any) => any) => {
-    ipcRenderer.on(IPCEvents.UPDATE_USERS, (_: any, treeData: any) => {
       callback(treeData);
     });
   };
