@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import DirectoryTree from "antd/lib/tree/DirectoryTree";
-import { Button, Tooltip, Row, Card, Avatar } from "antd";
+import { Button, Tooltip, Row, Card, Avatar, Tree } from "antd";
 import {
   UserAddOutlined,
   FileTextOutlined,
   ArrowRightOutlined,
   UserOutlined,
+  MehOutlined,
+  SmileOutlined,
+  FrownFilled,
 } from "@ant-design/icons";
 import Paths from "../paths";
 import TopBar from "src/components/topbar/top-bar";
@@ -29,6 +32,32 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     treeData: [],
     users: [],
   };
+  /*
+  treeData2 = [
+    {
+      title: "parent 1",
+      key: "0-0",
+      icon: <> </>,
+      children: [
+        {
+          title: "leaf",
+          key: "0-0-0",
+          icon: <> </>,
+        },
+        {
+          title: "leaf.txt",
+          key: "0-0-1",
+          icon: <Avatar className="smallAvatar" icon={<UserOutlined />} />,
+        },
+      ],
+    },
+  ];
+
+  applyAvatars = (treeData: any, path: string, avatar: any) => {
+    console.log("apply avatars");
+    const pathTest = "";
+    avatar = 
+  };*/
 
   componentDidMount() {
     if (!this.context.connected) return;
@@ -138,9 +167,10 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         <TopBar />
         <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">
-          <DirectoryTree
-            multiple
+          <Tree
             defaultExpandAll
+            showIcon
+            showLine
             onSelect={this.onSelect}
             onExpand={this.onExpand}
             treeData={treeData}

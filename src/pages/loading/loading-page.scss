@@ -4,12 +4,18 @@
   height: 400px;
 }
 
+.bottomCenter {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
 .lumiFish {
   animation-name: lumiAnim;
   animation-duration: 4s;
   animation-iteration-count: infinite;
   left: 50%;
-  top: 60%;
+  top: 40%;
   position: absolute;
   width: 300px;
   transform: translate(-50%, -50%);
@@ -17,6 +23,7 @@
   height: 400px;
   overflow: hidden;
   color: #ffffff;
+  transform-origin: center;
 }
 
 @keyframes lumiAnim {
@@ -25,20 +32,17 @@
     height: 240px;
     -webkit-filter: drop-shadow(3px 3px 2px black);
     filter: drop-shadow(3px 3px 2px black);
-    top: 50%;
   }
   50% {
     width: 400px;
     height: 400px;
     -webkit-filter: drop-shadow(10px 10px 10px black);
     filter: drop-shadow(10px 10px 10px black);
-    top: 45%;
   }
   100% {
     width: 240px;
     height: 240px;
     -webkit-filter: drop-shadow(3px 3px 2px black);
     filter: drop-shadow(3px 3px 2px black);
-    top: 50%;
   }
 }
