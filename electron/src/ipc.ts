@@ -1,6 +1,8 @@
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
+import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
+import fse from 'fs-extra';
 import {
   FileEvent,
   FileEventRequest,
@@ -187,5 +189,22 @@ export default class IPC {
 
       return true;
     });
+
+    ipcMain.handle(IPCEvents.SELECT_AVATAR, async () => {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        filters: [{ name: "Images", extensions: ["jpg", "png"] }],
+      });
+      return result.filePaths[0];
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_USER_SETTINGS,
+      async (_, avatarPath: string, username: string) => {
+        const config: IConfig = await Config.get();
+        config.avatar = fse.readFileSync(avatarPath);
+        config.username = username;
+        Config.update(config);
+      }
+    );
   }
 }

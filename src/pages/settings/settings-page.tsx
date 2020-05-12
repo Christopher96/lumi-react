@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Menu, Button, message } from "antd";
+import { Row, Col, Menu, message } from "antd";
 import "./settings-page.scss";
 import UserSettings from "src/components/settings-components/user-settings";
 import { ClickParam } from "antd/lib/menu";
@@ -65,17 +65,6 @@ export default class SettingsPage extends Component<IProps, IState> {
           </Col>
           <Col span={16} push={2}>
             <div className="option-box">{activeItem}</div>
-          </Col>
-        </Row>
-        <br />
-        <Row>
-          <Col span={4} push={16}>
-            <Button>Cancel</Button>
-          </Col>
-          <Col span={4} push={16}>
-            <Button type="primary" onClick={this.onApply}>
-              Apply
-            </Button>
           </Col>
         </Row>
       </div>

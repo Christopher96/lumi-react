@@ -1,89 +1,80 @@
 import React, { Component } from "react";
-import { Row, Col, Input, Upload } from "antd";
+import { Form, Input, Button, message } from "antd";
 import "./settings-components.scss";
+import { FolderOutlined } from "@ant-design/icons";
+import IPC from "src/context/ipc";
+
+const { Search } = Input;
 
 interface IProps {}
 interface IState {}
 
-function getBase64(img: Blob, callback: any) {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
-
-function beforeUpload(file: any) {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    console.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    console.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
-}
-
 export default class UserSettings extends Component<IProps, IState> {
-  state = { imageUrl: "", loading: false };
+  private form: any = React.createRef();
 
-  handleChange = (info: any) => {
-    if (info.file.status === "uploading") {
-      console.log("uploading");
-      return this.setState({ loading: true });
-    }
-    if (info.file.status === "done") {
-      console.log("done");
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl: any) =>
-        this.setState({
-          imageUrl: imageUrl,
-          loading: false,
-        })
-      );
-    }
+  selectAvatar = () => {
+    IPC.selectAvatar().then((path) => {
+      this.form.current.setFieldsValue({
+        avatar: path,
+      });
+    });
+  };
+
+  onFinish = (values: any) => {
+    IPC.saveUserSettings(values.avatar, values.username);
+    message.success(`${values.avatar} : ${values.username}`);
+  };
+
+  onFinishFailed = () => {
+    message.error('Could not save user settings');
   };
 
   render() {
-    const { imageUrl } = this.state;
     return (
       <div>
-        <Row>
-          <Col span={10}>Change Avatar:</Col>
-          <Col span={14}>
-            <div className="change-avatar">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                beforeUpload={beforeUpload}
-                onChange={this.handleChange}
-              >
-                {imageUrl ? (
-                  <img src={imageUrl} alt="avatar" />
-                ) : (
-                  <div>
-                    <div className="ant-upload-text">Upload</div>
-                  </div>
-                )}
-              </Upload>
-            </div>
-          </Col>
-        </Row>
-        <br />
-        <Row>
-          <Col span={10}>Change username:</Col>
-          <Col span={14}>
-            <Input placeholder="new username" />
-          </Col>
-        </Row>
-        <br />
-        <Row>
-          <Col span={10}>Change password:</Col>
-          <Col span={14}>
-            <Input.Password placeholder="new password" />
-          </Col>
-        </Row>
+        <Form
+          name="user_settings"
+          ref={this.form}
+          initialValues={{ remember: true }}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          <Form.Item
+            label="Avatar"
+            name="avatar"
+            rules={[
+              {
+                required: true,
+                message: "You need to select an avatar",
+              },
+            ]}
+          >
+            <Search
+              enterButton={
+                <>
+                  <span>Open</span>
+                  <FolderOutlined />
+                </>
+              }
+              placeholder="Enter an avatar path..."
+              onSearch={this.selectAvatar}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     );
   }

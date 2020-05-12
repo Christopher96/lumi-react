@@ -36,6 +36,10 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
+  static selectAvatar = (): Promise<void> => {
+    return ipcRenderer.invoke(IPCEvents.SELECT_AVATAR);
+  };
+
   static fetchLogs = (amount: number): Promise<void> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
   };
@@ -63,6 +67,10 @@ export default class IPC {
   static createWindow = (window: Window) => {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
+
+  static saveUserSettings = (avatarPath: string, username: string) => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_USER_SETTINGS, avatarPath, username);
+  }
 
   static openInvite = () => {
     return IPC.createWindow({
