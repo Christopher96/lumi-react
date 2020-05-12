@@ -63,7 +63,7 @@
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
-    "postinstall": "cd electron && npm r lumi-cli && npm i",
+    "postinstall": "cd electron && npm r lumi-cli && npm i lumi-cli && npm i",
     "react:start": "react-app-rewired start",
     "react:build": "react-app-rewired build",
     "react:test": "react-app-rewired test",
