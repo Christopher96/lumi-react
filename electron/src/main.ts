@@ -31,11 +31,14 @@ export default class Main {
       process.env.URL = "http://localhost:3000";
       navMenu(Main.mainWindow);
     } else {
-      process.env.URL = `file://${path.join(
-        process.cwd(),
-        "resources/app.asar/build/index.html"
+      process.env.URL = `file://${path.resolve(
+        process.execPath,
+        "../resources/app.asar/build/index.html"
       )}`;
     }
+
+    console.log(process.execPath);
+    console.log(process.env.URL);
 
     const local = false;
     process.env.SERVER_ENDPOINT = local
