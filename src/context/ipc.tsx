@@ -44,7 +44,7 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
   };
 
-  static fetchUsers = (roomId: string): Promise<[UserData]> => {
+  static fetchUsers = (roomId: string): Promise<any> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_USERS, roomId);
   };
 
@@ -62,6 +62,40 @@ export default class IPC {
 
   static createWindow = (window: Window) => {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
+  };
+
+  static notfiy = (title: string, body?: any) => {
+    navigator.serviceWorker.ready.then(() => {
+      navigator.serviceWorker.getRegistration().then((registration: any) => {
+        console.log(registration);
+        registration.showNotification(title, {
+          body,
+          actions: [
+            {
+              action: "yes",
+              title: "Yes",
+            },
+          ],
+        });
+
+        window.addEventListener(
+          "notificationclick",
+          function(event: any) {
+            event.notification.close();
+            if (event.action === "yes") {
+              // Archive action was clicked
+              window.alert("yes");
+            } else {
+              window.alert("no");
+            }
+          },
+          {
+            capture: false,
+            once: true,
+          }
+        );
+      });
+    });
   };
 
   static openInvite = () => {

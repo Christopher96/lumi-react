@@ -35,7 +35,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: "Room",
+      title: `Room ${this.context.room.roomId}`,
     });
 
     IPC.updateFolder((treeData: any) => {
@@ -44,14 +44,12 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
-    console.log(this.context);
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
       });
     });
 
-    /*
     IPC.updateUsers((users: [UserData]) => {
       this.setState({
         users,
@@ -63,7 +61,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         users,
       });
     });
-     */
   }
 
   openInvite() {

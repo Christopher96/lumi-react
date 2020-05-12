@@ -2,7 +2,7 @@ import path from "path";
 import navMenu from "./navmenu";
 import IPC from "./ipc";
 
-const { app, BrowserWindow } = require("electron");
+const { ipc, app, BrowserWindow } = require("electron");
 
 export default class Main {
   static mainWindow: any;
@@ -37,15 +37,15 @@ export default class Main {
       )}`;
     }
 
-    const local = true;
+    const local = false;
     process.env.SERVER_ENDPOINT = local
       ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
 
+    IPC.init(Main.mainWindow);
+
     Main.mainWindow.loadURL(process.env.URL);
     Main.mainWindow.on("closed", Main.onClose);
-
-    IPC.init(Main.mainWindow);
   }
 
   static init() {

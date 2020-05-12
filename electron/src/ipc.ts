@@ -20,7 +20,12 @@ interface Connection {
 }
 
 export default class IPC {
+  static win: any;
   static connection: Connection;
+
+  static notify(title: string, body?: string) {
+    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  }
 
   static getUsers = async (roomId: string) => {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
@@ -37,6 +42,8 @@ export default class IPC {
   };
 
   static init(mainWindow: any) {
+    IPC.win = mainWindow;
+
     ipcMain.handle(IPCEvents.CHECK_CONNECTION, () => {
       if (IPC.connection !== undefined) {
         return IPC.connection.room;
@@ -46,7 +53,7 @@ export default class IPC {
     });
 
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
-      const result = await dialog.showOpenDialog(mainWindow, {
+      const result = await dialog.showOpenDialog(IPC.win, {
         properties: ["openDirectory"],
       });
       return result.filePaths[0];
@@ -77,7 +84,7 @@ export default class IPC {
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
-          mainWindow.webContents.send(IPCEvents.DISCONNECTED);
+          IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
         socket.emit(Events.room_join, roomId);
@@ -114,12 +121,9 @@ export default class IPC {
 
                   const treeData = IPC.getTreeData(source);
 
-                  mainWindow.webContents.send(
-                    IPCEvents.UPDATE_FOLDER,
-                    treeData
-                  );
+                  IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
-                  console.log(`File changed: ${fileEventRequest.change.path}`);
+                  IPC.notify(`File changed: ${fileEventRequest.change.path}`);
                 }
               }
             );
@@ -127,7 +131,7 @@ export default class IPC {
             socket.on(
               Events.room_users_update_res,
               (eventData: RoomChangedEvent) => {
-                mainWindow.webContents.send(
+                IPC.win.webContents.send(
                   IPCEvents.UPDATE_USERS,
                   eventData.users
                 );

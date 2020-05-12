@@ -3,6 +3,7 @@ import LumiContext from "./lumi-context";
 import IPCEvents from "./ipc-events";
 import { RoomData } from "./interfaces";
 import { withRouter } from "react-router";
+import IPC from "./ipc";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -41,6 +42,12 @@ class IPCGlobal extends Component<IProps, IState> {
         connected: false,
       });
     });
+
+    ipcRenderer.on(IPCEvents.NOTIFICATION, (title: string, body?: string) => {
+      IPC.notfiy(title, body);
+    });
+
+    IPC.notfiy("hello", "hello");
   }
 
   render() {
