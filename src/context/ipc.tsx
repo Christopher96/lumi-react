@@ -64,7 +64,13 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
 
-  static notfiy = (title: string, body?: any) => {
+  static notify = (title: string, body?: any) => {
+    const notif = new Notification(title, {
+      body,
+    });
+  };
+
+  static SWnotify = (title: string, body?: any) => {
     navigator.serviceWorker.ready.then(() => {
       navigator.serviceWorker.getRegistration().then((registration: any) => {
         console.log(registration);

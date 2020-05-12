@@ -44,10 +44,10 @@ class IPCGlobal extends Component<IProps, IState> {
     });
 
     ipcRenderer.on(IPCEvents.NOTIFICATION, (title: string, body?: string) => {
-      IPC.notfiy(title, body);
+      IPC.notify(title, body);
     });
 
-    IPC.notfiy("hello", "hello");
+    IPC.notify("hello", "hello");
   }
 
   render() {
