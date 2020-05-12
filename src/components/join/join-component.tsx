@@ -17,6 +17,7 @@ export default class JoinComponent extends Component<IProps, IState> {
   form: any = React.createRef();
 
   selectDir = () => {
+  
     IPC.selectDir().then((path) => {
       this.form.current.setFieldsValue({
         source: path,
@@ -25,6 +26,7 @@ export default class JoinComponent extends Component<IProps, IState> {
   };
 
   onFinish = (values: any) => {
+
     if (this.context.loading || this.context.connected) return;
     this.context.update({
       connected: false,

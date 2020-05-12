@@ -5,6 +5,8 @@ import Paths from "src/pages/paths";
 const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
+  static registration: ServiceWorkerRegistration;
+
   static createRoom = async (context: any, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
@@ -65,43 +67,53 @@ export default class IPC {
   };
 
   static notify = (title: string, body?: any) => {
-    const notif = new Notification(title, {
-      body,
+    new Promise((res, rej) => {
+      if(window.Notification.permission === "granted") {
+        res();
+      } 
+      window.Notification.requestPermission().then((permission) => {
+        if(permission === "granted") {
+          res();
+        } else {
+          rej();
+        }
+      })
+    }).then(() => {
+      console.log("saft");
+
+      const notif = new window.Notification(title, {
+        body,
+      });
     });
   };
 
   static SWnotify = (title: string, body?: any) => {
-    navigator.serviceWorker.ready.then(() => {
-      navigator.serviceWorker.getRegistration().then((registration: any) => {
-        console.log(registration);
-        registration.showNotification(title, {
-          body,
-          actions: [
-            {
-              action: "yes",
-              title: "Yes",
-            },
-          ],
-        });
-
-        window.addEventListener(
-          "notificationclick",
-          function(event: any) {
-            event.notification.close();
-            if (event.action === "yes") {
-              // Archive action was clicked
-              window.alert("yes");
-            } else {
-              window.alert("no");
-            }
-          },
-          {
-            capture: false,
-            once: true,
-          }
-        );
-      });
+    IPC.registration.showNotification(title, {
+      body,
+      actions: [
+        {
+          action: "yes",
+          title: "Yes",
+        },
+      ],
     });
+
+    window.addEventListener(
+      "notificationclick",
+      function(event: any) {
+        event.notification.close();
+        if (event.action === "yes") {
+          // Archive action was clicked
+          window.alert("yes");
+        } else {
+          window.alert("no");
+        }
+      },
+      {
+        capture: false,
+        once: true,
+      }
+    );
   };
 
   static openInvite = () => {

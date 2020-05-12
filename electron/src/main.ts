@@ -2,7 +2,7 @@ import path from "path";
 import navMenu from "./navmenu";
 import IPC from "./ipc";
 
-const { ipc, app, BrowserWindow } = require("electron");
+const { app, BrowserWindow } = require("electron");
 
 export default class Main {
   static mainWindow: any;

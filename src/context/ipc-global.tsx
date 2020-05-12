@@ -47,7 +47,6 @@ class IPCGlobal extends Component<IProps, IState> {
       IPC.notify(title, body);
     });
 
-    IPC.notify("hello", "hello");
   }
 
   render() {

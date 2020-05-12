@@ -17,6 +17,8 @@ export default class CreateComponent extends Component<IProps, IState> {
   form: any = React.createRef();
 
   selectDir = () => {
+    IPC.SWnotify("hello", "hello");
+    return;
     IPC.selectDir().then((path) => {
       this.form.current.setFieldsValue({
         source: path,
