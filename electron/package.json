@@ -7,7 +7,8 @@
         "postinstall": "electron-builder install-app-deps",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "rimraf build && cross-env NODE_ENV=development webpack && electron ./build/bundle.js",
-        "dist": "rimraf build && mv ../build . && cross-env NODE_ENV=production webpack && electron-builder --dir"
+        "dist": "rimraf build && mv ../build . && cross-env NODE_ENV=production webpack && electron-builder --dir",
+        "webpack": "webpack"
     },
     "build": {
         "appId": "com.example.lumi",
