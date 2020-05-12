@@ -31,7 +31,8 @@ export default class Main {
       process.env.URL = "http://localhost:3000";
       navMenu(Main.mainWindow);
     } else {
-      process.env.URL = `file://${path.resolve(
+      process.env.URL = `file://${path.join(
+        process.cwd(),
         "resources/app.asar/build/index.html"
       )}`;
     }
