@@ -2,10 +2,10 @@ import path from "path";
 import navMenu from "./navmenu";
 import IPC from "./ipc";
 
-const { app, BrowserWindow } = require("electron");
+import { app, BrowserWindow } from "electron";
 
 export default class Main {
-  static mainWindow: any;
+  static mainWindow: BrowserWindow;
   static app: any;
 
   private static onWindowAllClosed() {
@@ -23,26 +23,26 @@ export default class Main {
       width: 900,
       height: 680,
       webPreferences: {
-        nodeIntegration: true,
-      },
+        nodeIntegration: true
+      }
     });
 
-    if (process.env.NODE_ENV === "development") {
-      process.env.URL = "http://localhost:3000";
-      navMenu(Main.mainWindow);
-    } else {
-      process.env.URL = `file://${path.resolve(
-        process.execPath,
-        "../resources/app.asar/build/index.html"
-      )}`;
-    }
-
-    const local = true;
+    const local = false;
     process.env.SERVER_ENDPOINT = local
       ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
 
-    Main.mainWindow.loadURL(process.env.URL);
+    if (process.env.NODE_ENV === "development") {
+      //
+      process.env.URL = "http://localhost:3000";
+      navMenu(Main.mainWindow);
+      Main.mainWindow.loadURL(process.env.URL);
+      //
+    } else {
+      //
+      Main.mainWindow.loadFile("./build/index.html");
+    }
+
     Main.mainWindow.on("closed", Main.onClose);
 
     IPC.init(Main.mainWindow);
