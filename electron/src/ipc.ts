@@ -11,6 +11,7 @@ import {
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+import { LogsQueryParams } from "lumi-cli/dist/api/routes/LogsRequest";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
 
@@ -150,17 +151,22 @@ export default class IPC {
       }
     );
 
-    ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
-      const res = await API.LogsRequest.getAllLogs(amount);
-      return res.logs.map((l) => {
-        return {
-          event: l.event,
-          user: l.byWhom?.username || "Unknown",
-          date: new Date(l.date).toLocaleString(),
-          path: l.body?.path || "",
-        };
-      });
-    });
+    ipcMain.handle(
+      IPCEvents.FETCH_LOG,
+      async (_, amount: number, offset?: number) => {
+        //const logParams: LogsQueryParams = { offset: offset.toString() };
+        const res = await API.LogsRequest.getAllLogs(amount);
+
+        return res.logs.map((l) => {
+          return {
+            event: l.event,
+            user: l.byWhom?.username || "Unknown",
+            date: new Date(l.date).toLocaleString(),
+            path: l.body?.path || "",
+          };
+        });
+      }
+    );
 
     ipcMain.handle(IPCEvents.FETCH_FOLDER, async (_, path: string) => {
       return IPC.getTreeData(path);

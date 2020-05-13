@@ -36,7 +36,7 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
-  static fetchLogs = (amount: number): Promise<void> => {
+  static fetchLogs = (amount: number, offset?: number): Promise<void> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
   };
 
