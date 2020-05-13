@@ -37,12 +37,9 @@ export default class Main {
       )}`;
     }
 
-    console.log(process.execPath);
-    console.log(process.env.URL);
-
     const local = false;
     process.env.SERVER_ENDPOINT = local
-      ? "http://localhost:3000"
+      ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
 
     Main.mainWindow.loadURL(process.env.URL);
