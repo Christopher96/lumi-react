@@ -2,7 +2,7 @@ import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
 import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
-import fse from 'fs-extra';
+import fse from "fs-extra";
 import {
   FileEvent,
   FileEventRequest,
@@ -198,12 +198,21 @@ export default class IPC {
     });
 
     ipcMain.handle(
-      IPCEvents.SAVE_USER_SETTINGS,
+      IPCEvents.SAVE_SETTINGS,
       async (_, avatarPath: string, username: string) => {
         const config: IConfig = await Config.get();
-        config.avatar = fse.readFileSync(avatarPath);
-        config.username = username;
+        if (avatarPath === null) config.avatar = null;
+        else if (avatarPath !== undefined)
+          config.avatar = await fse.readFile(avatarPath);
+        if (username !== undefined) config.username = username;
         Config.update(config);
+      }
+    );
+
+    ipcMain.handle(
+      IPCEvents.FETCH_SETTINGS,
+      async (_): Promise<IConfig> => {
+        return Config.get();
       }
     );
   }

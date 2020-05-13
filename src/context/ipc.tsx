@@ -1,4 +1,5 @@
 import { Window, RoomData, UserData } from "./interfaces";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
@@ -36,7 +37,7 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
-  static selectAvatar = (): Promise<void> => {
+  static selectAvatar = (): Promise<string> => {
     return ipcRenderer.invoke(IPCEvents.SELECT_AVATAR);
   };
 
@@ -68,9 +69,15 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
 
-  static saveUserSettings = (avatarPath: string, username: string) => {
-    return ipcRenderer.invoke(IPCEvents.SAVE_USER_SETTINGS, avatarPath, username);
-  }
+  static saveSettings = (avatarPath: string, username: string): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_SETTINGS, avatarPath, username).then(() => {
+      return IPC.fetchSettings();
+    });
+  };
+
+  static fetchSettings = (): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_SETTINGS);
+  };
 
   static openInvite = () => {
     return IPC.createWindow({

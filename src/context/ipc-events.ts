@@ -12,7 +12,8 @@ enum IPCEvents {
   UPDATE_FOLDER = "update_folder",
   UPDATE_USERS = "update_users",
   SELECT_AVATAR = "select_avatar",
-  SAVE_USER_SETTINGS = "save_user_settings"
+  SAVE_SETTINGS = "save_settings",
+  FETCH_SETTINGS = "fetch_settings"
 }
 
 export default IPCEvents;

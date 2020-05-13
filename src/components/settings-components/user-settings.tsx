@@ -1,16 +1,30 @@
 import React, { Component } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button, message, Row, Avatar } from "antd";
 import "./settings-components.scss";
-import { FolderOutlined } from "@ant-design/icons";
+import { FolderOutlined, UserOutlined } from "@ant-design/icons";
 import IPC from "src/context/ipc";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
+import { ProfilePicture } from "../image/profile-picture";
 
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
 
-export default class UserSettings extends Component<IProps, IState> {
+export default class UserSettings extends Component<IProps, IConfig> {
   private form: any = React.createRef();
+
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+    };
+  }
+
+  componentDidMount() {
+    IPC.fetchSettings().then((config: IConfig) => {
+      this.setState(config);
+    });
+  }
 
   selectAvatar = () => {
     IPC.selectAvatar().then((path) => {
@@ -20,18 +34,36 @@ export default class UserSettings extends Component<IProps, IState> {
     });
   };
 
+  deselectAvatar = () => {
+    this.form.current.setFieldsValue({
+      avatar: null,
+    });
+    this.setState({ avatar: undefined });
+  };
+
   onFinish = (values: any) => {
-    IPC.saveUserSettings(values.avatar, values.username);
-    message.success(`${values.avatar} : ${values.username}`);
+    IPC.saveSettings(values.avatar, values.username)
+      .then((config: IConfig) => {
+        this.setState(config);
+        message.success("Changes saved!");
+      })
+      .catch(() => {
+        message.error("Check that the avatar path is correct");
+      });
   };
 
   onFinishFailed = () => {
-    message.error('Could not save user settings');
+    message.error("Could not save user settings");
   };
 
   render() {
     return (
       <div>
+        <Row>
+          <ProfilePicture image={this.state.avatar} size={128} alt="profile" />
+          <Button onClick={this.deselectAvatar}>Remove</Button>
+        </Row>
+
         <Form
           name="user_settings"
           ref={this.form}
@@ -44,7 +76,6 @@ export default class UserSettings extends Component<IProps, IState> {
             name="avatar"
             rules={[
               {
-                required: true,
                 message: "You need to select an avatar",
               },
             ]}
@@ -64,9 +95,9 @@ export default class UserSettings extends Component<IProps, IState> {
           <Form.Item
             label="Username"
             name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            rules={[{ message: "Please input your username!" }]}
           >
-            <Input />
+            <Input placeholder={this.state.username} />
           </Form.Item>
 
           <Form.Item>
