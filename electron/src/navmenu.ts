@@ -22,25 +22,7 @@ const navMenu = (win: any): any => {
     submenu,
   });
 
-  const test = new MenuItem({
-    label: "Test",
-    submenu: [
-      {
-        label: "Popup",
-        click() {
-          let myNotification = new Notification("Title", {
-            body: "Lorem Ipsum Dolor Sit Amet",
-          });
-          myNotification.onclick = () => {
-            console.log("Notification clicked");
-          };
-        },
-      },
-    ],
-  });
-
   menu.append(navItem);
-  menu.append(test);
   Menu.setApplicationMenu(menu);
 };
 

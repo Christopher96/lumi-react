@@ -50,10 +50,6 @@ export default class CreateComponent extends Component<IProps, IState> {
     });
   };
 
-  onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-
   render() {
     const { connected, loading } = this.context;
     const { error } = this.state;
@@ -76,7 +72,6 @@ export default class CreateComponent extends Component<IProps, IState> {
               name="basic"
               initialValues={{ remember: true }}
               onFinish={this.onFinish}
-              onFinishFailed={this.onFinishFailed}
             >
               {errorAlert}
               <FormItem

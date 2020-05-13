@@ -6,7 +6,6 @@ import {
   FileEventRequest,
   IPatch,
   IFileChange,
-  RoomChangedEvent,
 } from "lumi-cli/dist/lib/common/types";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
@@ -21,7 +20,12 @@ interface Connection {
 }
 
 export default class IPC {
+  static win: any;
   static connection: Connection;
+
+  static notify(title: string, body?: string) {
+    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  }
 
   static getUsers = async (roomId: string) => {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
@@ -38,6 +42,8 @@ export default class IPC {
   };
 
   static init(mainWindow: any) {
+    IPC.win = mainWindow;
+
     ipcMain.handle(IPCEvents.CHECK_CONNECTION, () => {
       if (IPC.connection !== undefined) {
         return IPC.connection.room;
@@ -47,7 +53,7 @@ export default class IPC {
     });
 
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
-      const result = await dialog.showOpenDialog(mainWindow, {
+      const result = await dialog.showOpenDialog(IPC.win, {
         properties: ["openDirectory"],
       });
       return result.filePaths[0];
@@ -91,10 +97,10 @@ export default class IPC {
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
-          mainWindow.webContents.send(IPCEvents.DISCONNECTED);
+          IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
-        const joinWait = async (resolve) => {
+        const joinWait = async (resolve: any) => {
           setInterval(() => {
             resolve({
               error: `Timed out`,
@@ -108,7 +114,6 @@ export default class IPC {
           });
 
           socket.once(Events.room_join_res, async () => {
-            console.log("hello");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
             await FS.createShadow(source, zippedRoom);
 
@@ -116,6 +121,11 @@ export default class IPC {
               socket.emit(Events.room_file_change, {
                 change: fileChange,
                 roomId,
+              });
+
+              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+                console.log(e);
+                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
               });
             });
 
@@ -128,7 +138,6 @@ export default class IPC {
               Events.room_file_change_res,
               async (fileEventRequest: FileEventRequest) => {
                 if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-                  console.log(`File patched: ${fileEventRequest.change.path}`);
                   const patch = fileEventRequest.change as IPatch;
                   await FS.applyPatches(source, patch);
                 } else {
@@ -137,25 +146,32 @@ export default class IPC {
 
                   const treeData = IPC.getTreeData(source);
 
-                  mainWindow.webContents.send(
-                    IPCEvents.UPDATE_FOLDER,
-                    treeData
-                  );
+                  IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
-                  console.log(`File changed: ${fileEventRequest.change.path}`);
+                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
               }
             );
 
-            socket.on(
-              Events.room_users_update_res,
-              (eventData: RoomChangedEvent) => {
-                mainWindow.webContents.send(
-                  IPCEvents.UPDATE_USERS,
-                  eventData.users
-                );
+            socket.on(Events.room_users_update_res, (eventData: any) => {
+              let user: any, title: string;
+              const { event } = eventData;
+
+              if (event === "JOIN") {
+                title = "User joined the room";
+                user = eventData.newUser;
+              } else if (event === "LEAVE") {
+                title = "User left the room";
+                user = eventData.removedUser;
               }
-            );
+
+              const { username, id } = user;
+              if (username) title += `: ${username}`;
+
+              IPC.notify(title, `ID: ${id}`);
+
+              IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
+            });
 
             const room = {
               roomId,

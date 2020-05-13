@@ -35,7 +35,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: "Room",
+      title: `Room ${this.context.room.roomId}`,
     });
 
     IPC.updateFolder((treeData: any) => {
@@ -113,9 +113,9 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     //alert("Trigger Expand");
   };
 
-  makeUser = (user: any) => {
+  makeUser = (user: any, key: number) => {
     return (
-      <div className="userItem">
+      <div key={key} className="userItem">
         <Card>
           <Meta
             avatar={
