@@ -53,8 +53,7 @@ export default class SettingsPage extends Component<IProps, IState> {
   render() {
     const { activeItem } = this.state;
     return (
-      <div>
-        <h2 className="settings-header">Settings</h2>
+      <div className="settings-page">
         <Row>
           <Col span={4} className="settingsMenu">
             <Menu mode="inline" onClick={this.onItemClick}>

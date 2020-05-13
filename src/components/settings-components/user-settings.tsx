@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Form, Input, Button, message, Row, Avatar } from "antd";
+import { Form, Input, Button, message, Row, Col } from "antd";
 import "./settings-components.scss";
-import { FolderOutlined, UserOutlined } from "@ant-design/icons";
+import { FolderOutlined } from "@ant-design/icons";
 import IPC from "src/context/ipc";
 import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import { ProfilePicture } from "../image/profile-picture";
@@ -60,11 +60,16 @@ export default class UserSettings extends Component<IProps, IConfig> {
     return (
       <div>
         <Row>
+          <h1>User settings</h1>
+        </Row>
+        <Row className='profile-picture-row'>
           <ProfilePicture image={this.state.avatar} size={128} alt="profile" />
-          <Button onClick={this.deselectAvatar}>Remove</Button>
         </Row>
 
         <Form
+          labelCol={{ span: 4 }}
+          labelAlign="left"
+          wrapperCol={{ span: 20 }}
           name="user_settings"
           ref={this.form}
           initialValues={{ remember: true }}
@@ -80,7 +85,10 @@ export default class UserSettings extends Component<IProps, IConfig> {
               },
             ]}
           >
-            <Search
+            {this.state.avatar ? (
+              <Button onClick={this.deselectAvatar}>Remove Image</Button>
+            ) : (
+              <Search
               enterButton={
                 <>
                   <span>Open</span>
@@ -90,6 +98,8 @@ export default class UserSettings extends Component<IProps, IConfig> {
               placeholder="Enter an avatar path..."
               onSearch={this.selectAvatar}
             />
+            )}
+
           </Form.Item>
 
           <Form.Item

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import './profile-picture.scss'
 
 interface IProps {
   image?: Buffer;
@@ -18,6 +19,7 @@ export class ProfilePicture extends Component<IProps, IState> {
       const base64Image = Buffer.from(this.props.image).toString("base64");
       image = (
         <img
+          className='profile-picture'
           src={`data:image;base64,${base64Image}`}
           alt={this.props.alt}
           width={this.props.size}
