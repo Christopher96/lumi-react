@@ -21,13 +21,13 @@ export default class IPC {
           context.update({
             room,
             connected: true,
-            loading: false,
+            loading: false
           });
         }
       })
       .finally(() => {
         context.update({
-          loading: false,
+          loading: false
         });
       });
   };
@@ -38,6 +38,10 @@ export default class IPC {
 
   static fetchLogs = (amount: number): Promise<void> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
+  };
+
+  static fetchSingleLog = (id: string, amount: number): Promise<any[]> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_SINGLE_LOG, id, amount);
   };
 
   static fetchFolder = (folder: string): Promise<void> => {
@@ -68,7 +72,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 500,
       height: 400,
-      path: Paths.INVITE,
+      path: Paths.INVITE
     });
   };
 
@@ -76,7 +80,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 800,
       height: 800,
-      path: Paths.SERVER_LOG,
+      path: Paths.SERVER_LOG
     });
   };
 
@@ -84,7 +88,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 300,
       height: 200,
-      path: Paths.LEAVE,
+      path: Paths.LEAVE
     });
   };
 
@@ -92,7 +96,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 800,
       height: 400,
-      path: Paths.SETTINGS,
+      path: Paths.SETTINGS
     });
   };
 }

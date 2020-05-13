@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import DirectoryTree from "antd/lib/tree/DirectoryTree";
+import { Tree } from "antd";
+
 import { Button, Tooltip, Row, Card, Avatar } from "antd";
 import {
   UserAddOutlined,
   FileTextOutlined,
   ArrowRightOutlined,
-  UserOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import Paths from "../paths";
 import TopBar from "src/components/topbar/top-bar";
@@ -16,50 +17,64 @@ import { Redirect } from "react-router-dom";
 import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
 import { UserData } from "src/context/interfaces";
+import { AddIconsToTree } from "./add-icons-to-tree";
 
 interface IProps {}
 interface IState {
   treeData: any;
-  users: any;
+  users: any[];
+  logs: any;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
   static contextType = LumiContext;
 
-  state = {
+  state: IState = {
     treeData: [],
     users: [],
+    logs: []
   };
 
   componentDidMount() {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: "Room",
+      title: "Room"
     });
 
     IPC.updateFolder((treeData: any) => {
+      IPC.fetchSingleLog(this.context.room.roomId, 1).then(logs => {
+        this.setState({
+          logs: [...logs, ...this.state.logs]
+        });
+      });
+
       this.setState({
-        treeData,
+        treeData
       });
     });
 
-    console.log(this.context);
-    IPC.fetchFolder(this.context.room.source).then((treeData) => {
+    IPC.fetchFolder(this.context.room.source).then(treeData => {
       this.setState({
-        treeData,
+        treeData
       });
     });
 
     IPC.updateUsers((users: [UserData]) => {
       this.setState({
-        users,
+        users
       });
     });
 
     IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
       this.setState({
-        users,
+        users
+      });
+    });
+
+    IPC.fetchSingleLog(this.context.room.roomId, 100).then(logs => {
+      this.setState({
+        logs
       });
     });
   }
@@ -67,9 +82,11 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   openInvite() {
     IPC.openInvite();
   }
+
   openLogs() {
     IPC.openLogs();
   }
+
   openLeave() {
     IPC.openLeave();
   }
@@ -139,7 +156,23 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    const { users, treeData } = this.state;
+    const { users, treeData, logs } = this.state;
+    const changes: { path: string; user: string }[] = logs.filter(
+      (v: { event: string }) => v.event === "FILE_MANIPULATIION"
+    );
+    console.log(users);
+
+    const realTree = new AddIconsToTree().make(treeData, list => {
+      const changeIndex = changes.findIndex(v => v.path === list.join("/"));
+
+      if (changeIndex === -1) return undefined;
+      else {
+        const change = changes[changeIndex];
+        // Finds the user which
+        const user = users.find(v => v.username === change.user);
+        return <p style={{ fontSize: "4px" }}>{changes[changeIndex].user}</p>;
+      }
+    });
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
@@ -148,12 +181,12 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         <TopBar />
         <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">
-          <DirectoryTree
-            multiple
-            defaultExpandAll
+          <Tree
+            showLine
+            showIcon
+            defaultExpandedKeys={["0-0-0"]}
+            treeData={realTree as any}
             onSelect={this.onSelect}
-            onExpand={this.onExpand}
-            treeData={treeData}
           />
           {this.bottomMenuButtons}
         </div>

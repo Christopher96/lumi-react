@@ -6,7 +6,7 @@ import {
   FileEventRequest,
   IPatch,
   IFileChange,
-  RoomChangedEvent,
+  RoomChangedEvent
 } from "lumi-cli/dist/lib/common/types";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
@@ -47,7 +47,7 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
       const result = await dialog.showOpenDialog(mainWindow, {
-        properties: ["openDirectory"],
+        properties: ["openDirectory"]
       });
       return result.filePaths[0];
     });
@@ -92,7 +92,7 @@ export default class IPC {
             FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
               socket.emit(Events.room_file_change, {
                 change: fileChange,
-                roomId,
+                roomId
               });
             });
 
@@ -138,8 +138,8 @@ export default class IPC {
               socket,
               room: {
                 roomId,
-                source,
-              },
+                source
+              }
             };
 
             resolve(IPC.connection.room);
@@ -151,16 +151,32 @@ export default class IPC {
     );
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
-      const res = await API.LogsRequest.getAllLogs(amount);
-      return res.logs.map((l) => {
+      const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
+      return res.logs.map(l => {
         return {
           event: l.event,
           user: l.byWhom?.username || "Unknown",
           date: new Date(l.date).toLocaleString(),
-          path: l.body?.path || "",
+          path: l.body?.path || ""
         };
       });
     });
+
+    ipcMain.handle(
+      IPCEvents.FETCH_SINGLE_LOG,
+      async (_, id: string, amount: number) => {
+        const res = await API.LogsRequest.getLog(id, amount, { reverse: "1" });
+
+        return res.logs.map(l => {
+          return {
+            event: l.event,
+            user: l.byWhom?.username || "Unknown",
+            date: new Date(l.date).toLocaleString(),
+            path: l.body?.path || ""
+          };
+        });
+      }
+    );
 
     ipcMain.handle(IPCEvents.FETCH_FOLDER, async (_, path: string) => {
       return IPC.getTreeData(path);
@@ -176,8 +192,8 @@ export default class IPC {
         width: winProps.width,
         height: winProps.height,
         webPreferences: {
-          nodeIntegration: true,
-        },
+          nodeIntegration: true
+        }
       });
       win.on("close", () => {
         win = null;
