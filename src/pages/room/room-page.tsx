@@ -51,7 +51,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
-    /*
     IPC.updateUsers((users: [UserData]) => {
       this.setState({
         users,
@@ -63,7 +62,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         users,
       });
     });
-     */
   }
 
   openInvite() {
