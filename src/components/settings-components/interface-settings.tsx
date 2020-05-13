@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Cascader, Row, Col, InputNumber } from "antd";
+import { Cascader, Row, Col } from "antd";
 import "./settings-components.scss";
 
 interface IProps {}
@@ -41,25 +41,14 @@ export default class InterfaceSettings extends Component<IProps, IState> {
     return (
       <div>
         <Row>
+          <h1>Interface settings</h1>
+        </Row>
+        <Row>
           <Col span={10}>Application theme:</Col>
           <Col span={14}>
             <Cascader options={options} placeholder="Please select" />
           </Col>
-        </Row>
-        <br />
-        <Row>
-          <Col span={10}>Application Interface size:</Col>
-          <Col span={14}>
-            <div>
-              <InputNumber
-                defaultValue={100}
-                min={0}
-                max={300}
-                formatter={(value) => `${value}%`}
-              />
-            </div>
-          </Col>
-        </Row>
+        </Row>   
       </div>
     );
   }

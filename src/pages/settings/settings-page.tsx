@@ -1,11 +1,10 @@
 import React, { Component } from "react";
-import { Row, Col, Menu, message } from "antd";
+import { Row, Col, Menu } from "antd";
 import "./settings-page.scss";
 import UserSettings from "src/components/settings-components/user-settings";
 import { ClickParam } from "antd/lib/menu";
 import InterfaceSettings from "src/components/settings-components/interface-settings";
-import SystemSettings from "src/components/settings-components/system-settings";
-import HelpSettings from "src/components/settings-components/help-settings";
+import RoomSettings from "src/components/settings-components/room-settings";
 
 interface IProps {}
 interface IState {
@@ -15,7 +14,7 @@ interface IState {
 export default class SettingsPage extends Component<IProps, IState> {
   state = { activeItem: <UserSettings /> };
 
-  settingsMenuItems = ["User", "Interface", "System", "Help"];
+  settingsMenuItems = ["User", "Room", "Interface"];
 
   createMenuItems = (item: string) => {
     return <Menu.Item key={item}>{item}</Menu.Item>;
@@ -23,31 +22,19 @@ export default class SettingsPage extends Component<IProps, IState> {
 
   onItemClick = (param: ClickParam) => {
     switch (param.key) {
+      case "Room":
+        return this.setState({
+          activeItem: <RoomSettings />,
+        });
       case "Interface":
         return this.setState({
           activeItem: <InterfaceSettings />,
-        });
-      case "System":
-        return this.setState({
-          activeItem: <SystemSettings />,
-        });
-      case "Help":
-        return this.setState({
-          activeItem: (
-            <div>
-              <HelpSettings />
-            </div>
-          ),
         });
       default:
         return this.setState({
           activeItem: <UserSettings />,
         });
     }
-  };
-
-  onApply = () => {
-    message.success("Saved changes", 1);
   };
 
   render() {
