@@ -44,9 +44,12 @@ class IPCGlobal extends Component<IProps, IState> {
       });
     });
 
-    ipcRenderer.on(IPCEvents.NOTIFICATION, (title: string, body?: string) => {
-      IPC.notify(title, body);
-    });
+    ipcRenderer.on(
+      IPCEvents.NOTIFICATION,
+      (_: any, title: string, body?: string) => {
+        IPC.notify(title, body);
+      }
+    );
   }
 
   render() {

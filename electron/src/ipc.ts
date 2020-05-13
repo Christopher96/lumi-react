@@ -6,7 +6,6 @@ import {
   FileEventRequest,
   IPatch,
   IFileChange,
-  RoomChangedEvent,
 } from "lumi-cli/dist/lib/common/types";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
@@ -125,6 +124,7 @@ export default class IPC {
               });
 
               socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+                console.log(e);
                 IPC.notify("Could not apply patch", `File: ${e.change.path}`);
               });
             });
@@ -153,21 +153,25 @@ export default class IPC {
               }
             );
 
-            socket.on(
-              Events.room_users_update_res,
-              (eventData: RoomChangedEvent) => {
-                let title = "User joined";
-                const { username, id } = eventData.newUser;
-                if (username) title += `: ${username}`;
+            socket.on(Events.room_users_update_res, (eventData: any) => {
+              let user: any, title: string;
+              const { event } = eventData;
 
-                IPC.notify(title, `ID: ${id}`);
-
-                IPC.win.webContents.send(
-                  IPCEvents.UPDATE_USERS,
-                  eventData.users
-                );
+              if (event === "JOIN") {
+                title = "User joined the room";
+                user = eventData.newUser;
+              } else if (event === "LEAVE") {
+                title = "User left the room";
+                user = eventData.removedUser;
               }
-            );
+
+              const { username, id } = user;
+              if (username) title += `: ${username}`;
+
+              IPC.notify(title, `ID: ${id}`);
+
+              IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
+            });
 
             const room = {
               roomId,

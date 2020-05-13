@@ -2,6 +2,7 @@ import { Window, UserData } from "./interfaces";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
+const logo = require("src/assets/logo.png");
 const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
@@ -98,6 +99,7 @@ export default class IPC {
       });
     }).then(() => {
       new window.Notification(title, {
+        icon: logo,
         body,
       });
     });
