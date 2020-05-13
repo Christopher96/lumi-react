@@ -35,6 +35,9 @@ export default class JoinComponent extends Component<IProps, IState> {
     this.context.update({
       connected: false,
       loading: true,
+    });
+
+    this.setState({
       error: false,
     });
 
