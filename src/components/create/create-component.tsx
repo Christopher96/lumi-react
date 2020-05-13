@@ -9,12 +9,18 @@ import IPC from "src/context/ipc";
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
+interface IState {
+  error: string | boolean;
+}
 
 export default class CreateComponent extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   form: any = React.createRef();
+
+  state = {
+    error: false,
+  };
 
   selectDir = () => {
     IPC.selectDir().then((path) => {
@@ -29,6 +35,9 @@ export default class CreateComponent extends Component<IProps, IState> {
     this.context.update({
       connected: false,
       loading: true,
+    });
+
+    this.setState({
       error: false,
     });
 
@@ -47,6 +56,15 @@ export default class CreateComponent extends Component<IProps, IState> {
 
   render() {
     const { connected, loading } = this.context;
+    const { error } = this.state;
+
+    let errorAlert = error ? (
+      <FormItem>
+        <Alert type="error" message={error} banner />
+      </FormItem>
+    ) : (
+      ""
+    );
 
     return (
       <div className="container">
@@ -60,12 +78,7 @@ export default class CreateComponent extends Component<IProps, IState> {
               onFinish={this.onFinish}
               onFinishFailed={this.onFinishFailed}
             >
-              <Alert
-                message="Error"
-                description="This is an error message about copywriting."
-                type="error"
-                showIcon
-              />
+              {errorAlert}
               <FormItem
                 name="source"
                 rules={[

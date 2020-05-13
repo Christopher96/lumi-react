@@ -1,4 +1,4 @@
-import { Window, RoomData, UserData } from "./interfaces";
+import { Window, UserData } from "./interfaces";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
@@ -6,6 +6,7 @@ const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
   static createRoom = async (context: any, source: string) => {
+    console.log(source);
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
       .then((res: any) => {

@@ -38,13 +38,12 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       title: "Room",
     });
 
-    IPC.updateFolder((treeData: any, newPatch) => {
+    IPC.updateFolder((treeData: any) => {
       this.setState({
         treeData,
       });
     });
 
-    console.log(this.context);
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
