@@ -8,7 +8,8 @@ export default class IPC {
   static createRoom = async (context: any, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
-      .then((_: any, roomID: string) => {
+      .then((roomID: string) => {
+        if (roomID !== undefined) return false;
         return IPC.joinRoom(context, roomID, source);
       });
   };
