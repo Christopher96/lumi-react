@@ -37,7 +37,7 @@ export default class Main {
       )}`;
     }
 
-    const local = true;
+    const local = false;
     process.env.SERVER_ENDPOINT = local
       ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
