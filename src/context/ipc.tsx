@@ -9,6 +9,7 @@ export default class IPC {
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
       .then((roomID: string) => {
+        if (roomID !== undefined) return false;
         return IPC.joinRoom(context, roomID, source);
       });
   };
