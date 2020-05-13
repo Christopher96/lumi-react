@@ -8,22 +8,38 @@ export default class IPC {
   static createRoom = async (context: any, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
-      .then((roomID: string) => {
-        if (roomID !== undefined) return false;
-        return IPC.joinRoom(context, roomID, source);
+      .then((res: any) => {
+        if (res.error) {
+          return {
+            error: res.error,
+          };
+        } else {
+          return IPC.joinRoom(context, res, source);
+        }
+      })
+      .finally(() => {
+        context.update({
+          loading: false,
+        });
       });
   };
 
   static joinRoom = async (context: any, roomID: string, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, source)
-      .then((room: RoomData) => {
-        if (room) {
+      .then((res: any) => {
+        if (res.error) {
+          return {
+            error: res.error,
+          };
+        } else {
           context.update({
-            room,
+            room: res,
             connected: true,
             loading: false,
           });
+
+          return true;
         }
       })
       .finally(() => {

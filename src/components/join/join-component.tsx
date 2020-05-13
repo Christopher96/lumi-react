@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Input, Button, Col, Row } from "antd";
+import { Input, Button, Col, Row, Alert } from "antd";
 import { FolderOutlined } from "@ant-design/icons";
 import Form from "antd/lib/form/Form";
 import FormItem from "antd/lib/form/FormItem";
@@ -9,12 +9,18 @@ import LumiContext from "src/context/lumi-context";
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
+interface IState {
+  error: string | boolean;
+}
 
 export default class JoinComponent extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   form: any = React.createRef();
+
+  state = {
+    error: false,
+  };
 
   selectDir = () => {
     IPC.selectDir().then((path) => {
@@ -29,9 +35,18 @@ export default class JoinComponent extends Component<IProps, IState> {
     this.context.update({
       connected: false,
       loading: true,
+      error: false,
     });
 
-    IPC.joinRoom(this.context, values.roomID, values.source);
+    IPC.joinRoom(this.context, values.roomID, values.source).then(
+      (res: any) => {
+        if (res.error) {
+          this.setState({
+            error: res.error,
+          });
+        }
+      }
+    );
   };
 
   onFinishFailed = (errorInfo: any) => {
@@ -40,7 +55,15 @@ export default class JoinComponent extends Component<IProps, IState> {
 
   render() {
     const { connected, loading } = this.context;
+    const { error } = this.state;
 
+    let errorAlert = error ? (
+      <FormItem>
+        <Alert type="error" message={error} banner />
+      </FormItem>
+    ) : (
+      ""
+    );
     return (
       <div className="container">
         <Row justify="start">
@@ -53,6 +76,7 @@ export default class JoinComponent extends Component<IProps, IState> {
               onFinish={this.onFinish}
               onFinishFailed={this.onFinishFailed}
             >
+              {errorAlert}
               <FormItem
                 name="roomID"
                 rules={[

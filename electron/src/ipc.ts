@@ -11,6 +11,7 @@ import {
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+import * as fse from "fs-extra";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
 
@@ -52,10 +53,23 @@ export default class IPC {
       return result.filePaths[0];
     });
 
-    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, path) => {
-      const buffer = await FS.zip(path);
-      const serverResponse = await API.RoomRequest.create(buffer);
-      return serverResponse.roomId;
+    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
+      if (!fse.existsSync(source)) {
+        return {
+          error: `Target directory does not exist: ${source}`,
+        };
+      }
+
+      const buffer = await FS.zip(source);
+      const { roomId } = await API.RoomRequest.create(buffer);
+
+      if (roomId) {
+        return roomId;
+      } else {
+        return {
+          error: `Could not create room with source: ${source}`,
+        };
+      }
     });
 
     ipcMain.handle(
@@ -64,14 +78,14 @@ export default class IPC {
         console.log("JOINING ROOM");
         console.log(roomId, source);
 
-        if (IPC.connection !== undefined) {
-          IPC.connection.socket.disconnect();
+        if (!fse.existsSync(source)) {
+          return {
+            error: `Target directory does not exist: ${source}`,
+          };
         }
 
-        const { ok } = await API.RoomRequest.getRoom(roomId);
-
-        if (!ok) {
-          return false;
+        if (IPC.connection !== undefined) {
+          IPC.connection.socket.disconnect();
         }
 
         const socket = await API.RoomRequest.createSocket();
@@ -80,12 +94,21 @@ export default class IPC {
           mainWindow.webContents.send(IPCEvents.DISCONNECTED);
         });
 
-        socket.emit(Events.room_join, roomId);
+        const joinWait = async (resolve) => {
+          setInterval(() => {
+            resolve({
+              error: `Timed out`,
+            });
+          }, 5000);
 
-        const room = await new Promise((resolve, reject) => {
-          socket.once(Events.room_join_res, async (response: any) => {
-            if (!response.ok) reject();
+          socket.once(Events.room_join_err, (res: any) => {
+            resolve({
+              error: res.message,
+            });
+          });
 
+          socket.once(Events.room_join_res, async () => {
+            console.log("hello");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
             await FS.createShadow(source, zippedRoom);
 
@@ -134,19 +157,23 @@ export default class IPC {
               }
             );
 
-            IPC.connection = {
-              socket,
-              room: {
-                roomId,
-                source,
-              },
+            const room = {
+              roomId,
+              source,
             };
 
-            resolve(IPC.connection.room);
-          });
-        });
+            IPC.connection = {
+              socket,
+              room,
+            };
 
-        return room;
+            resolve(room);
+          });
+        };
+
+        socket.emit(Events.room_join, roomId);
+
+        return await new Promise(joinWait);
       }
     );
 
