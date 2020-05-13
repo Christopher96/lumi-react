@@ -115,7 +115,6 @@ export default class IPC {
           });
 
           socket.once(Events.room_join_res, async () => {
-            console.log("hello");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
             await FS.createShadow(source, zippedRoom);
 
@@ -123,6 +122,10 @@ export default class IPC {
               socket.emit(Events.room_file_change, {
                 change: fileChange,
                 roomId,
+              });
+
+              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
               });
             });
 
@@ -145,7 +148,7 @@ export default class IPC {
 
                   IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
-                  IPC.notify(`File changed: ${fileEventRequest.change.path}`);
+                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
               }
             );
@@ -153,6 +156,12 @@ export default class IPC {
             socket.on(
               Events.room_users_update_res,
               (eventData: RoomChangedEvent) => {
+                let title = "User joined";
+                const { username, id } = eventData.newUser;
+                if (username) title += `: ${username}`;
+
+                IPC.notify(title, `ID: ${id}`);
+
                 IPC.win.webContents.send(
                   IPCEvents.UPDATE_USERS,
                   eventData.users
