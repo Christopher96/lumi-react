@@ -6,16 +6,17 @@ import {
   FileEventRequest,
   IPatch,
   IFileChange,
+  RoomChangedEvent,
 } from "lumi-cli/dist/lib/common/types";
-import { FileTree } from "lumi-cli/dist/lib/common/FileTree";
-import { Window, Room } from "../../src/context/interfaces";
+import FileTree from "./lib/FileTree";
+import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
   socket: SocketIOClient.Socket;
-  room: Room;
+  room: RoomData;
 }
 
 export default class IPC {
@@ -23,6 +24,7 @@ export default class IPC {
 
   static getUsers = async (roomId: string) => {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
+
     if (serverResponse.ok) {
       return serverResponse.users;
     } else {
@@ -56,79 +58,97 @@ export default class IPC {
       return serverResponse.roomId;
     });
 
-    ipcMain.handle(IPCEvents.JOIN_ROOM, async (_, roomId, source) => {
-      console.log("JOINING ROOM");
-      console.log(roomId, source);
+    ipcMain.handle(
+      IPCEvents.JOIN_ROOM,
+      async (_, roomId: string, source: string) => {
+        console.log("JOINING ROOM");
+        console.log(roomId, source);
 
-      if (IPC.connection !== undefined) {
-        IPC.connection.socket.disconnect();
-      }
+        if (IPC.connection !== undefined) {
+          IPC.connection.socket.disconnect();
+        }
 
-      const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-      await FS.createShadow(source, zippedRoom);
+        const { ok } = await API.RoomRequest.getRoom(roomId);
 
-      const socket = await API.RoomRequest.createSocket();
+        if (!ok) {
+          return false;
+        }
 
-      socket.on("disconnect", () => {
-        mainWindow.webContents.send(IPCEvents.DISCONNECTED);
-      });
+        const socket = await API.RoomRequest.createSocket();
 
-      socket.emit(Events.room_join, roomId);
-
-      const room = await new Promise((resolve, reject) => {
-        socket.once(Events.room_join_res, async (response: any) => {
-          if (!response.ok) reject();
-
-          FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
-            socket.emit(Events.room_file_change, {
-              change: fileChange,
-              roomId,
-            });
-          });
-
-          FS.listenForLocalPatches(source, (patch: IPatch) => {
-            socket.emit(Events.room_file_change, { change: patch, roomId });
-          });
-
-          // Tell the server we would like to join.
-          socket.on(
-            Events.room_file_change_res,
-            async (fileEventRequest: FileEventRequest) => {
-              if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-                console.log(`File patched: ${fileEventRequest.change.path}`);
-                const patch = fileEventRequest.change as IPatch;
-                await FS.applyPatches(source, patch);
-              } else {
-                const fileChange = fileEventRequest.change as IFileChange;
-                await FS.applyFileChange(source, fileChange);
-
-                const treeData = IPC.getTreeData(source);
-                mainWindow.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
-
-                console.log(`File changed: ${fileEventRequest.change.path}`);
-              }
-            }
-          );
-
-          // socket.on(Events.room_new_user, (user: any) => {
-          //   console.log(user);
-          //   // mainWindow.webContents.send(IPCEvents.UPDATE_USERS, treeData);
-          // });
-
-          IPC.connection = {
-            socket,
-            room: {
-              roomId,
-              source,
-            },
-          };
-
-          resolve(IPC.connection.room);
+        socket.on("disconnect", () => {
+          mainWindow.webContents.send(IPCEvents.DISCONNECTED);
         });
-      });
 
-      return room;
-    });
+        socket.emit(Events.room_join, roomId);
+
+        const room = await new Promise((resolve, reject) => {
+          socket.once(Events.room_join_res, async (response: any) => {
+            if (!response.ok) reject();
+
+            const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
+            await FS.createShadow(source, zippedRoom);
+
+            FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
+              socket.emit(Events.room_file_change, {
+                change: fileChange,
+                roomId,
+              });
+            });
+
+            FS.listenForLocalPatches(source, (patch: IPatch) => {
+              socket.emit(Events.room_file_change, { change: patch, roomId });
+            });
+
+            // Tell the server we would like to join.
+            socket.on(
+              Events.room_file_change_res,
+              async (fileEventRequest: FileEventRequest) => {
+                if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
+                  console.log(`File patched: ${fileEventRequest.change.path}`);
+                  const patch = fileEventRequest.change as IPatch;
+                  await FS.applyPatches(source, patch);
+                } else {
+                  const fileChange = fileEventRequest.change as IFileChange;
+                  await FS.applyFileChange(source, fileChange);
+
+                  const treeData = IPC.getTreeData(source);
+
+                  mainWindow.webContents.send(
+                    IPCEvents.UPDATE_FOLDER,
+                    treeData
+                  );
+
+                  console.log(`File changed: ${fileEventRequest.change.path}`);
+                }
+              }
+            );
+
+            socket.on(
+              Events.room_users_update_res,
+              (eventData: RoomChangedEvent) => {
+                mainWindow.webContents.send(
+                  IPCEvents.UPDATE_USERS,
+                  eventData.users
+                );
+              }
+            );
+
+            IPC.connection = {
+              socket,
+              room: {
+                roomId,
+                source,
+              },
+            };
+
+            resolve(IPC.connection.room);
+          });
+        });
+
+        return room;
+      }
+    );
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const res = await API.LogsRequest.getAllLogs(amount);
@@ -162,7 +182,7 @@ export default class IPC {
       win.on("close", () => {
         win = null;
       });
-      win.loadURL(`${process.env.URL}${winProps.path}`);
+      win.loadURL(`${process.env.URL}#${winProps.path}`);
       win.show();
 
       return true;

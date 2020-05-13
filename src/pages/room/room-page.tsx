@@ -1,14 +1,10 @@
 import React, { Component } from "react";
-import DirectoryTree from "antd/lib/tree/DirectoryTree";
 import { Button, Tooltip, Row, Card, Avatar, Tree } from "antd";
 import {
   UserAddOutlined,
   FileTextOutlined,
   ArrowRightOutlined,
   UserOutlined,
-  MehOutlined,
-  SmileOutlined,
-  FrownFilled,
 } from "@ant-design/icons";
 import Paths from "../paths";
 import TopBar from "src/components/topbar/top-bar";
@@ -32,7 +28,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     treeData: [],
     users: [],
   };
-  /*
+
   treeData2 = [
     {
       title: "parent 1",
@@ -52,7 +48,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       ],
     },
   ];
-
+  /*
   applyAvatars = (treeData: any, path: string, avatar: any) => {
     console.log("apply avatars");
     const pathTest = "";
@@ -72,25 +68,26 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
+    console.log(this.context);
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
       });
     });
 
-    IPC.updateUsers((users: any) => {
-      console.log(users);
+    /*
+    IPC.updateUsers((users: [UserData]) => {
       this.setState({
         users,
       });
     });
 
-    IPC.fetchUsers(this.context.room.roomId).then((users) => {
-      console.log(users);
+    IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
       this.setState({
         users,
       });
     });
+     */
   }
 
   openInvite() {
@@ -148,7 +145,17 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       <div className="userItem">
         <Card>
           <Meta
-            avatar={<Avatar icon={<UserOutlined />} />}
+            avatar={
+              <Avatar
+                icon={
+                  user.avatar ? (
+                    <img alt="avatar" src={user.avatar} />
+                  ) : (
+                    <UserOutlined />
+                  )
+                }
+              />
+            }
             title={user.username}
             description={user.id}
           />

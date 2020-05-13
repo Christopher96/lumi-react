@@ -43,7 +43,7 @@ export default class App extends Component<{}, LumiState> {
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
             <Route path={Paths.SERVER_LOG} component={ServerLogPage} />
-            <Redirect to={Paths.ROOM}></Redirect>
+            <Redirect to={Paths.START} />
           </Switch>
         </HashRouter>
       </LumiProvider>

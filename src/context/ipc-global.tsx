@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import LumiContext from "./lumi-context";
 import IPCEvents from "./ipc-events";
-import { Room } from "./interfaces";
+import { RoomData } from "./interfaces";
 import { withRouter } from "react-router";
 
 const { ipcRenderer } = window.require("electron");
@@ -19,7 +19,7 @@ class IPCGlobal extends Component<IProps, IState> {
   componentDidMount() {
     ipcRenderer
       .invoke(IPCEvents.CHECK_CONNECTION)
-      .then((room: Room | boolean) => {
+      .then((room: RoomData | boolean) => {
         if (room !== false) {
           this.context.update({
             room,

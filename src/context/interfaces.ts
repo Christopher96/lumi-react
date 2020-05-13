@@ -1,20 +1,26 @@
 import Paths from "../pages/paths";
 
 export interface LumiState {
-  room: Room | null;
+  room: RoomData | null;
   connected: boolean;
   title: string;
   loading: boolean;
   update: (obj: any) => void;
 }
 
-export interface Room {
-  source: string;
-  roomId: string;
-}
-
 export interface Window {
   width: number;
   height: number;
   path: Paths;
+}
+
+export interface RoomData {
+  source: string;
+  roomId: string;
+}
+
+export interface UserData {
+  id: string;
+  username: string;
+  avatar: Buffer;
 }
