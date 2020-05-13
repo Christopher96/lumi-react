@@ -20,6 +20,7 @@ class IPCGlobal extends Component<IProps, IState> {
     ipcRenderer
       .invoke(IPCEvents.CHECK_CONNECTION)
       .then((room: RoomData | boolean) => {
+        console.log(room);
         if (room !== false) {
           this.context.update({
             room,
