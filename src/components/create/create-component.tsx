@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input, Button, Row, Col } from "antd";
+import { Input, Button, Row, Col, Alert } from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import Form from "antd/lib/form/Form";
 import LumiContext from "src/context/lumi-context";
@@ -9,16 +9,20 @@ import IPC from "src/context/ipc";
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
+interface IState {
+  error: string | boolean;
+}
 
 export default class CreateComponent extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   form: any = React.createRef();
 
+  state = {
+    error: false,
+  };
+
   selectDir = () => {
-    IPC.SWnotify("hello", "hello");
-    return;
     IPC.selectDir().then((path) => {
       this.form.current.setFieldsValue({
         source: path,
@@ -33,15 +37,30 @@ export default class CreateComponent extends Component<IProps, IState> {
       loading: true,
     });
 
-    IPC.createRoom(this.context, values.source);
-  };
+    this.setState({
+      error: false,
+    });
 
-  onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+    IPC.createRoom(this.context, values.source).then((res: any) => {
+      if (res.error) {
+        this.setState({
+          error: res.error,
+        });
+      }
+    });
   };
 
   render() {
     const { connected, loading } = this.context;
+    const { error } = this.state;
+
+    let errorAlert = error ? (
+      <FormItem>
+        <Alert type="error" message={error} banner />
+      </FormItem>
+    ) : (
+      ""
+    );
 
     return (
       <div className="container">
@@ -53,8 +72,8 @@ export default class CreateComponent extends Component<IProps, IState> {
               name="basic"
               initialValues={{ remember: true }}
               onFinish={this.onFinish}
-              onFinishFailed={this.onFinishFailed}
             >
+              {errorAlert}
               <FormItem
                 name="source"
                 rules={[
