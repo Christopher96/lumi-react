@@ -52,10 +52,26 @@ export default class IPC {
       return result.filePaths[0];
     });
 
-    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, path) => {
-      const buffer = await FS.zip(path);
-      const serverResponse = await API.RoomRequest.create(buffer);
-      return serverResponse.roomId;
+    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
+      let buffer: Buffer;
+
+      try {
+        buffer = await FS.zip(source);
+      } catch (err) {
+        return {
+          error: `Target directory does not exist: ${source}`,
+        };
+      }
+
+      const { roomId } = await API.RoomRequest.create(buffer);
+
+      if (roomId) {
+        return roomId;
+      } else {
+        return {
+          error: `Could not create room with source: ${source}`,
+        };
+      }
     });
 
     ipcMain.handle(
@@ -68,24 +84,28 @@ export default class IPC {
           IPC.connection.socket.disconnect();
         }
 
-        const { ok } = await API.RoomRequest.getRoom(roomId);
-
-        if (!ok) {
-          return false;
-        }
-
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
           mainWindow.webContents.send(IPCEvents.DISCONNECTED);
         });
 
-        socket.emit(Events.room_join, roomId);
+        const joinWait = async (resolve) => {
+          console.log("swag");
+          setInterval(() => {
+            resolve({
+              error: `Timed out`,
+            });
+          }, 5000);
 
-        const room = await new Promise((resolve, reject) => {
-          socket.once(Events.room_join_res, async (response: any) => {
-            if (!response.ok) reject();
+          socket.once(Events.room_join_err, (res: any) => {
+            resolve({
+              error: res.message,
+            });
+          });
 
+          socket.once(Events.room_join_res, async () => {
+            console.log("hello");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
             await FS.createShadow(source, zippedRoom);
 
@@ -134,19 +154,23 @@ export default class IPC {
               }
             );
 
-            IPC.connection = {
-              socket,
-              room: {
-                roomId,
-                source,
-              },
+            const room = {
+              roomId,
+              source,
             };
 
-            resolve(IPC.connection.room);
-          });
-        });
+            IPC.connection = {
+              socket,
+              room,
+            };
 
-        return room;
+            resolve(room);
+          });
+        };
+
+        socket.emit(Events.room_join, roomId);
+
+        return await new Promise(joinWait);
       }
     );
 

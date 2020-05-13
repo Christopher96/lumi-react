@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input, Button, Row, Col } from "antd";
+import { Input, Button, Row, Col, Alert } from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import Form from "antd/lib/form/Form";
 import LumiContext from "src/context/lumi-context";
@@ -29,9 +29,16 @@ export default class CreateComponent extends Component<IProps, IState> {
     this.context.update({
       connected: false,
       loading: true,
+      error: false,
     });
 
-    IPC.createRoom(this.context, values.source);
+    IPC.createRoom(this.context, values.source).then((res: any) => {
+      if (res.error) {
+        this.setState({
+          error: res.error,
+        });
+      }
+    });
   };
 
   onFinishFailed = (errorInfo: any) => {
@@ -53,6 +60,12 @@ export default class CreateComponent extends Component<IProps, IState> {
               onFinish={this.onFinish}
               onFinishFailed={this.onFinishFailed}
             >
+              <Alert
+                message="Error"
+                description="This is an error message about copywriting."
+                type="error"
+                showIcon
+              />
               <FormItem
                 name="source"
                 rules={[
