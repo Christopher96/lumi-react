@@ -40,7 +40,7 @@ export default class IPC {
   static fetchLogs = (
     amount: number,
     config?: LogsQueryParams
-  ): Promise<void> => {
+  ): Promise<[]> => {
     console.log("offset's true form: " + config?.offset?.toString());
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount, config);
   };

@@ -18,6 +18,7 @@ interface IState {
   logs: logData[];
   offsetVal: number;
   logQuantity: number;
+  loading: boolean;
 }
 
 const { Title } = Typography;
@@ -27,14 +28,18 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     logs: [],
     offsetVal: 0,
     logQuantity: 10,
+    loading: false,
   };
 
   syncMore = () => {
-    const { logQuantity } = this.state;
     this.setState({
-      logQuantity: logQuantity + 5,
+      logQuantity: this.state.logQuantity + 5,
+      loading: true,
     });
-    this.componentDidMount();
+    setTimeout(() => {
+      this.setState({ loading: false });
+      this.componentDidMount();
+    }, 2000);
   };
 
   componentDidMount = () => {
@@ -43,10 +48,10 @@ export default class ServerLogComponent extends Component<IProps, IState> {
       offset: offsetVal.toString(),
       reverse: "1",
     };
-    IPC.fetchLogs(logQuantity, config).then((logs) => {
-      console.log(logs);
+    IPC.fetchLogs(logQuantity, config).then((syncedLogs) => {
+      console.log(syncedLogs);
       this.setState({
-        logs,
+        logs: syncedLogs.reverse(),
       });
     });
   };
@@ -57,33 +62,6 @@ export default class ServerLogComponent extends Component<IProps, IState> {
       message.success({ content: "Exported!", duration: 2 });
     }, 1000);
   };
-
-  exportButton = (
-    <div className="exportButtonIcon">
-      <Tooltip title="Export" className="tooltip">
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<ExportOutlined />}
-          onClick={this.onExport}
-        />
-      </Tooltip>
-    </div>
-  );
-
-  bottomMenuButtons = (
-    <Row className="bottom-menu">
-      <Tooltip title="Sync" className="tooltip">
-        <Button
-          size="large"
-          onClick={this.componentDidMount}
-          type="primary"
-          shape="circle"
-          icon={<SyncOutlined />}
-        />
-      </Tooltip>
-    </Row>
-  );
 
   makeLog = (log: any) => {
     return (
@@ -104,14 +82,40 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     );
   };
 
+  syncButton = (
+    <Tooltip title="Sync" className="tooltip">
+      <Button
+        size="large"
+        onClick={this.componentDidMount}
+        type="primary"
+        shape="circle"
+        icon={<SyncOutlined />}
+      />
+    </Tooltip>
+  );
+
+  exportButton = (
+    <Tooltip title="Export" className="tooltip">
+      <Button
+        size="large"
+        type="primary"
+        shape="circle"
+        icon={<ExportOutlined />}
+        onClick={this.onExport}
+      />
+    </Tooltip>
+  );
+
   render() {
-    const { logs } = this.state;
+    const { logs, loading } = this.state;
     return (
       <div className="container">
         <Title level={2}>Room logs</Title>
-        <Button onClick={this.syncMore}>View More</Button>
+        <Button onClick={this.syncMore} loading={loading}>
+          View More
+        </Button>
         <List itemLayout="horizontal">{logs.map(this.makeLog)}</List>
-        {this.bottomMenuButtons}
+        <Row className="bottom-menu">{this.syncButton}</Row>
       </div>
     );
   }
