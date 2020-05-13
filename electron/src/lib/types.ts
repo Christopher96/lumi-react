@@ -12,4 +12,5 @@ export type Branch = {
   key: string;
   isLeaf: false;
   children: Tree[];
+  icon?: any;
 };

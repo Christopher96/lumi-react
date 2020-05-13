@@ -1,6 +1,8 @@
+import React, { Component } from "react";
 import * as fse from "fs-extra";
 import * as path from "path";
 import { Tree } from "./types";
+import Meta from "antd/lib/card/Meta";
 
 export default class FileTree {
   private isDirectory(path: string) {
@@ -16,7 +18,7 @@ export default class FileTree {
       isLeaf: true,
       key: indecies.join("-"),
       title: path.basename(filePath),
-      icon: "(<div></div>)",
+      icon: "T1",
     };
   }
 
@@ -48,6 +50,7 @@ export default class FileTree {
       children,
       key: indecies.join("-"),
       title: path.basename(dirPath),
+      icon: "T2",
     };
   }
 
