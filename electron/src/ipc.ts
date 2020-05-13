@@ -153,9 +153,8 @@ export default class IPC {
 
     ipcMain.handle(
       IPCEvents.FETCH_LOG,
-      async (_, amount: number, offset?: number) => {
-        //const logParams: LogsQueryParams = { offset: offset.toString() };
-        const res = await API.LogsRequest.getAllLogs(amount);
+      async (_, amount: number, config?: LogsQueryParams) => {
+        const res = await API.LogsRequest.getAllLogs(amount, config);
 
         return res.logs.map((l) => {
           return {

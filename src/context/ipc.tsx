@@ -1,4 +1,4 @@
-import { Window, RoomData, UserData } from "./interfaces";
+import { Window, RoomData, UserData, LogsQueryParams } from "./interfaces";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
@@ -37,8 +37,12 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
-  static fetchLogs = (amount: number, offset?: number): Promise<void> => {
-    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
+  static fetchLogs = (
+    amount: number,
+    config?: LogsQueryParams
+  ): Promise<void> => {
+    console.log("offset's true form: " + config?.offset?.toString());
+    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount, config);
   };
 
   static fetchFolder = (folder: string): Promise<void> => {
