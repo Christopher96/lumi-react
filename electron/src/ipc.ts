@@ -11,6 +11,7 @@ import {
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+import * as fse from "fs-extra";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
 
@@ -53,16 +54,13 @@ export default class IPC {
     });
 
     ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
-      let buffer: Buffer;
-
-      try {
-        buffer = await FS.zip(source);
-      } catch (err) {
+      if (!fse.existsSync(source)) {
         return {
           error: `Target directory does not exist: ${source}`,
         };
       }
 
+      const buffer = await FS.zip(source);
       const { roomId } = await API.RoomRequest.create(buffer);
 
       if (roomId) {
@@ -80,6 +78,12 @@ export default class IPC {
         console.log("JOINING ROOM");
         console.log(roomId, source);
 
+        if (!fse.existsSync(source)) {
+          return {
+            error: `Target directory does not exist: ${source}`,
+          };
+        }
+
         if (IPC.connection !== undefined) {
           IPC.connection.socket.disconnect();
         }
@@ -91,7 +95,6 @@ export default class IPC {
         });
 
         const joinWait = async (resolve) => {
-          console.log("swag");
           setInterval(() => {
             resolve({
               error: `Timed out`,
