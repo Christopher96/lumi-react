@@ -6,7 +6,7 @@ import {
   UserAddOutlined,
   FileTextOutlined,
   ArrowRightOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import Paths from "../paths";
 import TopBar from "src/components/topbar/top-bar";
@@ -34,43 +34,44 @@ export default class RoomFolderPage extends Component<IProps, IState> {
 
   state: IState = {
     treeData: [],
+    fileMap: {},
     users: [],
-    fileMap: {}
   };
 
   componentDidMount() {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: `Room ${this.context.room.roomId}`
+      title: `Room ${this.context.room.roomId}`,
     });
 
     IPC.updateFolder(({ treeData, fileMap }: any) => {
       this.setState({
         treeData,
-        fileMap: fileMap.roomMap
+        fileMap,
       });
     });
 
     IPC.fetchUsers(this.context.room.roomId).then(
       (users: { user: UserData }[]) => {
         this.setState({
-          users: users.map(v => v.user)
+          users: users.map((v) => v.user),
         });
       }
     );
 
     IPC.updateUsers((users: UserData[]) => {
       this.setState({
-        users
+        users,
       });
     });
 
     IPC.fetchFolder(this.context.room.source, this.context.room.roomId).then(
       ({ treeData, fileMap }: any) => {
+        console.log(fileMap);
         this.setState({
           treeData,
-          fileMap: fileMap.roomMap
+          fileMap,
         });
       }
     );
@@ -88,7 +89,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       if (!leave) return;
 
       this.context.update({
-        connected: false
+        connected: false,
       });
     });
   };
@@ -162,11 +163,11 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   getIconTree = (treeData: any, fileMap: any, users: any[]) => {
-    return new AddIconsToTree().make(treeData, filePath => {
+    return new AddIconsToTree().make(treeData, (filePath) => {
       // We want to remove the shadow relative path if shadow is in the first index.
       filePath = filePath.filter((v, i) => !(v === ".shadow" && i === 0));
       const userId = fileMap[filePath.join(",")];
-      const user = users.find(v => v.id === userId);
+      const user = users.find((v) => v.id === userId);
 
       return (
         <div className="change-file-user-icon">
@@ -185,8 +186,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     ) : (
       <>
         <TopBar />
-        {JSON.stringify(users)}
-        {JSON.stringify(fileMap)}
         <div className="users">{[...users].map(this.makeUser)}</div>
         <div className="container">
           <Tree

@@ -75,7 +75,8 @@ export default class IPC {
     roomId: string
   ): Promise<{ treeData: any; fileMap: any }> => {
     const treeData = new FileTree().make(path);
-    const fileMap = await API.LogsRequest.getFileMap(roomId);
+    const fileMapRes = await API.LogsRequest.getFileMap(roomId);
+    const fileMap = fileMapRes.roomMap;
     return { treeData, fileMap };
   };
 
@@ -174,7 +175,6 @@ export default class IPC {
             });
 
             socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
-              console.log(e);
               IPC.notify(
                 NotifyEventType.FILE_ERROR,
                 "Could not apply patch",
@@ -194,7 +194,7 @@ export default class IPC {
                   await FS.applyFileChange(source, fileChange);
                 }
 
-                const treeData = IPC.getTreeData(source, roomId);
+                const treeData = await IPC.getTreeData(source, roomId);
                 IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
                 IPC.notify(
@@ -284,13 +284,12 @@ export default class IPC {
     ipcMain.handle(
       IPCEvents.FETCH_FOLDER,
       async (_, path: string, roomId: string) => {
-        return IPC.getTreeData(path, roomId);
+        return await IPC.getTreeData(path, roomId);
       }
     );
 
     ipcMain.handle(IPCEvents.FETCH_USERS, async (_, roomId: string) => {
       const res = await API.RoomRequest.listUsersInRoom(roomId);
-      console.log(res.users);
       return res.users;
     });
 
