@@ -28,13 +28,7 @@ export default class IPC {
       });
   };
 
-  static joinRoom = async (
-    context: any,
-    roomID: string,
-    source: string,
-    onPassword: () => void,
-    onNoAuth: () => void
-  ) => {
+  static joinRoom = async (context: any, roomID: string, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, source)
       .then((res: any) => {

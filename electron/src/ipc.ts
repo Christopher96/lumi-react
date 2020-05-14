@@ -11,8 +11,10 @@ import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
+import { getPassword } from "./lib/getPassword";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
+const prompt = require("electron-prompt");
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -111,6 +113,28 @@ export default class IPC {
             resolve({
               error: res.message,
             });
+          });
+
+          socket.on(Events.room_join_auth, async (obj) => {
+            console.log(obj.message);
+            //resolve({ auth: true, roomId });
+
+            prompt({
+              title: "Room Password",
+              value: "password",
+              inputAttrs: {},
+              type: "input",
+            })
+              .then(async (res) => {
+                if (res === null) {
+                  console.log("user cancelled");
+                } else {
+                  const hash = await getPassword(res);
+                  socket.emit(Events.room_join_auth, { roomId, hash });
+                  console.log("903: result", res);
+                }
+              })
+              .catch(console.error);
           });
 
           socket.once(Events.room_join_res, async () => {
