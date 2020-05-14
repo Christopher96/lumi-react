@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "fs-extra": "^9.0.0",
-    "lumi-cli": "0.0.45",
+    "lumi-cli": "0.0.46",
     "path": "^0.12.7"
   }
 }

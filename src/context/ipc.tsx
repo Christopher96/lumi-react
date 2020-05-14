@@ -1,4 +1,5 @@
-import { Window, UserData } from "./interfaces";
+import { Window, RoomData, UserData } from "./interfaces";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
@@ -60,6 +61,10 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_DIR);
   };
 
+  static selectAvatar = (): Promise<string> => {
+    return ipcRenderer.invoke(IPCEvents.SELECT_AVATAR);
+  };
+
   static fetchLogs = (amount: number): Promise<void> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
   };
@@ -86,6 +91,33 @@ export default class IPC {
 
   static createWindow = (window: Window) => {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
+  };
+
+  static saveUserSettings = (
+    avatarPath: string,
+    username: string
+  ): Promise<IConfig> => {
+    return ipcRenderer
+      .invoke(IPCEvents.SAVE_USER_SETTINGS, avatarPath, username)
+      .then(() => {
+        return IPC.fetchSettings();
+      });
+  };
+
+  static saveRoomSettings = (values: any): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_ROOM_SETTINGS, values).then(() => {
+      return IPC.fetchSettings();
+    });
+  };
+
+  static saveInterfaceSettings = (values: any): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_INTERFACE_SETTINGS, values).then(() => {
+      return IPC.fetchSettings();
+    });
+  };
+
+  static fetchSettings = (): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_SETTINGS);
   };
 
   static notify = (title: string, body?: any) => {
