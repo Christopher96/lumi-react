@@ -163,6 +163,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     const { users, treeData, fileMap } = this.state;
 
     const realTree = new AddIconsToTree().make(treeData, filePath => {
+      filePath = filePath.filter(v => v !== ".shadow");
       const userId = fileMap[filePath.join(",")];
       const user = users.find(v => v.id === userId);
 
