@@ -15,12 +15,12 @@ interface IProps {
 interface IState {}
 
 const layout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 14 },
+  labelCol: { span: 12 }, //Offset from left side of the screen.
+  wrapperCol: { span: 8 }, //Size of element container.
 };
 
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+  wrapperCol: { offset: 10, span: 16 },
 };
 
 export default class CreateComponent extends Component<IProps, IState> {
@@ -32,7 +32,7 @@ export default class CreateComponent extends Component<IProps, IState> {
     return (
       <>
         <form {...layout}>
-          <FormItem>
+          <FormItem {...tailLayout}>
             <Avatar
               shape="circle"
               size={95}
@@ -42,8 +42,7 @@ export default class CreateComponent extends Component<IProps, IState> {
           </FormItem>
 
           <FormItem {...tailLayout}>
-            <h1> {this.props.name} </h1>
-            {this.props.isHost ? <CrownFilled /> : ""}
+            <h1> {this.props.name} {this.props.isHost ? <CrownFilled /> : ""} </h1>
           </FormItem>
 
           <FormItem>
@@ -65,7 +64,7 @@ export default class CreateComponent extends Component<IProps, IState> {
             <TextArea rows={10} disabled={true} value={this.props.log} />
           </FormItem>
 
-          <FormItem>
+          <FormItem  {...tailLayout}>
             <Button onClick={this.user_Kick} type="primary">
               Kick{" "}
             </Button>

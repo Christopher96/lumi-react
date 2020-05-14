@@ -21,6 +21,7 @@ interface IProps {}
 interface IState {
   treeData: any;
   users: any;
+  drawer: boolean;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
@@ -29,6 +30,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   state = {
     treeData: [],
     users: [],
+    drawer: false,
   };
 
   componentDidMount() {
@@ -51,7 +53,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
-    /*
+    
     IPC.updateUsers((users: [UserData]) => {
       this.setState({
         users,
@@ -63,7 +65,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         users,
       });
     });
-     */
+     
   }
 
   openInvite() {
