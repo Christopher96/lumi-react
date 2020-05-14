@@ -1,4 +1,4 @@
-import { Window, RoomData, UserData } from "./interfaces";
+import { Window, UserData } from "./interfaces";
 import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
@@ -69,8 +69,8 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
   };
 
-  static fetchFolder = (folder: string): Promise<void> => {
-    return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
+  static fetchFolder = (folder: string, roomId: string): Promise<any> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder, roomId);
   };
 
   static fetchUsers = (roomId: string): Promise<any> => {
@@ -83,17 +83,26 @@ export default class IPC {
     });
   };
 
-  static updateFolder = (callback: (treeData: any) => any) => {
-    ipcRenderer.on(IPCEvents.UPDATE_FOLDER, (_: any, treeData: any) => {
-      callback(treeData);
-    });
+  static updateFolder = (
+    callback: (treeDataAndFileMap: {
+      fileMap: unknown;
+      treeData: unknown;
+    }) => any
+  ) => {
+    ipcRenderer.on(
+      IPCEvents.UPDATE_FOLDER,
+      (_: any, treeDataAndFileMap: any) => {
+        console.log(treeDataAndFileMap);
+        callback(treeDataAndFileMap);
+      }
+    );
   };
 
   static createWindow = (window: Window) => {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
 
-  static saveUserSettings = (
+  static saveUserSettings = async (
     avatarPath: string,
     username: string
   ): Promise<IConfig> => {
@@ -104,16 +113,18 @@ export default class IPC {
       });
   };
 
-  static saveRoomSettings = (values: any): Promise<IConfig> => {
+  static saveRoomSettings = async (values: any): Promise<IConfig> => {
     return ipcRenderer.invoke(IPCEvents.SAVE_ROOM_SETTINGS, values).then(() => {
       return IPC.fetchSettings();
     });
   };
 
-  static saveInterfaceSettings = (values: any): Promise<IConfig> => {
-    return ipcRenderer.invoke(IPCEvents.SAVE_INTERFACE_SETTINGS, values).then(() => {
-      return IPC.fetchSettings();
-    });
+  static saveInterfaceSettings = async (values: any): Promise<IConfig> => {
+    return ipcRenderer
+      .invoke(IPCEvents.SAVE_INTERFACE_SETTINGS, values)
+      .then(() => {
+        return IPC.fetchSettings();
+      });
   };
 
   static fetchSettings = (): Promise<IConfig> => {
@@ -184,6 +195,14 @@ export default class IPC {
       width: 800,
       height: 800,
       path: Paths.SERVER_LOG,
+    });
+  };
+
+  static openLeave = () => {
+    return IPC.createWindow({
+      width: 300,
+      height: 200,
+      path: Paths.LEAVE,
     });
   };
 
