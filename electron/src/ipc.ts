@@ -20,12 +20,44 @@ interface Connection {
   room: RoomData;
 }
 
+enum NotifyEventType {
+  FILE_CHANGE = "file_change",
+  FILE_ERROR = "file_error",
+  USER_JOIN = "user_join",
+  USER_LEAVE = "user_leave",
+}
+
 export default class IPC {
   static win: any;
   static connection: Connection;
 
-  static notify(title: string, body?: string) {
-    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  static async notify(
+    notifyEvent: NotifyEventType,
+    title: string,
+    body?: string
+  ) {
+    // In the future we should try to find a new approach so we don't have to read the config on disk everytime.
+    const config: IConfig = await Config.get();
+    let send = false;
+
+    switch (notifyEvent) {
+      case NotifyEventType.FILE_CHANGE:
+        send = config.notifyFileChange;
+        break;
+      case NotifyEventType.FILE_ERROR:
+        send = config.notifyFileError;
+        break;
+      case NotifyEventType.USER_JOIN:
+        send = config.notifyUserJoin;
+        break;
+      case NotifyEventType.USER_LEAVE:
+        send = config.notifyUserLeave;
+        break;
+      default:
+        throw Error("Could not match to notify event");
+    }
+
+    if (send) IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
   }
 
   static getUsers = async (roomId: string) => {
@@ -130,15 +162,19 @@ export default class IPC {
                 change: fileChange,
                 roomId,
               });
-
-              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
-                console.log(e);
-                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
-              });
             });
 
             FS.listenForLocalPatches(source, (patch: IPatch) => {
               socket.emit(Events.room_file_change, { change: patch, roomId });
+            });
+
+            socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+              console.log(e);
+              IPC.notify(
+                NotifyEventType.FILE_ERROR,
+                "Could not apply patch",
+                `File: ${e.change.path}`
+              );
             });
 
             // Tell the server we would like to join.
@@ -155,9 +191,12 @@ export default class IPC {
                   const treeData = IPC.getTreeData(source);
 
                   IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
-
-                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
+
+                IPC.notify(
+                  NotifyEventType.FILE_CHANGE,
+                  `File updated: ${fileEventRequest.change.path}`
+                );
               }
             );
 
@@ -165,18 +204,22 @@ export default class IPC {
               let user: any, title: string;
               const { event } = eventData;
 
+              let notifyEvent: NotifyEventType;
+
               if (event === "JOIN") {
                 title = "User joined the room";
                 user = eventData.newUser;
+                notifyEvent = NotifyEventType.USER_JOIN;
               } else if (event === "LEAVE") {
                 title = "User left the room";
                 user = eventData.removedUser;
+                notifyEvent = NotifyEventType.USER_LEAVE;
               }
 
               const { username, id } = user;
               if (username) title += `: ${username}`;
 
-              IPC.notify(title, `ID: ${id}`);
+              IPC.notify(notifyEvent, title, `ID: ${id}`);
 
               IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
             });
