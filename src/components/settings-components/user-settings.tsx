@@ -17,7 +17,12 @@ export default class UserSettings extends Component<IProps, IConfig> {
     super(props);
     this.state = {
       username: "",
-    };
+      notifyFileChange: false,
+      notifyFileError: false,
+      notifyUserJoin: false,
+      notifyUserLeave: false,
+      theme: "",
+    }
   }
 
   componentDidMount() {
@@ -48,12 +53,12 @@ export default class UserSettings extends Component<IProps, IConfig> {
         message.success("Changes saved!");
       })
       .catch(() => {
-        message.error("Check that the avatar path is correct");
+        message.error("Check that the avatar path is correct!");
       });
   };
 
   onFinishFailed = () => {
-    message.error("Could not save user settings");
+    message.error("Could not save user settings!");
   };
 
   render() {

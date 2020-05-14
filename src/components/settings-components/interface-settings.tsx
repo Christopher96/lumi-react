@@ -29,10 +29,12 @@ const options = [
 ];
 
 export default class InterfaceSettings extends Component<IProps, IState> {
-  onFinish(values: any) {}
+  onFinish(values: any) {
+    message.success("Changes saved!");
+  }
 
   onFinishFailed() {
-    message.error("Could not save interface settings");
+    message.error("Could not save interface settings!");
   }
 
   render() {
@@ -53,7 +55,7 @@ export default class InterfaceSettings extends Component<IProps, IState> {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
         >
-          <Form.Item name="theme_select" label="Select a theme">
+          <Form.Item name="theme" label="Select a theme">
             <Cascader options={options} placeholder="Please select" />
           </Form.Item>
           <Form.Item>

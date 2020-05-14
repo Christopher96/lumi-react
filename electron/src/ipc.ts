@@ -2,7 +2,6 @@ import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
 import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
-import fse from "fs-extra";
 import {
   FileEvent,
   FileEventRequest,

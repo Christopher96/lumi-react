@@ -2,17 +2,38 @@ import React, { Component } from "react";
 import { Row, Switch, Form, message, Input, Button } from "antd";
 import LumiContext from "src/context/lumi-context";
 import Password from "antd/lib/input/Password";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
+import IPC from "src/context/ipc";
 
 interface IProps {}
-interface IState {}
 
-export default class RoomSettings extends Component<IProps, IState> {
+export default class RoomSettings extends Component<IProps, IConfig> {
   static contextType = LumiContext;
 
-  onFinish(values: any) {}
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+      notifyFileChange: false,
+      notifyFileError: false,
+      notifyUserJoin: false,
+      notifyUserLeave: false,
+      theme: "",
+    }
+  }
+
+  componentDidMount() {
+    IPC.fetchSettings().then((config: IConfig) => {
+      this.setState(config);
+    });
+  }
+
+  onFinish(values: any) {
+    message.success("Changes saved!");
+  }
 
   onFinishFailed() {
-    message.error("Could not save room settings");
+    message.error("Could not save room settings!");
   }
 
   render() {
@@ -34,16 +55,16 @@ export default class RoomSettings extends Component<IProps, IState> {
           onFinishFailed={this.onFinishFailed}
         >
           <Form.Item name="notify_file_change" label="Notify file change">
-            <Switch defaultChecked />
+            <Switch checked={this.state.notifyFileChange || false} />
           </Form.Item>
           <Form.Item name="notify_file_error" label="Notify file error">
-            <Switch defaultChecked />
+            <Switch checked={this.state.notifyFileError || false} />
           </Form.Item>
           <Form.Item name="notify_user_join" label="Notify user join">
-            <Switch defaultChecked />
+            <Switch checked={this.state.notifyUserJoin || false} />
           </Form.Item>
           <Form.Item name="notify_user_leave" label="Notify user leave">
-            <Switch defaultChecked />
+            <Switch checked={this.state.notifyUserJoin || false} />
           </Form.Item>
 
           <Row>
