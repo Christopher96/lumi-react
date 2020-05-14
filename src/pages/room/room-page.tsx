@@ -69,9 +69,15 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   openLogs() {
     IPC.openLogs();
   }
-  openLeave() {
-    IPC.openLeave();
-  }
+  openLeave = () => {
+    IPC.leaveRoom().then((leave: boolean) => {
+      if (!leave) return;
+
+      this.context.update({
+        connected: false,
+      });
+    });
+  };
 
   bottomMenuButtons = (
     <Row className="bottom-menu">
