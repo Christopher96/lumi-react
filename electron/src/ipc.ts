@@ -12,7 +12,7 @@ import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
 
-const { ipcMain, dialog, BrowserWindow } = require("electron");
+const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -40,6 +40,14 @@ export default class IPC {
   static getTreeData = (path: string) => {
     return new FileTree().make(path);
   };
+
+  static disconnect() {
+    if (IPC.connection !== undefined) {
+      IPC.connection.socket.disconnect();
+    }
+
+    IPC.connection = undefined;
+  }
 
   static init(mainWindow: any) {
     IPC.win = mainWindow;
@@ -90,13 +98,12 @@ export default class IPC {
           };
         }
 
-        if (IPC.connection !== undefined) {
-          IPC.connection.socket.disconnect();
-        }
+        IPC.disconnect();
 
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
+          IPC.disconnect();
           IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
@@ -192,6 +199,27 @@ export default class IPC {
         return await new Promise(joinWait);
       }
     );
+
+    ipcMain.handle(IPCEvents.LEAVE_ROOM, async () => {
+      const logo = nativeImage.createFromPath("../../src/assets/logo.png");
+
+      dialog
+        .showMessageBox(IPC.win, {
+          type: "question",
+          message: "Leave room",
+          detail: "Are you sure you want to leave the room?",
+          buttons: ["Yes", "No"],
+          icon: logo,
+        })
+        .then((answer: any) => {
+          const disconnect = answer.response === 0;
+          if (disconnect) {
+            IPC.disconnect();
+          }
+
+          return disconnect;
+        });
+    });
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const res = await API.LogsRequest.getAllLogs(amount);
