@@ -6,7 +6,7 @@ import {
   FileEvent,
   FileEventRequest,
   IPatch,
-  IFileChange
+  IFileChange,
 } from "lumi-cli/dist/lib/common/types";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
@@ -20,12 +20,44 @@ interface Connection {
   room: RoomData;
 }
 
+enum NotifyEventType {
+  FILE_CHANGE = "file_change",
+  FILE_ERROR = "file_error",
+  USER_JOIN = "user_join",
+  USER_LEAVE = "user_leave",
+}
+
 export default class IPC {
   static win: any;
   static connection: Connection;
 
-  static notify(title: string, body?: string) {
-    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  static async notify(
+    notifyEvent: NotifyEventType,
+    title: string,
+    body?: string
+  ) {
+    // In the future we should try to find a new approach so we don't have to read the config on disk everytime.
+    const config: IConfig = await Config.get();
+    let send = false;
+
+    switch (notifyEvent) {
+      case NotifyEventType.FILE_CHANGE:
+        send = config.notifyFileChange;
+        break;
+      case NotifyEventType.FILE_ERROR:
+        send = config.notifyFileError;
+        break;
+      case NotifyEventType.USER_JOIN:
+        send = config.notifyUserJoin;
+        break;
+      case NotifyEventType.USER_LEAVE:
+        send = config.notifyUserLeave;
+        break;
+      default:
+        throw Error("Could not match to notify event");
+    }
+
+    if (send) IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
   }
 
   static getUsers = async (roomId: string) => {
@@ -68,7 +100,7 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
       const result = await dialog.showOpenDialog(IPC.win, {
-        properties: ["openDirectory"]
+        properties: ["openDirectory"],
       });
       return result.filePaths[0];
     });
@@ -76,7 +108,7 @@ export default class IPC {
     ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
       if (!fse.existsSync(source)) {
         return {
-          error: `Target directory does not exist: ${source}`
+          error: `Target directory does not exist: ${source}`,
         };
       }
 
@@ -87,7 +119,7 @@ export default class IPC {
         return roomId;
       } else {
         return {
-          error: `Could not create room with source: ${source}`
+          error: `Could not create room with source: ${source}`,
         };
       }
     });
@@ -100,7 +132,7 @@ export default class IPC {
 
         if (!fse.existsSync(source)) {
           return {
-            error: `Target directory does not exist: ${source}`
+            error: `Target directory does not exist: ${source}`,
           };
         }
 
@@ -116,13 +148,13 @@ export default class IPC {
         const joinWait = async (resolve: any) => {
           setInterval(() => {
             resolve({
-              error: `Timed out`
+              error: `Timed out`,
             });
           }, 5000);
 
           socket.once(Events.room_join_err, (res: any) => {
             resolve({
-              error: res.message
+              error: res.message,
             });
           });
 
@@ -133,17 +165,21 @@ export default class IPC {
             FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
               socket.emit(Events.room_file_change, {
                 change: fileChange,
-                roomId
-              });
-
-              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
-                console.log(e);
-                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
+                roomId,
               });
             });
 
             FS.listenForLocalPatches(source, (patch: IPatch) => {
               socket.emit(Events.room_file_change, { change: patch, roomId });
+            });
+
+            socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+              console.log(e);
+              IPC.notify(
+                NotifyEventType.FILE_ERROR,
+                "Could not apply patch",
+                `File: ${e.change.path}`
+              );
             });
 
             // Tell the server we would like to join.
@@ -156,16 +192,15 @@ export default class IPC {
                 } else {
                   const fileChange = fileEventRequest.change as IFileChange;
                   await FS.applyFileChange(source, fileChange);
-
-                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
-                const { treeData } = await IPC.getTreeData(source, roomId);
-                const fileMap = await API.LogsRequest.getFileMap(roomId);
 
-                IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, {
-                  treeData,
-                  fileMap
-                });
+                const treeData = IPC.getTreeData(source, roomId);
+                IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
+
+                IPC.notify(
+                  NotifyEventType.FILE_CHANGE,
+                  `File updated: ${fileEventRequest.change.path}`
+                );
               }
             );
 
@@ -173,30 +208,34 @@ export default class IPC {
               let user: any, title: string;
               const { event } = eventData;
 
+              let notifyEvent: NotifyEventType;
+
               if (event === "JOIN") {
                 title = "User joined the room";
                 user = eventData.newUser;
+                notifyEvent = NotifyEventType.USER_JOIN;
               } else if (event === "LEAVE") {
                 title = "User left the room";
                 user = eventData.removedUser;
+                notifyEvent = NotifyEventType.USER_LEAVE;
               }
 
               const { username, id } = user;
               if (username) title += `: ${username}`;
 
-              IPC.notify(title, `ID: ${id}`);
+              IPC.notify(notifyEvent, title, `ID: ${id}`);
 
               IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
             });
 
             const room = {
               roomId,
-              source
+              source,
             };
 
             IPC.connection = {
               socket,
-              room
+              room,
             };
 
             resolve(room);
@@ -218,7 +257,7 @@ export default class IPC {
           message: "Leave room",
           detail: "Are you sure you want to leave the room?",
           buttons: ["Yes", "No"],
-          icon: logo
+          icon: logo,
         })
         .then((answer: any) => {
           const disconnect = answer.response === 0;
@@ -232,12 +271,12 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
-      return res.logs.map(l => {
+      return res.logs.map((l) => {
         return {
           event: l.event,
           user: l.byWhom?.username || "Unknown",
           date: new Date(l.date).toLocaleString(),
-          path: l.body?.path || ""
+          path: l.body?.path || "",
         };
       });
     });
@@ -260,8 +299,8 @@ export default class IPC {
         width: winProps.width,
         height: winProps.height,
         webPreferences: {
-          nodeIntegration: true
-        }
+          nodeIntegration: true,
+        },
       });
       win.on("close", () => {
         win = null;
@@ -274,7 +313,7 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.SELECT_AVATAR, async () => {
       const result = await dialog.showOpenDialog(mainWindow, {
-        filters: [{ name: "Images", extensions: ["jpg", "png"] }]
+        filters: [{ name: "Images", extensions: ["jpg", "png"] }],
       });
       return result.filePaths[0];
     });

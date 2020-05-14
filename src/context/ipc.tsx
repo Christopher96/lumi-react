@@ -15,7 +15,7 @@ export default class IPC {
       .then((res: any) => {
         if (res.error) {
           return {
-            error: res.error
+            error: res.error,
           };
         } else {
           return IPC.joinRoom(context, res, source);
@@ -23,7 +23,7 @@ export default class IPC {
       })
       .finally(() => {
         context.update({
-          loading: false
+          loading: false,
         });
       });
   };
@@ -34,13 +34,13 @@ export default class IPC {
       .then((res: any) => {
         if (res.error) {
           return {
-            error: res.error
+            error: res.error,
           };
         } else {
           context.update({
             room: res,
             connected: true,
-            loading: false
+            loading: false,
           });
 
           return true;
@@ -48,7 +48,7 @@ export default class IPC {
       })
       .finally(() => {
         context.update({
-          loading: false
+          loading: false,
         });
       });
   };
@@ -132,7 +132,7 @@ export default class IPC {
       if (window.Notification.permission === "granted") {
         res();
       }
-      window.Notification.requestPermission().then(permission => {
+      window.Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
           res();
         } else {
@@ -142,7 +142,8 @@ export default class IPC {
     }).then(() => {
       new window.Notification(title, {
         icon: logo,
-        body
+        silent: true,
+        body,
       });
     });
   };
@@ -154,9 +155,9 @@ export default class IPC {
       actions: [
         {
           action: "yes",
-          title: "Yes"
-        }
-      ]
+          title: "Yes",
+        },
+      ],
     });
 
     window.addEventListener(
@@ -172,7 +173,7 @@ export default class IPC {
       },
       {
         capture: false,
-        once: true
+        once: true,
       }
     );
   };
@@ -181,7 +182,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 500,
       height: 400,
-      path: Paths.INVITE
+      path: Paths.INVITE,
     });
   };
 
@@ -189,7 +190,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 800,
       height: 800,
-      path: Paths.SERVER_LOG
+      path: Paths.SERVER_LOG,
     });
   };
 
@@ -197,7 +198,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 300,
       height: 200,
-      path: Paths.LEAVE
+      path: Paths.LEAVE,
     });
   };
 
@@ -205,7 +206,7 @@ export default class IPC {
     return IPC.createWindow({
       width: 800,
       height: 400,
-      path: Paths.SETTINGS
+      path: Paths.SETTINGS,
     });
   };
 }
