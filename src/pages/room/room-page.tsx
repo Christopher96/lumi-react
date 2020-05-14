@@ -23,7 +23,9 @@ interface IProps {}
 interface IState {
   treeData: any;
   users: any[];
-  logs: any;
+
+  // File Path => Socket id
+  fileMap: Record<string, string>;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
@@ -32,33 +34,31 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   state: IState = {
     treeData: [],
     users: [],
-    logs: []
+    fileMap: {}
   };
 
   componentDidMount() {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: "Room"
+      title: `Room ${this.context.room.roomId}`
     });
 
-    IPC.updateFolder((treeData: any) => {
-      IPC.fetchSingleLog(this.context.room.roomId, 1).then(logs => {
+    IPC.updateFolder(({ treeData, fileMap }: any) => {
+      this.setState({
+        treeData,
+        fileMap: fileMap.roomMap
+      });
+    });
+
+    IPC.fetchFolder(this.context.room.source, this.context.room.roomId).then(
+      ({ treeData, fileMap }: any) => {
         this.setState({
-          logs: [...logs, ...this.state.logs]
+          treeData,
+          fileMap: fileMap.roomMap
         });
-      });
-
-      this.setState({
-        treeData
-      });
-    });
-
-    IPC.fetchFolder(this.context.room.source).then(treeData => {
-      this.setState({
-        treeData
-      });
-    });
+      }
+    );
 
     IPC.updateUsers((users: [UserData]) => {
       this.setState({
@@ -69,12 +69,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
       this.setState({
         users
-      });
-    });
-
-    IPC.fetchSingleLog(this.context.room.roomId, 100).then(logs => {
-      this.setState({
-        logs
       });
     });
   }
@@ -131,9 +125,9 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     //alert("Trigger Expand");
   };
 
-  makeUser = (user: any) => {
+  makeUser = (user: any, key: number) => {
     return (
-      <div className="userItem">
+      <div key={key} className="userItem">
         <Card>
           <Meta
             avatar={
@@ -156,28 +150,20 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    const { users, treeData, logs } = this.state;
-    const changes: { path: string; user: string }[] = logs.filter(
-      (v: { event: string }) => v.event === "FILE_MANIPULATIION"
-    );
-    console.log(users);
+    const { users, treeData, fileMap } = this.state;
 
-    const realTree = new AddIconsToTree().make(treeData, list => {
-      const changeIndex = changes.findIndex(v => v.path === list.join("/"));
+    const realTree = new AddIconsToTree().make(treeData, filePath => {
+      const userId = fileMap[filePath.join(",")];
+      const user = users.find(v => v.id === userId);
 
-      if (changeIndex === -1) return undefined;
-      else {
-        const change = changes[changeIndex];
-        // Finds the user which
-        const user = users.find(v => v.username === change.user);
-        return <p style={{ fontSize: "4px" }}>{changes[changeIndex].user}</p>;
-      }
+      return <p style={{ fontSize: "5px" }}>{JSON.stringify(user)}</p>;
     });
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
     ) : (
       <>
+        {JSON.stringify(fileMap)}
         <TopBar />
         <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">

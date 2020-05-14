@@ -19,11 +19,14 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
+  padding: .3em;
+  padding-bottom: 0;
   .userItem {
     cursor: pointer;
     white-space: nowrap;
     transition: width .5s;
     width: 60px;
+    margin: .3em;
   }
   .userItem:hover {
     width: 250px;
