@@ -163,11 +163,16 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     const { users, treeData, fileMap } = this.state;
 
     const realTree = new AddIconsToTree().make(treeData, filePath => {
-      filePath = filePath.filter(v => v !== ".shadow");
+      // We want to remove the shadow relative path if shadow is in the first index.
+      filePath = filePath.filter((v, i) => !(v === ".shadow" && i === 0));
       const userId = fileMap[filePath.join(",")];
       const user = users.find(v => v.id === userId);
 
-      return <ProfilePicture size={15} alt="avatar" image={user?.avatar} />;
+      return (
+        <div className="change-file-user-icon">
+          <ProfilePicture size={25} alt="avatar" image={user?.avatar} />
+        </div>
+      );
     });
 
     return !this.context.connected ? (
