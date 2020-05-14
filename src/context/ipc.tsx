@@ -3,27 +3,48 @@ import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
+const logo = require("src/assets/logo.png");
 const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
+  static registration: ServiceWorkerRegistration;
+
   static createRoom = async (context: any, source: string) => {
+    console.log(source);
     return await ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
-      .then((_: any, roomID: string) => {
-        return IPC.joinRoom(context, roomID, source);
+      .then((res: any) => {
+        if (res.error) {
+          return {
+            error: res.error,
+          };
+        } else {
+          return IPC.joinRoom(context, res, source);
+        }
+      })
+      .finally(() => {
+        context.update({
+          loading: false,
+        });
       });
   };
 
   static joinRoom = async (context: any, roomID: string, source: string) => {
     return await ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, source)
-      .then((room: RoomData) => {
-        if (room) {
+      .then((res: any) => {
+        if (res.error) {
+          return {
+            error: res.error,
+          };
+        } else {
           context.update({
-            room,
+            room: res,
             connected: true,
             loading: false,
           });
+
+          return true;
         }
       })
       .finally(() => {
@@ -49,7 +70,7 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.FETCH_FOLDER, folder);
   };
 
-  static fetchUsers = (roomId: string): Promise<[UserData]> => {
+  static fetchUsers = (roomId: string): Promise<any> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_USERS, roomId);
   };
 
@@ -77,6 +98,56 @@ export default class IPC {
 
   static fetchSettings = (): Promise<IConfig> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_SETTINGS);
+  }
+  
+  static notify = (title: string, body?: any) => {
+    new Promise((res, rej) => {
+      if (window.Notification.permission === "granted") {
+        res();
+      }
+      window.Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          res();
+        } else {
+          rej();
+        }
+      });
+    }).then(() => {
+      new window.Notification(title, {
+        icon: logo,
+        body,
+      });
+    });
+  };
+
+  // TODO We might use the service worker to use notification actions
+  static SWnotify = (title: string, body?: any) => {
+    IPC.registration.showNotification(title, {
+      body,
+      actions: [
+        {
+          action: "yes",
+          title: "Yes",
+        },
+      ],
+    });
+
+    window.addEventListener(
+      "notificationclick",
+      function(event: any) {
+        event.notification.close();
+        if (event.action === "yes") {
+          // Archive action was clicked
+          window.alert("yes");
+        } else {
+          window.alert("no");
+        }
+      },
+      {
+        capture: false,
+        once: true,
+      }
+    );
   };
 
   static openInvite = () => {
