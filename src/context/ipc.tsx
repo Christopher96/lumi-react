@@ -103,6 +103,7 @@ export default class IPC {
     }).then(() => {
       new window.Notification(title, {
         icon: logo,
+        silent: true,
         body,
       });
     });
