@@ -62,7 +62,10 @@ export default class UserSettings extends Component<IProps, IConfig> {
         <Row>
           <h1>User settings</h1>
         </Row>
-        <Row className='profile-picture-row'>
+        <Row>
+          <h2>Profile</h2>
+        </Row>
+        <Row className="profile-picture-row">
           <ProfilePicture image={this.state.avatar} size={128} alt="profile" />
         </Row>
 
@@ -76,37 +79,24 @@ export default class UserSettings extends Component<IProps, IConfig> {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
         >
-          <Form.Item
-            label="Avatar"
-            name="avatar"
-            rules={[
-              {
-                message: "You need to select an avatar",
-              },
-            ]}
-          >
+          <Form.Item label="Avatar" name="avatar">
             {this.state.avatar ? (
               <Button onClick={this.deselectAvatar}>Remove Image</Button>
             ) : (
               <Search
-              enterButton={
-                <>
-                  <span>Open</span>
-                  <FolderOutlined />
-                </>
-              }
-              placeholder="Enter an avatar path..."
-              onSearch={this.selectAvatar}
-            />
+                enterButton={
+                  <>
+                    <span>Open</span>
+                    <FolderOutlined />
+                  </>
+                }
+                placeholder="Enter an avatar path..."
+                onSearch={this.selectAvatar}
+              />
             )}
-
           </Form.Item>
 
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[{ message: "Please input your username!" }]}
-          >
+          <Form.Item label="Username" name="username">
             <Input placeholder={this.state.username} />
           </Form.Item>
 
