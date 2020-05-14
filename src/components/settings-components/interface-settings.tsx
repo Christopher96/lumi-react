@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Cascader, Row, Form, message, Button } from "antd";
 import "./settings-components.scss";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
+import IPC from "src/context/ipc";
 
 interface IProps {}
-interface IState {}
 
 const options = [
   {
@@ -28,14 +29,39 @@ const options = [
   },
 ];
 
-export default class InterfaceSettings extends Component<IProps, IState> {
-  onFinish(values: any) {
-    message.success("Changes saved!");
+export default class InterfaceSettings extends Component<IProps, IConfig> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+      notifyFileChange: false,
+      notifyFileError: false,
+      notifyUserJoin: false,
+      notifyUserLeave: false,
+      theme: "Lumi_01",
+    };
+  }
+  
+  componentDidMount() {
+    IPC.fetchSettings().then((config: IConfig) => {
+      this.setState(config);
+    });
   }
 
-  onFinishFailed() {
+  onFinish = (values: any) => {
+    IPC.saveInterfaceSettings(values)
+      .then((config: IConfig) => {
+        this.setState(config);
+        message.success("Changes saved!");
+      })
+      .catch((err) => {
+        message.error("Could not save interface settings!");
+      });
+  };
+
+  onFinishFailed = () => {
     message.error("Could not save interface settings!");
-  }
+  };
 
   render() {
     return (
@@ -56,7 +82,7 @@ export default class InterfaceSettings extends Component<IProps, IState> {
           onFinishFailed={this.onFinishFailed}
         >
           <Form.Item name="theme" label="Select a theme">
-            <Cascader options={options} placeholder="Please select" />
+            <Cascader options={options} placeholder={options.find((e) => e.value === this.state.theme)?.label} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

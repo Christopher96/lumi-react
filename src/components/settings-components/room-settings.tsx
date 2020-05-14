@@ -1,14 +1,11 @@
 import React, { Component } from "react";
-import { Row, Switch, Form, message, Input, Button } from "antd";
-import LumiContext from "src/context/lumi-context";
-import Password from "antd/lib/input/Password";
+import { Row, Switch, Form, message, Button } from "antd";
 import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPC from "src/context/ipc";
 
 interface IProps {}
 
 export default class RoomSettings extends Component<IProps, IConfig> {
-  static contextType = LumiContext;
 
   constructor(props: any) {
     super(props);
@@ -19,7 +16,7 @@ export default class RoomSettings extends Component<IProps, IConfig> {
       notifyUserJoin: false,
       notifyUserLeave: false,
       theme: "",
-    }
+    };
   }
 
   componentDidMount() {
@@ -28,13 +25,20 @@ export default class RoomSettings extends Component<IProps, IConfig> {
     });
   }
 
-  onFinish(values: any) {
-    message.success("Changes saved!");
-  }
+  onFinish = (values: any) => {
+    IPC.saveRoomSettings(values)
+      .then((config: IConfig) => {
+        this.setState(config);
+        message.success("Changes saved!");
+      })
+      .catch((err) => {
+        message.error("Could not save room settings!");
+      });
+  };
 
-  onFinishFailed() {
+  onFinishFailed = () => {
     message.error("Could not save room settings!");
-  }
+  };
 
   render() {
     return (
@@ -54,23 +58,40 @@ export default class RoomSettings extends Component<IProps, IConfig> {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
         >
-          <Form.Item name="notify_file_change" label="Notify file change">
-            <Switch checked={this.state.notifyFileChange || false} />
+          <Form.Item name="notifyFileChange" label="Notify file change">
+            <Switch
+              onClick={(e) => this.setState({ notifyFileChange: e.valueOf() })}
+              checked={this.state.notifyFileChange}
+            />
           </Form.Item>
-          <Form.Item name="notify_file_error" label="Notify file error">
-            <Switch checked={this.state.notifyFileError || false} />
+          <Form.Item name="notifyFileError" label="Notify file error">
+            <Switch
+              onClick={(e) => this.setState({ notifyFileError: e.valueOf() })}
+              checked={this.state.notifyFileError}
+            />
           </Form.Item>
-          <Form.Item name="notify_user_join" label="Notify user join">
-            <Switch checked={this.state.notifyUserJoin || false} />
+          <Form.Item name="notifyUserJoin" label="Notify user join">
+            <Switch
+              onClick={(e) => this.setState({ notifyUserJoin: e.valueOf() })}
+              checked={this.state.notifyUserJoin}
+            />
           </Form.Item>
-          <Form.Item name="notify_user_leave" label="Notify user leave">
-            <Switch checked={this.state.notifyUserJoin || false} />
+          <Form.Item name="notifyUserLeave" label="Notify user leave">
+            <Switch
+              onClick={(e) => this.setState({ notifyUserLeave: e.valueOf() })}
+              checked={this.state.notifyUserLeave}
+            />
           </Form.Item>
 
-          <Row>
+         
+
+          {/*   
+          
+            Uncomment this if we want to be able to change the room password
+
+           <Row>
             <h2>Room specific</h2>
           </Row>
-
           <Form.Item label="Room password" name="room_password">
             <Password
               disabled={!this.context.connected}
@@ -80,7 +101,8 @@ export default class RoomSettings extends Component<IProps, IConfig> {
                   : "Please join a room first"
               }
             />
-          </Form.Item>
+            </Form.Item> */}
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save

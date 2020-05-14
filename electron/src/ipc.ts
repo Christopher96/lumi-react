@@ -240,13 +240,35 @@ export default class IPC {
     });
 
     ipcMain.handle(
-      IPCEvents.SAVE_SETTINGS,
+      IPCEvents.SAVE_USER_SETTINGS,
       async (_, avatarPath: string, username: string) => {
         const config: IConfig = await Config.get();
         if (avatarPath === null) config.avatar = null;
         else if (avatarPath !== undefined)
           config.avatar = await fse.readFile(avatarPath);
         if (username !== undefined) config.username = username;
+        Config.update(config);
+      }
+    );
+
+    ipcMain.handle(IPCEvents.SAVE_ROOM_SETTINGS, async (_, values: any) => {
+      const config: IConfig = await Config.get();
+      if (values.notifyFileChange !== undefined)
+        config.notifyFileChange = values.notifyFileChange;
+      if (values.notifyFileError !== undefined)
+        config.notifyFileError = values.notifyFileError;
+      if (values.notifyUserJoin !== undefined)
+        config.notifyUserJoin = values.notifyUserJoin;
+      if (values.notifyUserLeave !== undefined)
+        config.notifyUserLeave = values.notifyUserLeave;
+      Config.update(config);
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_INTERFACE_SETTINGS,
+      async (_, values: any) => {
+        const config: IConfig = await Config.get();
+        if (values.theme !== undefined) config.theme = values.theme[0];
         Config.update(config);
       }
     );

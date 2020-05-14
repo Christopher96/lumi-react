@@ -90,16 +90,33 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.CREATE_WINDOW, window);
   };
 
-  static saveSettings = (avatarPath: string, username: string): Promise<IConfig> => {
-    return ipcRenderer.invoke(IPCEvents.SAVE_SETTINGS, avatarPath, username).then(() => {
+  static saveUserSettings = (
+    avatarPath: string,
+    username: string
+  ): Promise<IConfig> => {
+    return ipcRenderer
+      .invoke(IPCEvents.SAVE_USER_SETTINGS, avatarPath, username)
+      .then(() => {
+        return IPC.fetchSettings();
+      });
+  };
+
+  static saveRoomSettings = (values: any): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_ROOM_SETTINGS, values).then(() => {
+      return IPC.fetchSettings();
+    });
+  };
+
+  static saveInterfaceSettings = (values: any): Promise<IConfig> => {
+    return ipcRenderer.invoke(IPCEvents.SAVE_INTERFACE_SETTINGS, values).then(() => {
       return IPC.fetchSettings();
     });
   };
 
   static fetchSettings = (): Promise<IConfig> => {
     return ipcRenderer.invoke(IPCEvents.FETCH_SETTINGS);
-  }
-  
+  };
+
   static notify = (title: string, body?: any) => {
     new Promise((res, rej) => {
       if (window.Notification.permission === "granted") {
