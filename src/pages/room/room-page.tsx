@@ -52,6 +52,20 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
+    IPC.fetchUsers(this.context.room.roomId).then(
+      (users: { user: UserData }[]) => {
+        this.setState({
+          users: users.map(v => v.user)
+        });
+      }
+    );
+
+    IPC.updateUsers((users: UserData[]) => {
+      this.setState({
+        users
+      });
+    });
+
     IPC.fetchFolder(this.context.room.source, this.context.room.roomId).then(
       ({ treeData, fileMap }: any) => {
         this.setState({
@@ -60,18 +74,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         });
       }
     );
-
-    IPC.updateUsers((users: [UserData]) => {
-      this.setState({
-        users
-      });
-    });
-
-    IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
-      this.setState({
-        users
-      });
-    });
   }
 
   openInvite() {
@@ -159,10 +161,8 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     );
   };
 
-  render() {
-    const { users, treeData, fileMap } = this.state;
-
-    const realTree = new AddIconsToTree().make(treeData, filePath => {
+  getIconTree = (treeData: any, fileMap: any, users: any[]) => {
+    return new AddIconsToTree().make(treeData, filePath => {
       // We want to remove the shadow relative path if shadow is in the first index.
       filePath = filePath.filter((v, i) => !(v === ".shadow" && i === 0));
       const userId = fileMap[filePath.join(",")];
@@ -174,19 +174,26 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         </div>
       );
     });
+  };
+
+  render() {
+    const { users, treeData, fileMap } = this.state;
+    const realTree = this.getIconTree(treeData, fileMap, users);
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
     ) : (
       <>
         <TopBar />
-        <div className="users">{users.map(this.makeUser)}</div>
+        {JSON.stringify(users)}
+        {JSON.stringify(fileMap)}
+        <div className="users">{[...users].map(this.makeUser)}</div>
         <div className="container">
           <Tree
             showLine
             showIcon
             defaultExpandedKeys={["0-0-0"]}
-            treeData={realTree as any}
+            treeData={[...(realTree || [])] as any}
             onSelect={this.onSelect}
           />
           {this.bottomMenuButtons}

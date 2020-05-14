@@ -251,6 +251,7 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.FETCH_USERS, async (_, roomId: string) => {
       const res = await API.RoomRequest.listUsersInRoom(roomId);
+      console.log(res.users);
       return res.users;
     });
 
