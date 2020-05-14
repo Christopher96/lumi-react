@@ -9,9 +9,8 @@ const { ipcRenderer } = window.require("electron");
 export default class IPC {
   static registration: ServiceWorkerRegistration;
 
-  static createRoom = async (context: any, source: string) => {
-    console.log(source);
-    return await ipcRenderer
+  static createRoom = (context: any, source: string) => {
+    return ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
       .then((res: any) => {
         if (res.error) {
@@ -29,8 +28,8 @@ export default class IPC {
       });
   };
 
-  static joinRoom = async (context: any, roomID: string, source: string) => {
-    return await ipcRenderer
+  static joinRoom = (context: any, roomID: string, source: string) => {
+    return ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, source)
       .then((res: any) => {
         if (res.error) {
@@ -52,6 +51,10 @@ export default class IPC {
           loading: false,
         });
       });
+  };
+
+  static leaveRoom = (): Promise<boolean> => {
+    return ipcRenderer.invoke(IPCEvents.LEAVE_ROOM);
   };
 
   static selectDir = (): Promise<void> => {
@@ -180,14 +183,6 @@ export default class IPC {
       width: 800,
       height: 800,
       path: Paths.SERVER_LOG,
-    });
-  };
-
-  static openLeave = () => {
-    return IPC.createWindow({
-      width: 300,
-      height: 200,
-      path: Paths.LEAVE,
     });
   };
 
