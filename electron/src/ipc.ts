@@ -36,30 +36,28 @@ export default class IPC {
     title: string,
     body?: string
   ) {
-
     // In the future we should try to find a new approach so we don't have to read the config on disk everytime.
     const config: IConfig = await Config.get();
+    let send = false;
 
     switch (notifyEvent) {
       case NotifyEventType.FILE_CHANGE:
-        if (config.notifyFileChange)
-          IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+        send = config.notifyFileChange;
         break;
       case NotifyEventType.FILE_ERROR:
-        if (config.notifyFileError)
-          IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+        send = config.notifyFileError;
         break;
       case NotifyEventType.USER_JOIN:
-        if (config.notifyUserJoin)
-          IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+        send = config.notifyUserJoin;
         break;
       case NotifyEventType.USER_LEAVE:
-        if (config.notifyUserLeave)
-          IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+        send = config.notifyUserLeave;
         break;
       default:
         throw Error("Could not match to notify event");
     }
+
+    if (send) IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
   }
 
   static getUsers = async (roomId: string) => {
@@ -164,15 +162,19 @@ export default class IPC {
                 change: fileChange,
                 roomId,
               });
-
-              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
-                console.log(e);
-                IPC.notify(NotifyEventType.FILE_ERROR, "Could not apply patch", `File: ${e.change.path}`);
-              });
             });
 
             FS.listenForLocalPatches(source, (patch: IPatch) => {
               socket.emit(Events.room_file_change, { change: patch, roomId });
+            });
+
+            socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+              console.log(e);
+              IPC.notify(
+                NotifyEventType.FILE_ERROR,
+                "Could not apply patch",
+                `File: ${e.change.path}`
+              );
             });
 
             // Tell the server we would like to join.
@@ -189,9 +191,12 @@ export default class IPC {
                   const treeData = IPC.getTreeData(source);
 
                   IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
-
-                  IPC.notify(NotifyEventType.FILE_CHANGE, `File updated: ${fileEventRequest.change.path}`);
                 }
+
+                IPC.notify(
+                  NotifyEventType.FILE_CHANGE,
+                  `File updated: ${fileEventRequest.change.path}`
+                );
               }
             );
 
