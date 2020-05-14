@@ -15,18 +15,6 @@ const options = [
     value: "Lumi_dark_01",
     label: "Lumi Dark",
   },
-  {
-    value: "Lumi_classic_01",
-    label: "Lumi Classic",
-  },
-  {
-    value: "Lumi_extra_02",
-    label: "Luminosity",
-  },
-  {
-    value: "Ubuntu_01",
-    label: "Ubuntu Ambience",
-  },
 ];
 
 export default class InterfaceSettings extends Component<IProps, IConfig> {
@@ -41,7 +29,7 @@ export default class InterfaceSettings extends Component<IProps, IConfig> {
       theme: "Lumi_01",
     };
   }
-  
+
   componentDidMount() {
     IPC.fetchSettings().then((config: IConfig) => {
       this.setState(config);
@@ -67,7 +55,7 @@ export default class InterfaceSettings extends Component<IProps, IConfig> {
     return (
       <div>
         <Row>
-          <h1>Interface settings</h1>
+          <h1>Interface settings (under construction)</h1>
         </Row>
         <Row>
           <h2>Looks and feels</h2>
@@ -82,7 +70,12 @@ export default class InterfaceSettings extends Component<IProps, IConfig> {
           onFinishFailed={this.onFinishFailed}
         >
           <Form.Item name="theme" label="Select a theme">
-            <Cascader options={options} placeholder={options.find((e) => e.value === this.state.theme)?.label} />
+            <Cascader
+              options={options}
+              placeholder={
+                options.find((e) => e.value === this.state.theme)?.label
+              }
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

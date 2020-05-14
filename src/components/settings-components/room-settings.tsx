@@ -83,8 +83,6 @@ export default class RoomSettings extends Component<IProps, IConfig> {
             />
           </Form.Item>
 
-         
-
           {/*   
           
             Uncomment this if we want to be able to change the room password
