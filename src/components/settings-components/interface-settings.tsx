@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Cascader, Row, Col, InputNumber } from "antd";
+import { Cascader, Row, Form, message, Button } from "antd";
 import "./settings-components.scss";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
+import IPC from "src/context/ipc";
 
 interface IProps {}
-interface IState {}
 
 const options = [
   {
@@ -14,52 +15,74 @@ const options = [
     value: "Lumi_dark_01",
     label: "Lumi Dark",
   },
-  {
-    value: "Lumi_classic_01",
-    label: "Lumi Classic",
-  },
-  {
-    value: "Lumi_extra_02",
-    label: "Luminosity",
-  },
-  {
-    value: "Ubuntu_01",
-    label: "Ubuntu Ambience",
-  },
 ];
 
-export default class InterfaceSettings extends Component<IProps, IState> {
-  state = {
-    value: 100,
+export default class InterfaceSettings extends Component<IProps, IConfig> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+      notifyFileChange: false,
+      notifyFileError: false,
+      notifyUserJoin: false,
+      notifyUserLeave: false,
+      theme: "Lumi_01",
+    };
+  }
+
+  componentDidMount() {
+    IPC.fetchSettings().then((config: IConfig) => {
+      this.setState(config);
+    });
+  }
+
+  onFinish = (values: any) => {
+    IPC.saveInterfaceSettings(values)
+      .then((config: IConfig) => {
+        this.setState(config);
+        message.success("Changes saved!");
+      })
+      .catch((err) => {
+        message.error("Could not save interface settings!");
+      });
   };
 
-  onChange = (value: number) => {
-    console.log("changed", value);
+  onFinishFailed = () => {
+    message.error("Could not save interface settings!");
   };
 
   render() {
     return (
       <div>
         <Row>
-          <Col span={10}>Application theme:</Col>
-          <Col span={14}>
-            <Cascader options={options} placeholder="Please select" />
-          </Col>
+          <h1>Interface settings (under construction)</h1>
         </Row>
-        <br />
         <Row>
-          <Col span={10}>Application Interface size:</Col>
-          <Col span={14}>
-            <div>
-              <InputNumber
-                defaultValue={100}
-                min={0}
-                max={300}
-                formatter={(value) => `${value}%`}
-              />
-            </div>
-          </Col>
+          <h2>Looks and feels</h2>
         </Row>
+        <Form
+          labelCol={{ span: 8 }}
+          labelAlign="left"
+          wrapperCol={{ span: 16 }}
+          name="room_settings"
+          initialValues={{ remember: true }}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          <Form.Item name="theme" label="Select a theme">
+            <Cascader
+              options={options}
+              placeholder={
+                options.find((e) => e.value === this.state.theme)?.label
+              }
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     );
   }

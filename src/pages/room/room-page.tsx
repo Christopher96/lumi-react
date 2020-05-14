@@ -18,6 +18,7 @@ import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
 import { UserData } from "src/context/interfaces";
 import { AddIconsToTree } from "./add-icons-to-tree";
+import { ProfilePicture } from "../../components/image/profile-picture";
 
 interface IProps {}
 interface IState {
@@ -80,10 +81,15 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   openLogs() {
     IPC.openLogs();
   }
+  openLeave = () => {
+    IPC.leaveRoom().then((leave: boolean) => {
+      if (!leave) return;
 
-  openLeave() {
-    IPC.openLeave();
-  }
+      this.context.update({
+        connected: false
+      });
+    });
+  };
 
   bottomMenuButtons = (
     <Row className="bottom-menu">
@@ -134,7 +140,11 @@ export default class RoomFolderPage extends Component<IProps, IState> {
               <Avatar
                 icon={
                   user.avatar ? (
-                    <img alt="avatar" src={user.avatar} />
+                    <ProfilePicture
+                      size={40}
+                      alt="avatar"
+                      image={user.avatar}
+                    />
                   ) : (
                     <UserOutlined />
                   )
@@ -156,14 +166,13 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       const userId = fileMap[filePath.join(",")];
       const user = users.find(v => v.id === userId);
 
-      return <p style={{ fontSize: "5px" }}>{JSON.stringify(user)}</p>;
+      return <ProfilePicture size={15} alt="avatar" image={user?.avatar} />;
     });
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
     ) : (
       <>
-        {JSON.stringify(fileMap)}
         <TopBar />
         <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">

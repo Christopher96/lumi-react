@@ -1,6 +1,7 @@
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
+import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
 import {
   FileEvent,
   FileEventRequest,
@@ -12,7 +13,7 @@ import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
 
-const { ipcMain, dialog, BrowserWindow } = require("electron");
+const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -45,6 +46,14 @@ export default class IPC {
     const fileMap = await API.LogsRequest.getFileMap(roomId);
     return { treeData, fileMap };
   };
+
+  static disconnect() {
+    if (IPC.connection !== undefined) {
+      IPC.connection.socket.disconnect();
+    }
+
+    IPC.connection = undefined;
+  }
 
   static init(mainWindow: any) {
     IPC.win = mainWindow;
@@ -95,13 +104,12 @@ export default class IPC {
           };
         }
 
-        if (IPC.connection !== undefined) {
-          IPC.connection.socket.disconnect();
-        }
+        IPC.disconnect();
 
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
+          IPC.disconnect();
           IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
@@ -149,16 +157,15 @@ export default class IPC {
                   const fileChange = fileEventRequest.change as IFileChange;
                   await FS.applyFileChange(source, fileChange);
 
-                  const { treeData } = await IPC.getTreeData(source, roomId);
-                  const fileMap = await API.LogsRequest.getFileMap(roomId);
-
-                  IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, {
-                    treeData,
-                    fileMap
-                  });
-
                   IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
+                const { treeData } = await IPC.getTreeData(source, roomId);
+                const fileMap = await API.LogsRequest.getFileMap(roomId);
+
+                IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, {
+                  treeData,
+                  fileMap
+                });
               }
             );
 
@@ -202,6 +209,27 @@ export default class IPC {
       }
     );
 
+    ipcMain.handle(IPCEvents.LEAVE_ROOM, async () => {
+      const logo = nativeImage.createFromPath("../../src/assets/logo.png");
+
+      dialog
+        .showMessageBox(IPC.win, {
+          type: "question",
+          message: "Leave room",
+          detail: "Are you sure you want to leave the room?",
+          buttons: ["Yes", "No"],
+          icon: logo
+        })
+        .then((answer: any) => {
+          const disconnect = answer.response === 0;
+          if (disconnect) {
+            IPC.disconnect();
+          }
+
+          return disconnect;
+        });
+    });
+
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
       return res.logs.map(l => {
@@ -242,5 +270,53 @@ export default class IPC {
 
       return true;
     });
+
+    ipcMain.handle(IPCEvents.SELECT_AVATAR, async () => {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        filters: [{ name: "Images", extensions: ["jpg", "png"] }]
+      });
+      return result.filePaths[0];
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_USER_SETTINGS,
+      async (_, avatarPath: string, username: string) => {
+        const config: IConfig = await Config.get();
+        if (avatarPath === null) config.avatar = null;
+        else if (avatarPath !== undefined)
+          config.avatar = await fse.readFile(avatarPath);
+        if (username !== undefined) config.username = username;
+        Config.update(config);
+      }
+    );
+
+    ipcMain.handle(IPCEvents.SAVE_ROOM_SETTINGS, async (_, values: any) => {
+      const config: IConfig = await Config.get();
+      if (values.notifyFileChange !== undefined)
+        config.notifyFileChange = values.notifyFileChange;
+      if (values.notifyFileError !== undefined)
+        config.notifyFileError = values.notifyFileError;
+      if (values.notifyUserJoin !== undefined)
+        config.notifyUserJoin = values.notifyUserJoin;
+      if (values.notifyUserLeave !== undefined)
+        config.notifyUserLeave = values.notifyUserLeave;
+      Config.update(config);
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_INTERFACE_SETTINGS,
+      async (_, values: any) => {
+        const config: IConfig = await Config.get();
+        if (values.theme !== undefined) config.theme = values.theme[0];
+        Config.update(config);
+      }
+    );
+
+    ipcMain.handle(
+      IPCEvents.FETCH_SETTINGS,
+      async (_): Promise<IConfig> => {
+        return Config.get();
+      }
+    );
   }
 }
