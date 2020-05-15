@@ -12,6 +12,7 @@ import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
+import path from "path";
 
 const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
 
@@ -305,7 +306,14 @@ export default class IPC {
       win.on("close", () => {
         win = null;
       });
-      win.loadURL(`${process.env.URL}#${winProps.path}`);
+
+      const url = `${process.env.URL}/#/${winProps.path}`;
+
+      if (process.env.NODE_ENV === "production") {
+        win.loadFile(url);
+      } else {
+        win.loadURL(url);
+      }
       win.show();
 
       return true;
