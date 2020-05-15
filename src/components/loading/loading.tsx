@@ -11,7 +11,7 @@ interface IState {
   dots: string;
 }
 
-const logo = require("src/assets/logo.png");
+const logo = require("src/assets/lumi_logo.svg");
 
 export default class Loading extends Component<IProps, IState> {
   state = {
@@ -36,9 +36,11 @@ export default class Loading extends Component<IProps, IState> {
     return (
       <div className="loadingZone">
         <div className="center">
-          <Title level={2} className="loadingTitle">
-            {this.props.title}
-            {this.state.dots}
+          <Title level={2}>
+            <div className="loadingTitle">
+              {this.props.title}
+              {this.state.dots}
+            </div>
           </Title>
           <img src={logo} alt="logo" className="lumiFish" />
         </div>

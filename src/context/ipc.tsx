@@ -3,7 +3,7 @@ import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
 
-const logo = require("src/assets/logo.png");
+const logo = require("src/assets/lumi_logo.png");
 const { ipcRenderer } = window.require("electron");
 
 export default class IPC {
