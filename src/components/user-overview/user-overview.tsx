@@ -3,8 +3,10 @@ import { Button, Input, Avatar } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { CrownFilled } from "@ant-design/icons";
 import FormItem from "antd/lib/form/FormItem";
+import { ProfilePicture } from "../image/profile-picture";
 
 interface IProps {
+  //userData: any;
   name: string;
   log: string;
   fileLocation: string;
@@ -15,15 +17,15 @@ interface IProps {
 interface IState {}
 
 const layout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 14 },
+  labelCol: { span: 12 }, //Offset from left side of the screen.
+  wrapperCol: { span: 8 } //Size of element container.
 };
 
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+  wrapperCol: { offset: 10, span: 12 }
 };
 
-export default class CreateComponent extends Component<IProps, IState> {
+export default class UserOverview extends Component<IProps, IState> {
   user_Kick = () => {
     console.log("Oh no! I've been kicked.");
   };
@@ -32,18 +34,27 @@ export default class CreateComponent extends Component<IProps, IState> {
     return (
       <>
         <form {...layout}>
-          <FormItem>
-            <Avatar
-              shape="circle"
+          <FormItem {...tailLayout}>
+            <ProfilePicture
               size={95}
+              image={this.props.profilePictureSource}
               alt="Profile Picture"
-              src={this.props.profilePictureSource}
-            />
+            >
+              {" "}
+            </ProfilePicture>
           </FormItem>
 
-          <FormItem {...tailLayout}>
-            <h1> {this.props.name} </h1>
-            {this.props.isHost ? <CrownFilled /> : ""}
+          <FormItem>
+            <h1
+              style={{
+                width: "100%",
+
+                textAlign: "center"
+              }}
+            >
+              {" "}
+              {this.props.name} {this.props.isHost ? <CrownFilled /> : ""}{" "}
+            </h1>
           </FormItem>
 
           <FormItem>
@@ -65,7 +76,7 @@ export default class CreateComponent extends Component<IProps, IState> {
             <TextArea rows={10} disabled={true} value={this.props.log} />
           </FormItem>
 
-          <FormItem>
+          <FormItem {...tailLayout}>
             <Button onClick={this.user_Kick} type="primary">
               Kick{" "}
             </Button>
