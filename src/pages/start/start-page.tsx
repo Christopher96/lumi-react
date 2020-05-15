@@ -8,7 +8,6 @@ import LumiContext from "src/context/lumi-context";
 import TopBar from "src/components/topbar/top-bar";
 import { Redirect } from "react-router-dom";
 import Paths from "../paths";
-import IPC from "src/context/ipc";
 
 const { TabPane } = Tabs;
 
@@ -42,10 +41,6 @@ export default class StartPage extends Component<IProps, IState> {
     this.context.update({
       title: this.state.isCreate ? "Create room" : "Join room",
     });
-  };
-
-  openSettings = () => {
-    IPC.openSettings();
   };
 
   render() {
