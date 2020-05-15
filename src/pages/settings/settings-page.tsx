@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import { Row, Col, Menu } from "antd";
+import { Row, Col, Menu, Tooltip, Button } from "antd";
 import "./settings-page.scss";
 import UserSettings from "src/components/settings-components/user-settings";
 import { ClickParam } from "antd/lib/menu";
 import InterfaceSettings from "src/components/settings-components/interface-settings";
 import RoomSettings from "src/components/settings-components/room-settings";
+import Paths from "../paths";
+import { HomeOutlined } from "@ant-design/icons";
 
 interface IProps {}
 interface IState {
@@ -52,6 +54,18 @@ export default class SettingsPage extends Component<IProps, IState> {
           <Col span={16} push={2}>
             <div className="option-box">{activeItem}</div>
           </Col>
+        </Row>
+        <Row className="bottom-menu">
+          <Tooltip title="Home" className="tooltip">
+            <a href={`#${Paths.START}`}>
+            <Button
+              size="large"
+              type="primary"
+              shape="circle"
+              icon={<HomeOutlined/>}
+            />
+            </a>
+          </Tooltip>
         </Row>
       </div>
     );
