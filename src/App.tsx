@@ -21,8 +21,8 @@ export default class App extends Component<{}, LumiState> {
     room: null,
     connected: false,
     title: "Lumi",
-    loading: true,
-    loadingTitle: "Creating room",
+    loading: false,
+    loadingTitle: "",
     update: (obj: any) => {
       this.setState({ ...obj });
     },
