@@ -25,6 +25,11 @@
         "AppImage"
       ],
       "category": "Development;Network"
+    },
+    "windows": {
+      "target": [
+        "nsis"
+      ]
     }
   },
   "author": "",

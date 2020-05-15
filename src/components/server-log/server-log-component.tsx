@@ -17,7 +17,6 @@ export default class ServerLogComponent extends Component<IProps, IState> {
 
   componentDidMount = () => {
     IPC.fetchLogs(10).then((logs) => {
-      console.log(logs);
       this.setState({
         logs,
       });
