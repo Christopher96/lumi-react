@@ -14,7 +14,6 @@
     },
     "build": {
         "appId": "com.example.lumi",
-        "extends": null,
         "directories": {
             "output": "dist"
         },
@@ -22,7 +21,17 @@
             "./build/**/*",
             "./node_modules/**/*"
         ],
+        "linux": {
+            "icon": "build/lumi_logo.png",
+            "target": "AppImage",
+            "category": "Development;Network"
+        },
+        "win": {
+            "icon": "build/lumi_logo.png",
+            "target": "nsis"
+        },
         "mac": {
+            "icon": "build/lumi_logo.png",
             "target": "dmg"
         }
     },
