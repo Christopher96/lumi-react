@@ -66,9 +66,10 @@ export default class JoinComponent extends Component<IProps, IState> {
     return (
       <div className="container">
         <Row justify="start">
-          <Col span={4}></Col>
-          <Col span={16}>
+          <Col span={3}></Col>
+          <Col span={18}>
             <Form
+              labelCol={{ span: 3 }}
               ref={this.form}
               name="basic"
               initialValues={{ remember: true }}
@@ -77,14 +78,7 @@ export default class JoinComponent extends Component<IProps, IState> {
             >
               {errorAlert}
               <FormItem
-                name="roomID"
-                rules={[
-                  { required: true, message: "You need to enter a room ID" },
-                ]}
-              >
-                <Input placeholder="Enter a room ID..." />
-              </FormItem>
-              <FormItem
+                label="Source"
                 name="source"
                 rules={[
                   {
@@ -104,7 +98,16 @@ export default class JoinComponent extends Component<IProps, IState> {
                   onSearch={this.selectDir}
                 />
               </FormItem>
-              <FormItem>
+              <FormItem
+                label="Room ID"
+                name="roomID"
+                rules={[
+                  { required: true, message: "You need to enter a room ID" },
+                ]}
+              >
+                <Input placeholder="Enter a room ID..." />
+              </FormItem>
+              <FormItem wrapperCol={{ offset: 3 }}>
                 <Button
                   disabled={connected}
                   loading={loading}
@@ -116,7 +119,7 @@ export default class JoinComponent extends Component<IProps, IState> {
               </FormItem>
             </Form>
           </Col>
-          <Col span={4}></Col>
+          <Col span={3}></Col>
         </Row>
       </div>
     );

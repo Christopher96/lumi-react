@@ -8,12 +8,13 @@ import {
   IPatch,
   IFileChange,
 } from "lumi-cli/dist/lib/common/types";
+import { setPassword } from "lumi-cli/dist/lib/utils/setPassword";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
-import path from "path";
 
+const prompt = require("electron-prompt");
 const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
@@ -107,28 +108,37 @@ export default class IPC {
       return result.filePaths[0];
     });
 
-    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
-      if (!fse.existsSync(source)) {
-        return {
-          error: `Target directory does not exist: ${source}`,
-        };
-      }
+    ipcMain.handle(
+      IPCEvents.CREATE_ROOM,
+      async (_, source: string, password?: string) => {
+        if (!fse.existsSync(source)) {
+          return {
+            error: `Target directory does not exist: ${source}`,
+          };
+        }
 
-      const buffer = await FS.zip(source);
-      const { roomId } = await API.RoomRequest.create(buffer);
+        const buffer = await FS.zip(source);
+        const { roomId } = await API.RoomRequest.create(buffer);
 
-      if (roomId) {
-        return roomId;
-      } else {
-        return {
-          error: `Could not create room with source: ${source}`,
-        };
+        if (roomId) {
+          if (password) {
+            const hash = await setPassword(password);
+            await API.RoomRequest.createPassword(roomId, hash);
+            return { roomId, hash };
+          }
+
+          return { roomId };
+        } else {
+          return {
+            error: `Could not create room with source: ${source}`,
+          };
+        }
       }
-    });
+    );
 
     ipcMain.handle(
       IPCEvents.JOIN_ROOM,
-      async (_, roomId: string, source: string) => {
+      async (_, roomId: string, source: string, hash?: string) => {
         console.log("JOINING ROOM");
         console.log(roomId, source);
 
@@ -152,13 +162,37 @@ export default class IPC {
             resolve({
               error: `Timed out`,
             });
-          }, 20000);
+          }, 40000);
 
           socket.once(Events.room_join_err, (res: any) => {
-            console.log(res);
             resolve({
               error: res.message,
             });
+          });
+
+          socket.on(Events.room_join_auth, async () => {
+            if (hash) {
+              socket.emit(Events.room_join, roomId, hash);
+              return;
+            }
+
+            prompt({
+              label: "Enter the room password:",
+              inputAttrs: {
+                type: "password",
+              },
+            })
+              .then(async (res: any) => {
+                if (res === null) {
+                  resolve({
+                    error: "Please enter a password to join this room",
+                  });
+                } else {
+                  const hash = await setPassword(res);
+                  socket.emit(Events.room_join, roomId, hash);
+                }
+              })
+              .catch(console.error);
           });
 
           socket.once(Events.room_join_res, async () => {

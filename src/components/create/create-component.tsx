@@ -37,13 +37,15 @@ export default class CreateComponent extends Component<IProps, IState> {
       error: false,
     });
 
-    IPC.createRoom(this.context, values.source).then((res: any) => {
-      if (res.error) {
-        this.setState({
-          error: res.error,
-        });
+    IPC.createRoom(this.context, values.source, values?.password).then(
+      (res: any) => {
+        if (res.error) {
+          this.setState({
+            error: res.error,
+          });
+        }
       }
-    });
+    );
   };
 
   render() {
@@ -61,9 +63,10 @@ export default class CreateComponent extends Component<IProps, IState> {
     return (
       <div className="container">
         <Row justify="start">
-          <Col span={4}></Col>
-          <Col span={16}>
+          <Col span={3}></Col>
+          <Col span={18}>
             <Form
+              labelCol={{ span: 3 }}
               ref={this.form}
               name="basic"
               initialValues={{ remember: true }}
@@ -71,6 +74,7 @@ export default class CreateComponent extends Component<IProps, IState> {
             >
               {errorAlert}
               <FormItem
+                label="Source:"
                 name="source"
                 rules={[
                   {
@@ -90,7 +94,10 @@ export default class CreateComponent extends Component<IProps, IState> {
                   onSearch={this.selectDir}
                 />
               </FormItem>
-              <FormItem>
+              <FormItem label="Password:" name="password">
+                <Input placeholder="Enter a password (optional)" />
+              </FormItem>
+              <FormItem wrapperCol={{ offset: 3 }}>
                 <Button
                   disabled={connected}
                   loading={loading}
@@ -102,7 +109,7 @@ export default class CreateComponent extends Component<IProps, IState> {
               </FormItem>
             </Form>
           </Col>
-          <Col span={4}></Col>
+          <Col span={3}></Col>
         </Row>
       </div>
     );

@@ -65,8 +65,8 @@
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
-    "lumiclean": "cd electron && npm r lumi-cli && npm i lumi-cli ",
-    "postinstall": "npm run lumiclean && npm i",
+    "lumiclean": "cd electron && npm r lumi-cli && npm i lumi-cli",
+    "postinstall": "npm run lumiclean",
     "react:start": "react-app-rewired start",
     "react:build": "react-app-rewired build",
     "react:test": "react-app-rewired test",
