@@ -161,9 +161,7 @@ export default class IPC {
           });
 
           socket.once(Events.room_join_res, async () => {
-            console.log("downloading room");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-            console.log("creating shadow");
             await FS.createShadow(source, zippedRoom);
 
             FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
