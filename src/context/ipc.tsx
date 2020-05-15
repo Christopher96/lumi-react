@@ -28,7 +28,6 @@ export default class IPC {
         }
       })
       .finally(() => {
-        console.log("create");
         context.update({
           loading: false,
         });
@@ -60,7 +59,6 @@ export default class IPC {
         }
       })
       .finally(() => {
-        console.log("hello");
         context.update({
           loading: false,
         });
