@@ -1,16 +1,17 @@
 import { API } from "lumi-cli/dist/api/API";
 import { FS } from "lumi-cli/dist/lib/common/FS";
 import { Events } from "lumi-cli/dist/api/routes/SocketEvents";
+import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
 import {
   FileEvent,
   FileEventRequest,
   IPatch,
   IFileChange,
-  RoomChangedEvent,
 } from "lumi-cli/dist/lib/common/types";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+import * as fse from "fs-extra";
 
 const { ipcMain, dialog, BrowserWindow } = require("electron");
 
@@ -20,7 +21,12 @@ interface Connection {
 }
 
 export default class IPC {
+  static win: any;
   static connection: Connection;
+
+  static notify(title: string, body?: string) {
+    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  }
 
   static getUsers = async (roomId: string) => {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
@@ -37,6 +43,8 @@ export default class IPC {
   };
 
   static init(mainWindow: any) {
+    IPC.win = mainWindow;
+
     ipcMain.handle(IPCEvents.CHECK_CONNECTION, () => {
       if (IPC.connection !== undefined) {
         return IPC.connection.room;
@@ -46,16 +54,29 @@ export default class IPC {
     });
 
     ipcMain.handle(IPCEvents.SELECT_DIR, async () => {
-      const result = await dialog.showOpenDialog(mainWindow, {
+      const result = await dialog.showOpenDialog(IPC.win, {
         properties: ["openDirectory"],
       });
       return result.filePaths[0];
     });
 
-    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, path) => {
-      const buffer = await FS.zip(path);
-      const serverResponse = await API.RoomRequest.create(buffer);
-      return serverResponse.roomId;
+    ipcMain.handle(IPCEvents.CREATE_ROOM, async (_, source: string) => {
+      if (!fse.existsSync(source)) {
+        return {
+          error: `Target directory does not exist: ${source}`,
+        };
+      }
+
+      const buffer = await FS.zip(source);
+      const { roomId } = await API.RoomRequest.create(buffer);
+
+      if (roomId) {
+        return roomId;
+      } else {
+        return {
+          error: `Could not create room with source: ${source}`,
+        };
+      }
     });
 
     ipcMain.handle(
@@ -64,28 +85,36 @@ export default class IPC {
         console.log("JOINING ROOM");
         console.log(roomId, source);
 
-        if (IPC.connection !== undefined) {
-          IPC.connection.socket.disconnect();
+        if (!fse.existsSync(source)) {
+          return {
+            error: `Target directory does not exist: ${source}`,
+          };
         }
 
-        const { ok } = await API.RoomRequest.getRoom(roomId);
-
-        if (!ok) {
-          return false;
+        if (IPC.connection !== undefined) {
+          IPC.connection.socket.disconnect();
         }
 
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
-          mainWindow.webContents.send(IPCEvents.DISCONNECTED);
+          IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
-        socket.emit(Events.room_join, roomId);
+        const joinWait = async (resolve: any) => {
+          setInterval(() => {
+            resolve({
+              error: `Timed out`,
+            });
+          }, 5000);
 
-        const room = await new Promise((resolve, reject) => {
-          socket.once(Events.room_join_res, async (response: any) => {
-            if (!response.ok) reject();
+          socket.once(Events.room_join_err, (res: any) => {
+            resolve({
+              error: res.message,
+            });
+          });
 
+          socket.once(Events.room_join_res, async () => {
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
             await FS.createShadow(source, zippedRoom);
 
@@ -93,6 +122,11 @@ export default class IPC {
               socket.emit(Events.room_file_change, {
                 change: fileChange,
                 roomId,
+              });
+
+              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+                console.log(e);
+                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
               });
             });
 
@@ -105,7 +139,6 @@ export default class IPC {
               Events.room_file_change_res,
               async (fileEventRequest: FileEventRequest) => {
                 if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-                  console.log(`File patched: ${fileEventRequest.change.path}`);
                   const patch = fileEventRequest.change as IPatch;
                   await FS.applyPatches(source, patch);
                 } else {
@@ -114,39 +147,50 @@ export default class IPC {
 
                   const treeData = IPC.getTreeData(source);
 
-                  mainWindow.webContents.send(
-                    IPCEvents.UPDATE_FOLDER,
-                    treeData
-                  );
+                  IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
 
-                  console.log(`File changed: ${fileEventRequest.change.path}`);
+                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
               }
             );
 
-            socket.on(
-              Events.room_users_update_res,
-              (eventData: RoomChangedEvent) => {
-                mainWindow.webContents.send(
-                  IPCEvents.UPDATE_USERS,
-                  eventData.users
-                );
+            socket.on(Events.room_users_update_res, (eventData: any) => {
+              let user: any, title: string;
+              const { event } = eventData;
+
+              if (event === "JOIN") {
+                title = "User joined the room";
+                user = eventData.newUser;
+              } else if (event === "LEAVE") {
+                title = "User left the room";
+                user = eventData.removedUser;
               }
-            );
+
+              const { username, id } = user;
+              if (username) title += `: ${username}`;
+
+              IPC.notify(title, `ID: ${id}`);
+
+              IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
+            });
+
+            const room = {
+              roomId,
+              source,
+            };
 
             IPC.connection = {
               socket,
-              room: {
-                roomId,
-                source,
-              },
+              room,
             };
 
-            resolve(IPC.connection.room);
+            resolve(room);
           });
-        });
+        };
 
-        return room;
+        socket.emit(Events.room_join, roomId);
+
+        return await new Promise(joinWait);
       }
     );
 
@@ -187,5 +231,31 @@ export default class IPC {
 
       return true;
     });
+
+    ipcMain.handle(IPCEvents.SELECT_AVATAR, async () => {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        filters: [{ name: "Images", extensions: ["jpg", "png"] }],
+      });
+      return result.filePaths[0];
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_SETTINGS,
+      async (_, avatarPath: string, username: string) => {
+        const config: IConfig = await Config.get();
+        if (avatarPath === null) config.avatar = null;
+        else if (avatarPath !== undefined)
+          config.avatar = await fse.readFile(avatarPath);
+        if (username !== undefined) config.username = username;
+        Config.update(config);
+      }
+    );
+
+    ipcMain.handle(
+      IPCEvents.FETCH_SETTINGS,
+      async (_): Promise<IConfig> => {
+        return Config.get();
+      }
+    );
   }
 }

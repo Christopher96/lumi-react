@@ -1,89 +1,116 @@
 import React, { Component } from "react";
-import { Row, Col, Input, Upload } from "antd";
+import { Form, Input, Button, message, Row, Col } from "antd";
 import "./settings-components.scss";
+import { FolderOutlined } from "@ant-design/icons";
+import IPC from "src/context/ipc";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
+import { ProfilePicture } from "../image/profile-picture";
+
+const { Search } = Input;
 
 interface IProps {}
-interface IState {}
 
-function getBase64(img: Blob, callback: any) {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
+export default class UserSettings extends Component<IProps, IConfig> {
+  private form: any = React.createRef();
 
-function beforeUpload(file: any) {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    console.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    console.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
-}
-
-export default class UserSettings extends Component<IProps, IState> {
-  state = { imageUrl: "", loading: false };
-
-  handleChange = (info: any) => {
-    if (info.file.status === "uploading") {
-      console.log("uploading");
-      return this.setState({ loading: true });
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+      notifyFileChange: false,
+      notifyFileError: false,
+      notifyUserJoin: false,
+      notifyUserLeave: false,
+      theme: "",
     }
-    if (info.file.status === "done") {
-      console.log("done");
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl: any) =>
-        this.setState({
-          imageUrl: imageUrl,
-          loading: false,
-        })
-      );
-    }
+  }
+
+  componentDidMount() {
+    IPC.fetchSettings().then((config: IConfig) => {
+      this.setState(config);
+    });
+  }
+
+  selectAvatar = () => {
+    IPC.selectAvatar().then((path) => {
+      this.form.current.setFieldsValue({
+        avatar: path,
+      });
+    });
+  };
+
+  deselectAvatar = () => {
+    this.form.current.setFieldsValue({
+      avatar: null,
+    });
+    this.setState({ avatar: undefined });
+  };
+
+  onFinish = (values: any) => {
+    IPC.saveSettings(values.avatar, values.username)
+      .then((config: IConfig) => {
+        this.setState(config);
+        message.success("Changes saved!");
+      })
+      .catch(() => {
+        message.error("Check that the avatar path is correct!");
+      });
+  };
+
+  onFinishFailed = () => {
+    message.error("Could not save user settings!");
   };
 
   render() {
-    const { imageUrl } = this.state;
     return (
       <div>
         <Row>
-          <Col span={10}>Change Avatar:</Col>
-          <Col span={14}>
-            <div className="change-avatar">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                beforeUpload={beforeUpload}
-                onChange={this.handleChange}
-              >
-                {imageUrl ? (
-                  <img src={imageUrl} alt="avatar" />
-                ) : (
-                  <div>
-                    <div className="ant-upload-text">Upload</div>
-                  </div>
-                )}
-              </Upload>
-            </div>
-          </Col>
+          <h1>User settings</h1>
         </Row>
-        <br />
         <Row>
-          <Col span={10}>Change username:</Col>
-          <Col span={14}>
-            <Input placeholder="new username" />
-          </Col>
+          <h2>Profile</h2>
         </Row>
-        <br />
-        <Row>
-          <Col span={10}>Change password:</Col>
-          <Col span={14}>
-            <Input.Password placeholder="new password" />
-          </Col>
+        <Row className="profile-picture-row">
+          <ProfilePicture image={this.state.avatar} size={128} alt="profile" />
         </Row>
+
+        <Form
+          labelCol={{ span: 4 }}
+          labelAlign="left"
+          wrapperCol={{ span: 20 }}
+          name="user_settings"
+          ref={this.form}
+          initialValues={{ remember: true }}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          <Form.Item label="Avatar" name="avatar">
+            {this.state.avatar ? (
+              <Button onClick={this.deselectAvatar}>Remove Image</Button>
+            ) : (
+              <Search
+                enterButton={
+                  <>
+                    <span>Open</span>
+                    <FolderOutlined />
+                  </>
+                }
+                placeholder="Enter an avatar path..."
+                onSearch={this.selectAvatar}
+              />
+            )}
+          </Form.Item>
+
+          <Form.Item label="Username" name="username">
+            <Input placeholder={this.state.username} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     );
   }

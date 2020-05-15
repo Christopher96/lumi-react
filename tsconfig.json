@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./src/types/cdk.d.ts"],
+    "typeRoots": [
+      ".src/@types",
+      "./node_modules/@types",
+      "./src/types/cdk.d.ts"
+    ],
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

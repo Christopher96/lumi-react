@@ -11,6 +11,10 @@ enum IPCEvents {
   CREATE_WINDOW = "create_window",
   UPDATE_FOLDER = "update_folder",
   UPDATE_USERS = "update_users",
+  SELECT_AVATAR = "select_avatar",
+  SAVE_SETTINGS = "save_settings",
+  FETCH_SETTINGS = "fetch_settings",
+  NOTIFICATION = "notification",
 }
 
 export default IPCEvents;

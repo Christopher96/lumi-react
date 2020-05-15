@@ -3,8 +3,10 @@ import { Button, Input, Avatar } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { CrownFilled } from "@ant-design/icons";
 import FormItem from "antd/lib/form/FormItem";
+import { ProfilePicture } from "../image/profile-picture";
 
 interface IProps {
+  //userData: any;
   name: string;
   log: string;
   fileLocation: string;
@@ -20,7 +22,7 @@ const layout = {
 };
 
 const tailLayout = {
-  wrapperCol: { offset: 10, span: 16 },
+  wrapperCol: { offset: 10, span: 12 },
 };
 
 export default class CreateComponent extends Component<IProps, IState> {
@@ -33,12 +35,7 @@ export default class CreateComponent extends Component<IProps, IState> {
       <>
         <form {...layout}>
           <FormItem {...tailLayout}>
-            <Avatar
-              shape="circle"
-              size={95}
-              alt="Profile Picture"
-              src={this.props.profilePictureSource}
-            />
+            <ProfilePicture size={95} image={this.props.profilePictureSource} alt="Profile Picture"> </ProfilePicture>
           </FormItem>
 
           <FormItem {...tailLayout}>

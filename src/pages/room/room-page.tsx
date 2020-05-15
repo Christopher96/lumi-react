@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import DirectoryTree from "antd/lib/tree/DirectoryTree";
-import { Button, Tooltip, Row, Card, Avatar } from "antd";
+import { Button, Tooltip, Row, Card, Avatar, Drawer } from "antd";
 import {
   UserAddOutlined,
   FileTextOutlined,
@@ -16,12 +16,13 @@ import { Redirect } from "react-router-dom";
 import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
 import { UserData } from "src/context/interfaces";
+import UserOverview from "src/components/user-overview/user-overview";
 
 interface IProps {}
 interface IState {
   treeData: any;
   users: any;
-  drawer: boolean;
+  userOverviewVisible: boolean;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
@@ -30,14 +31,14 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   state = {
     treeData: [],
     users: [],
-    drawer: false,
+    userOverviewVisible: false,
   };
 
   componentDidMount() {
     if (!this.context.connected) return;
 
     this.context.update({
-      title: "Room",
+      title: `Room ${this.context.room.roomId}`,
     });
 
     IPC.updateFolder((treeData: any) => {
@@ -46,7 +47,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       });
     });
 
-    console.log(this.context);
     IPC.fetchFolder(this.context.room.source).then((treeData) => {
       this.setState({
         treeData,
@@ -118,10 +118,19 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     //alert("Trigger Expand");
   };
 
-  makeUser = (user: any) => {
+  showDrawer = () => {
+    this.setState({userOverviewVisible: true});
+    console.log("Hello World");
+  };
+
+  closeDrawer = () => {
+    this.setState({userOverviewVisible: false});
+  };
+
+  makeUser = (user: any, key: number) => {
     return (
-      <div className="userItem">
-        <Card>
+      <div key={key} className="userItem">
+        <Card onClick={() => this.showDrawer}>
           <Meta
             avatar={
               <Avatar
@@ -149,6 +158,18 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       <Redirect to={Paths.START} />
     ) : (
       <>
+
+        <Drawer width={640} placement="right" closable={false} onClose={this.closeDrawer} visible={this.state.userOverviewVisible}>
+          <UserOverview
+            name={"Name"}
+            log={"None"}
+            fileLocation={"The Computer"}
+            lastEdit={"Yesterday"}
+            isHost={true}
+            profilePictureSource={null}
+          />
+        </Drawer>
+
         <TopBar />
         <div className="users">{users.map(this.makeUser)}</div>
         <div className="container">
