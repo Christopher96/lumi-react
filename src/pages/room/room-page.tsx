@@ -144,10 +144,10 @@ export default class RoomFolderPage extends Component<IProps, IState> {
                 icon={
                   user.avatar ? (
                     <ProfilePicture
-                      size={40}
-                      alt="avatar"
+                      alt="profile image"
                       image={user.avatar}
-                    />
+                      size={25}
+                    ></ProfilePicture>
                   ) : (
                     <UserOutlined />
                   )

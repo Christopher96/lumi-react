@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Input, Button, message, Row, Col, Spin } from "antd";
+import { Form, Input, Button, message, Row } from "antd";
 import "./settings-components.scss";
 import { FolderOutlined } from "@ant-design/icons";
 import IPC from "src/context/ipc";

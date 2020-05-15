@@ -32,10 +32,6 @@ export default class JoinComponent extends Component<IProps, IState> {
 
   onFinish = (values: any) => {
     if (this.context.loading || this.context.connected) return;
-    this.context.update({
-      connected: false,
-      loading: true,
-    });
 
     this.setState({
       error: false,

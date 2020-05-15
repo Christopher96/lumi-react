@@ -151,9 +151,10 @@ export default class IPC {
             resolve({
               error: `Timed out`,
             });
-          }, 5000);
+          }, 20000);
 
           socket.once(Events.room_join_err, (res: any) => {
+            console.log(res);
             resolve({
               error: res.message,
             });

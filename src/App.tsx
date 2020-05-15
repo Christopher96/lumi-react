@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { Route, HashRouter, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
-import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 
 import MainPage from "./pages/main/main-page";
-import LoadingPage from "./pages/loading/loading-page";
 import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
@@ -23,8 +21,8 @@ export default class App extends Component<{}, LumiState> {
     room: null,
     connected: false,
     title: "Lumi",
-    loading: false,
-    treeData: [],
+    loading: true,
+    loadingTitle: "Creating room",
     update: (obj: any) => {
       this.setState({ ...obj });
     },
@@ -39,7 +37,6 @@ export default class App extends Component<{}, LumiState> {
             <Route path={Paths.START} component={StartPage} />
             <Route path={Paths.ROOM} component={RoomFolderPage} />
             <Route path={Paths.HOME} component={MainPage} />
-            <Route path={Paths.LOADING} component={LoadingPage} />
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />
