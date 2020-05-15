@@ -18,11 +18,11 @@ interface IState {}
 
 const layout = {
   labelCol: { span: 12 }, //Offset from left side of the screen.
-  wrapperCol: { span: 8 }, //Size of element container.
+  wrapperCol: { span: 8 } //Size of element container.
 };
 
 const tailLayout = {
-  wrapperCol: { offset: 10, span: 12 },
+  wrapperCol: { offset: 10, span: 12 }
 };
 
 export default class UserOverview extends Component<IProps, IState> {
@@ -35,11 +35,26 @@ export default class UserOverview extends Component<IProps, IState> {
       <>
         <form {...layout}>
           <FormItem {...tailLayout}>
-            <ProfilePicture size={95} image={this.props.profilePictureSource} alt="Profile Picture"> </ProfilePicture>
+            <ProfilePicture
+              size={95}
+              image={this.props.profilePictureSource}
+              alt="Profile Picture"
+            >
+              {" "}
+            </ProfilePicture>
           </FormItem>
 
-          <FormItem {...tailLayout}>
-            <h1> {this.props.name} {this.props.isHost ? <CrownFilled /> : ""} </h1>
+          <FormItem>
+            <h1
+              style={{
+                width: "100%",
+
+                textAlign: "center"
+              }}
+            >
+              {" "}
+              {this.props.name} {this.props.isHost ? <CrownFilled /> : ""}{" "}
+            </h1>
           </FormItem>
 
           <FormItem>
@@ -61,7 +76,7 @@ export default class UserOverview extends Component<IProps, IState> {
             <TextArea rows={10} disabled={true} value={this.props.log} />
           </FormItem>
 
-          <FormItem  {...tailLayout}>
+          <FormItem {...tailLayout}>
             <Button onClick={this.user_Kick} type="primary">
               Kick{" "}
             </Button>
