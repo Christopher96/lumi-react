@@ -2,6 +2,7 @@ enum IPCEvents {
   SELECT_DIR = "select_dir",
   CREATE_ROOM = "create_room",
   JOIN_ROOM = "join_room",
+  LEAVE_ROOM = "leave_room",
   NAVIGATE = "navigate",
   DISCONNECTED = "disconnected",
   CHECK_CONNECTION = "check_connection",
@@ -12,9 +13,11 @@ enum IPCEvents {
   UPDATE_FOLDER = "update_folder",
   UPDATE_USERS = "update_users",
   SELECT_AVATAR = "select_avatar",
-  SAVE_SETTINGS = "save_settings",
+  SAVE_USER_SETTINGS = "save_user_settings",
+  SAVE_ROOM_SETTINGS = "save_room_settings",
+  SAVE_INTERFACE_SETTINGS = "save_interface_settings",
   FETCH_SETTINGS = "fetch_settings",
-  NOTIFICATION = "notification",
+  NOTIFICATION = "notification"
 }
 
 export default IPCEvents;

@@ -13,19 +13,51 @@ import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import * as fse from "fs-extra";
 
-const { ipcMain, dialog, BrowserWindow } = require("electron");
+const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
 
 interface Connection {
   socket: SocketIOClient.Socket;
   room: RoomData;
 }
 
+enum NotifyEventType {
+  FILE_CHANGE = "file_change",
+  FILE_ERROR = "file_error",
+  USER_JOIN = "user_join",
+  USER_LEAVE = "user_leave",
+}
+
 export default class IPC {
   static win: any;
   static connection: Connection;
 
-  static notify(title: string, body?: string) {
-    IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
+  static async notify(
+    notifyEvent: NotifyEventType,
+    title: string,
+    body?: string
+  ) {
+    // In the future we should try to find a new approach so we don't have to read the config on disk everytime.
+    const config: IConfig = await Config.get();
+    let send = false;
+
+    switch (notifyEvent) {
+      case NotifyEventType.FILE_CHANGE:
+        send = config.notifyFileChange;
+        break;
+      case NotifyEventType.FILE_ERROR:
+        send = config.notifyFileError;
+        break;
+      case NotifyEventType.USER_JOIN:
+        send = config.notifyUserJoin;
+        break;
+      case NotifyEventType.USER_LEAVE:
+        send = config.notifyUserLeave;
+        break;
+      default:
+        throw Error("Could not match to notify event");
+    }
+
+    if (send) IPC.win.webContents.send(IPCEvents.NOTIFICATION, title, body);
   }
 
   static getUsers = async (roomId: string) => {
@@ -38,9 +70,23 @@ export default class IPC {
     }
   };
 
-  static getTreeData = (path: string) => {
-    return new FileTree().make(path);
+  static getTreeData = async (
+    path: string,
+    roomId: string
+  ): Promise<{ treeData: any; fileMap: any }> => {
+    const treeData = new FileTree().make(path);
+    const fileMapRes = await API.LogsRequest.getFileMap(roomId);
+    const fileMap = fileMapRes.roomMap;
+    return { treeData, fileMap };
   };
+
+  static disconnect() {
+    if (IPC.connection !== undefined) {
+      IPC.connection.socket.disconnect();
+    }
+
+    IPC.connection = undefined;
+  }
 
   static init(mainWindow: any) {
     IPC.win = mainWindow;
@@ -91,13 +137,12 @@ export default class IPC {
           };
         }
 
-        if (IPC.connection !== undefined) {
-          IPC.connection.socket.disconnect();
-        }
+        IPC.disconnect();
 
         const socket = await API.RoomRequest.createSocket();
 
         socket.on("disconnect", () => {
+          IPC.disconnect();
           IPC.win.webContents.send(IPCEvents.DISCONNECTED);
         });
 
@@ -123,15 +168,18 @@ export default class IPC {
                 change: fileChange,
                 roomId,
               });
-
-              socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
-                console.log(e);
-                IPC.notify("Could not apply patch", `File: ${e.change.path}`);
-              });
             });
 
             FS.listenForLocalPatches(source, (patch: IPatch) => {
               socket.emit(Events.room_file_change, { change: patch, roomId });
+            });
+
+            socket.on(Events.room_file_change_err, (e: FileEventRequest) => {
+              IPC.notify(
+                NotifyEventType.FILE_ERROR,
+                "Could not apply patch",
+                `File: ${e.change.path}`
+              );
             });
 
             // Tell the server we would like to join.
@@ -144,13 +192,15 @@ export default class IPC {
                 } else {
                   const fileChange = fileEventRequest.change as IFileChange;
                   await FS.applyFileChange(source, fileChange);
-
-                  const treeData = IPC.getTreeData(source);
-
-                  IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
-
-                  IPC.notify(`File updated: ${fileEventRequest.change.path}`);
                 }
+
+                const treeData = await IPC.getTreeData(source, roomId);
+                IPC.win.webContents.send(IPCEvents.UPDATE_FOLDER, treeData);
+
+                IPC.notify(
+                  NotifyEventType.FILE_CHANGE,
+                  `File updated: ${fileEventRequest.change.path}`
+                );
               }
             );
 
@@ -158,18 +208,22 @@ export default class IPC {
               let user: any, title: string;
               const { event } = eventData;
 
+              let notifyEvent: NotifyEventType;
+
               if (event === "JOIN") {
                 title = "User joined the room";
                 user = eventData.newUser;
+                notifyEvent = NotifyEventType.USER_JOIN;
               } else if (event === "LEAVE") {
                 title = "User left the room";
                 user = eventData.removedUser;
+                notifyEvent = NotifyEventType.USER_LEAVE;
               }
 
               const { username, id } = user;
               if (username) title += `: ${username}`;
 
-              IPC.notify(title, `ID: ${id}`);
+              IPC.notify(notifyEvent, title, `ID: ${id}`);
 
               IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
             });
@@ -194,8 +248,29 @@ export default class IPC {
       }
     );
 
+    ipcMain.handle(IPCEvents.LEAVE_ROOM, async () => {
+      const logo = nativeImage.createFromPath("../../src/assets/logo.png");
+
+      dialog
+        .showMessageBox(IPC.win, {
+          type: "question",
+          message: "Leave room",
+          detail: "Are you sure you want to leave the room?",
+          buttons: ["Yes", "No"],
+          icon: logo,
+        })
+        .then((answer: any) => {
+          const disconnect = answer.response === 0;
+          if (disconnect) {
+            IPC.disconnect();
+          }
+
+          return disconnect;
+        });
+    });
+
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
-      const res = await API.LogsRequest.getAllLogs(amount);
+      const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
       return res.logs.map((l) => {
         return {
           event: l.event,
@@ -206,9 +281,12 @@ export default class IPC {
       });
     });
 
-    ipcMain.handle(IPCEvents.FETCH_FOLDER, async (_, path: string) => {
-      return IPC.getTreeData(path);
-    });
+    ipcMain.handle(
+      IPCEvents.FETCH_FOLDER,
+      async (_, path: string, roomId: string) => {
+        return await IPC.getTreeData(path, roomId);
+      }
+    );
 
     ipcMain.handle(IPCEvents.FETCH_USERS, async (_, roomId: string) => {
       const res = await API.RoomRequest.listUsersInRoom(roomId);
@@ -240,13 +318,35 @@ export default class IPC {
     });
 
     ipcMain.handle(
-      IPCEvents.SAVE_SETTINGS,
+      IPCEvents.SAVE_USER_SETTINGS,
       async (_, avatarPath: string, username: string) => {
         const config: IConfig = await Config.get();
         if (avatarPath === null) config.avatar = null;
         else if (avatarPath !== undefined)
           config.avatar = await fse.readFile(avatarPath);
         if (username !== undefined) config.username = username;
+        Config.update(config);
+      }
+    );
+
+    ipcMain.handle(IPCEvents.SAVE_ROOM_SETTINGS, async (_, values: any) => {
+      const config: IConfig = await Config.get();
+      if (values.notifyFileChange !== undefined)
+        config.notifyFileChange = values.notifyFileChange;
+      if (values.notifyFileError !== undefined)
+        config.notifyFileError = values.notifyFileError;
+      if (values.notifyUserJoin !== undefined)
+        config.notifyUserJoin = values.notifyUserJoin;
+      if (values.notifyUserLeave !== undefined)
+        config.notifyUserLeave = values.notifyUserLeave;
+      Config.update(config);
+    });
+
+    ipcMain.handle(
+      IPCEvents.SAVE_INTERFACE_SETTINGS,
+      async (_, values: any) => {
+        const config: IConfig = await Config.get();
+        if (values.theme !== undefined) config.theme = values.theme[0];
         Config.update(config);
       }
     );

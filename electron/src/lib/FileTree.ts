@@ -15,14 +15,14 @@ export default class FileTree {
     return {
       isLeaf: true,
       key: indecies.join("-"),
-      title: path.basename(filePath),
+      title: path.basename(filePath)
     };
   }
 
   private recTree(dirPath: string, indecies: number[]): Tree {
     const allEntitiesInDir = fse
       .readdirSync(dirPath)
-      .map((name) => path.join(dirPath, name));
+      .map(name => path.join(dirPath, name));
     const dirs = allEntitiesInDir.filter(this.isDirectory);
     const files = allEntitiesInDir.filter(this.isFile);
 
@@ -46,7 +46,7 @@ export default class FileTree {
       isLeaf: false,
       children,
       key: indecies.join("-"),
-      title: path.basename(dirPath),
+      title: path.basename(dirPath)
     };
   }
 
