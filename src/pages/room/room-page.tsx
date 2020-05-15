@@ -212,8 +212,11 @@ export default class RoomFolderPage extends Component<IProps, IState> {
         >
           <UserOverview
             name={currentOverviewUser?.username}
-            log={"Soon to be implemented"}
-            fileLocation={"The Computer"}
+            log={Object.entries(fileMap)
+              .filter(v => v[1] === currentOverviewUserId)
+              .map(v => "File change: " + v[0])
+              .join("\n")}
+            fileLocation={"-"}
             lastEdit={"Yesterday"}
             isHost={currentOverviewUser?.id === adminUserId}
             profilePictureSource={currentOverviewUser?.avatar}
