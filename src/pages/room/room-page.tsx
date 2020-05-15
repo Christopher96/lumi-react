@@ -24,6 +24,7 @@ interface IProps {}
 interface IState {
   treeData: any;
   users: any[];
+  adminUserId?: string;
   currentOverviewUserId: string | null;
   // File Path => Socket id
   fileMap: Record<string, string>;
@@ -54,9 +55,10 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     });
 
     IPC.fetchUsers(this.context.room.roomId).then(
-      (users: { user: UserData }[]) => {
+      (users: { user: UserData; isHost: boolean }[]) => {
         this.setState({
-          users: users.map(v => v.user)
+          users: users.map(v => v.user),
+          adminUserId: users.find(v => v.isHost === true)?.user.id
         });
       }
     );
@@ -69,7 +71,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
 
     IPC.fetchFolder(this.context.room.source, this.context.room.roomId).then(
       ({ treeData, fileMap }: any) => {
-        console.log(fileMap);
         this.setState({
           treeData,
           fileMap
@@ -137,7 +138,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
 
   showDrawer = (id: string) => {
     this.setState({ currentOverviewUserId: id });
-    console.log("Hello World");
   };
 
   closeDrawer = () => {
@@ -188,7 +188,13 @@ export default class RoomFolderPage extends Component<IProps, IState> {
   };
 
   render() {
-    const { users, treeData, fileMap, currentOverviewUserId } = this.state;
+    const {
+      users,
+      treeData,
+      adminUserId,
+      fileMap,
+      currentOverviewUserId
+    } = this.state;
     const realTree = this.getIconTree(treeData, fileMap, users);
     const currentOverviewUser =
       currentOverviewUserId && users.find(v => v.id === currentOverviewUserId);
@@ -197,6 +203,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       <Redirect to={Paths.START} />
     ) : (
       <>
+        <p>{">" + adminUserId}</p>
         <Drawer
           width={640}
           placement="right"
@@ -209,7 +216,7 @@ export default class RoomFolderPage extends Component<IProps, IState> {
             log={"Soon to be implemented"}
             fileLocation={"The Computer"}
             lastEdit={"Yesterday"}
-            isHost={true}
+            isHost={currentOverviewUser?.id === adminUserId}
             profilePictureSource={currentOverviewUser?.avatar}
           />
         </Drawer>
