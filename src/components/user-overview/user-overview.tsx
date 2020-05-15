@@ -25,7 +25,7 @@ const tailLayout = {
   wrapperCol: { offset: 10, span: 12 },
 };
 
-export default class CreateComponent extends Component<IProps, IState> {
+export default class UserOverview extends Component<IProps, IState> {
   user_Kick = () => {
     console.log("Oh no! I've been kicked.");
   };
