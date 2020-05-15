@@ -40,6 +40,7 @@ export default class Main {
     } else {
       process.env.URL = "./build/index.html";
       Main.mainWindow.loadFile(process.env.URL);
+      navMenu(Main.mainWindow);
     }
 
     Main.mainWindow.on("closed", Main.onClose);

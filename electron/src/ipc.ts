@@ -307,11 +307,12 @@ export default class IPC {
         win = null;
       });
 
-      const url = `${process.env.URL}/#/${winProps.path}`;
-
       if (process.env.NODE_ENV === "production") {
-        win.loadFile(url);
+        win.loadFile(process.env.URL).then(() => {
+          win.webContents.send(IPCEvents.NAVIGATE, winProps.path);
+        });
       } else {
+        const url = `${process.env.URL}#${winProps.path}`;
         win.loadURL(url);
       }
       win.show();
