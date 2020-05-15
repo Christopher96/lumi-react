@@ -203,7 +203,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       <Redirect to={Paths.START} />
     ) : (
       <>
-        <p>{">" + adminUserId}</p>
         <Drawer
           width={640}
           placement="right"
