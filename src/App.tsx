@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, HashRouter, Redirect, Switch } from "react-router-dom";
+import { Route, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 
 import MainPage from "./pages/main/main-page";
@@ -15,6 +15,8 @@ import { LumiProvider } from "./context/lumi-context";
 import IPCGlobalWithRouter from "./context/ipc-global";
 
 import "./base.scss";
+
+const { HashRouter } = require("react-router-dom/cjs/react-router-dom");
 
 export default class App extends Component<{}, LumiState> {
   state = {
@@ -32,7 +34,7 @@ export default class App extends Component<{}, LumiState> {
     return (
       <LumiProvider value={this.state}>
         <HashRouter hashType="slash">
-          <Route path="/" component={IPCGlobalWithRouter} />
+          <Route path="" component={IPCGlobalWithRouter} />
           <Switch>
             <Route path={Paths.START} component={StartPage} />
             <Route path={Paths.ROOM} component={RoomFolderPage} />

@@ -1,5 +1,4 @@
 enum Paths {
-  TOP_BAR = "/",
   HOME = "/home",
   START = "/start",
   INVITE = "/invite",

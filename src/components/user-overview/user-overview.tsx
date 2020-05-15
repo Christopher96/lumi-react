@@ -44,7 +44,7 @@ export default class UserOverview extends Component<IProps, IState> {
           <FormItem label="Last edit:">
             <Input
               disabled={true}
-              placeholder="File Location"
+              placeholder="None"
               value={this.props.fileLocation}
             />
           </FormItem>
@@ -57,7 +57,12 @@ export default class UserOverview extends Component<IProps, IState> {
           */}
 
           <FormItem label="Log:">
-            <TextArea rows={10} disabled={true} value={this.props.log} />
+            <TextArea
+              placeholder="None"
+              rows={10}
+              disabled={true}
+              value={this.props.log}
+            />
           </FormItem>
 
           {/*

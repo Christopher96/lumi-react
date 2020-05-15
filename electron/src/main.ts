@@ -35,10 +35,12 @@ export default class Main {
 
     if (process.env.NODE_ENV === "development") {
       process.env.URL = "http://localhost:3000";
-      navMenu(Main.mainWindow);
       Main.mainWindow.loadURL(process.env.URL);
+      navMenu(Main.mainWindow);
     } else {
-      Main.mainWindow.loadFile("./build/index.html");
+      process.env.URL = "./build/index.html";
+      Main.mainWindow.loadFile(process.env.URL);
+      navMenu(Main.mainWindow);
     }
 
     Main.mainWindow.on("closed", Main.onClose);
