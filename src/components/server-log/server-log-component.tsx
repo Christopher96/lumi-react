@@ -68,7 +68,11 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     return (
       <div className="container">
         <Title level={2}>Room logs</Title>
-        <List itemLayout="horizontal">{logs.map(this.makeLog)}</List>
+        <List
+          dataSource={logs}
+          renderItem={this.makeLog}
+          itemLayout="horizontal"
+        ></List>
       </div>
     );
   }
