@@ -9,7 +9,7 @@ const { ipcRenderer } = window.require("electron");
 export default class IPC {
   static registration: ServiceWorkerRegistration;
 
-  static createRoom = (context: any, source: string) => {
+  static createRoom = (context: any, source: string, password?: string) => {
     context.update({
       connected: false,
       loading: true,
@@ -17,14 +17,14 @@ export default class IPC {
     });
 
     return ipcRenderer
-      .invoke(IPCEvents.CREATE_ROOM, source)
+      .invoke(IPCEvents.CREATE_ROOM, source, password)
       .then((res: any) => {
         if (res.error) {
           return {
             error: res.error,
           };
         } else {
-          return IPC.joinRoom(context, res, source);
+          return IPC.joinRoom(context, res.roomId, source, res.hash);
         }
       })
       .finally(() => {
@@ -34,7 +34,12 @@ export default class IPC {
       });
   };
 
-  static joinRoom = (context: any, roomID: string, source: string) => {
+  static joinRoom = (
+    context: any,
+    roomID: string,
+    source: string,
+    hash?: string
+  ) => {
     context.update({
       connected: false,
       loading: true,
@@ -42,7 +47,7 @@ export default class IPC {
     });
 
     return ipcRenderer
-      .invoke(IPCEvents.JOIN_ROOM, roomID, source)
+      .invoke(IPCEvents.JOIN_ROOM, roomID, source, hash)
       .then((res: any) => {
         if (res.error) {
           return {
