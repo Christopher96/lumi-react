@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import DirectoryTree from "antd/lib/tree/DirectoryTree";
+import { Tree } from "antd";
+
 import { Button, Tooltip, Row, Card, Avatar } from "antd";
 import {
   UserAddOutlined,
@@ -16,18 +17,24 @@ import { Redirect } from "react-router-dom";
 import "./room-page.scss";
 import Meta from "antd/lib/card/Meta";
 import { UserData } from "src/context/interfaces";
+import { AddIconsToTree } from "./add-icons-to-tree";
+import { ProfilePicture } from "../../components/image/profile-picture";
 
 interface IProps {}
 interface IState {
   treeData: any;
-  users: any;
+  users: any[];
+
+  // File Path => Socket id
+  fileMap: Record<string, string>;
 }
 
 export default class RoomFolderPage extends Component<IProps, IState> {
   static contextType = LumiContext;
 
-  state = {
+  state: IState = {
     treeData: [],
+    fileMap: {},
     users: [],
   };
 
@@ -38,40 +45,54 @@ export default class RoomFolderPage extends Component<IProps, IState> {
       title: `Room ${this.context.room.roomId}`,
     });
 
-    IPC.updateFolder((treeData: any) => {
+    IPC.updateFolder(({ treeData, fileMap }: any) => {
       this.setState({
         treeData,
+        fileMap,
       });
     });
 
-    IPC.fetchFolder(this.context.room.source).then((treeData) => {
-      this.setState({
-        treeData,
-      });
-    });
+    IPC.fetchUsers(this.context.room.roomId).then(
+      (users: { user: UserData }[]) => {
+        this.setState({
+          users: users.map((v) => v.user),
+        });
+      }
+    );
 
-    IPC.updateUsers((users: [UserData]) => {
+    IPC.updateUsers((users: UserData[]) => {
       this.setState({
         users,
       });
     });
 
-    IPC.fetchUsers(this.context.room.roomId).then((users: [UserData]) => {
-      this.setState({
-        users,
-      });
-    });
+    IPC.fetchFolder(this.context.room.source, this.context.room.roomId).then(
+      ({ treeData, fileMap }: any) => {
+        console.log(fileMap);
+        this.setState({
+          treeData,
+          fileMap,
+        });
+      }
+    );
   }
 
   openInvite() {
     IPC.openInvite();
   }
+
   openLogs() {
     IPC.openLogs();
   }
-  openLeave() {
-    IPC.openLeave();
-  }
+  openLeave = () => {
+    IPC.leaveRoom().then((leave: boolean) => {
+      if (!leave) return;
+
+      this.context.update({
+        connected: false,
+      });
+    });
+  };
 
   bottomMenuButtons = (
     <Row className="bottom-menu">
@@ -122,7 +143,11 @@ export default class RoomFolderPage extends Component<IProps, IState> {
               <Avatar
                 icon={
                   user.avatar ? (
-                    <img alt="avatar" src={user.avatar} />
+                    <ProfilePicture
+                      size={40}
+                      alt="avatar"
+                      image={user.avatar}
+                    />
                   ) : (
                     <UserOutlined />
                   )
@@ -137,22 +162,38 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     );
   };
 
+  getIconTree = (treeData: any, fileMap: any, users: any[]) => {
+    return new AddIconsToTree().make(treeData, (filePath) => {
+      // We want to remove the shadow relative path if shadow is in the first index.
+      filePath = filePath.filter((v, i) => !(v === ".shadow" && i === 0));
+      const userId = fileMap[filePath.join(",")];
+      const user = users.find((v) => v.id === userId);
+
+      return (
+        <div className="change-file-user-icon">
+          <ProfilePicture size={25} alt="avatar" image={user?.avatar} />
+        </div>
+      );
+    });
+  };
+
   render() {
-    const { users, treeData } = this.state;
+    const { users, treeData, fileMap } = this.state;
+    const realTree = this.getIconTree(treeData, fileMap, users);
 
     return !this.context.connected ? (
       <Redirect to={Paths.START} />
     ) : (
       <>
         <TopBar />
-        <div className="users">{users.map(this.makeUser)}</div>
+        <div className="users">{[...users].map(this.makeUser)}</div>
         <div className="container">
-          <DirectoryTree
-            multiple
-            defaultExpandAll
+          <Tree
+            showLine
+            showIcon
+            defaultExpandedKeys={["0-0-0"]}
+            treeData={[...(realTree || [])] as any}
             onSelect={this.onSelect}
-            onExpand={this.onExpand}
-            treeData={treeData}
           />
           {this.bottomMenuButtons}
         </div>

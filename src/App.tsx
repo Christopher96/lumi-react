@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Route, HashRouter, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
+import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 
 import MainPage from "./pages/main/main-page";
 import LoadingPage from "./pages/loading/loading-page";
