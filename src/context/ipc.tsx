@@ -10,6 +10,12 @@ export default class IPC {
   static registration: ServiceWorkerRegistration;
 
   static createRoom = (context: any, source: string) => {
+    context.update({
+      connected: false,
+      loading: true,
+      loadingTitle: "Creating room",
+    });
+
     return ipcRenderer
       .invoke(IPCEvents.CREATE_ROOM, source)
       .then((res: any) => {
@@ -22,6 +28,7 @@ export default class IPC {
         }
       })
       .finally(() => {
+        console.log("create");
         context.update({
           loading: false,
         });
@@ -29,6 +36,12 @@ export default class IPC {
   };
 
   static joinRoom = (context: any, roomID: string, source: string) => {
+    context.update({
+      connected: false,
+      loading: true,
+      loadingTitle: "Joining room",
+    });
+
     return ipcRenderer
       .invoke(IPCEvents.JOIN_ROOM, roomID, source)
       .then((res: any) => {
@@ -47,6 +60,7 @@ export default class IPC {
         }
       })
       .finally(() => {
+        console.log("hello");
         context.update({
           loading: false,
         });

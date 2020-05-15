@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import LumiContext from "./lumi-context";
 import IPCEvents from "./ipc-events";
+import Loading from "src/components/loading/loading";
 import { RoomData } from "./interfaces";
 import { withRouter } from "react-router";
 import IPC from "./ipc";
@@ -52,7 +53,8 @@ class IPCGlobal extends Component<IProps, IState> {
   }
 
   render() {
-    return <></>;
+    const { loading, loadingTitle } = this.context;
+    return loading ? <Loading title={loadingTitle}></Loading> : <></>;
   }
 }
 

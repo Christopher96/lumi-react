@@ -151,16 +151,19 @@ export default class IPC {
             resolve({
               error: `Timed out`,
             });
-          }, 5000);
+          }, 20000);
 
           socket.once(Events.room_join_err, (res: any) => {
+            console.log(res);
             resolve({
               error: res.message,
             });
           });
 
           socket.once(Events.room_join_res, async () => {
+            console.log("downloading room");
             const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
+            console.log("creating shadow");
             await FS.createShadow(source, zippedRoom);
 
             FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
