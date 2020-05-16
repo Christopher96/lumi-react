@@ -79,9 +79,9 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     );
   }
 
-  openInvite() {
-    IPC.openInvite();
-  }
+  openInvite = () => {
+    IPC.openInvite(this.context.room.roomId);
+  };
 
   openLogs() {
     IPC.openLogs();
@@ -130,10 +130,6 @@ export default class RoomFolderPage extends Component<IProps, IState> {
 
   onSelect = (keys: any, event: any) => {
     //alert("Trigger Select" + keys + event);
-  };
-
-  onExpand = () => {
-    //alert("Trigger Expand");
   };
 
   showDrawer = (id: string) => {

@@ -307,6 +307,7 @@ export default class IPC {
 
     ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
       const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
+      console.log(res);
       return res.logs.map((l) => {
         return {
           event: l.event,

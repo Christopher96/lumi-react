@@ -199,11 +199,11 @@ export default class IPC {
     );
   };
 
-  static openInvite = () => {
+  static openInvite = (roomId: string) => {
     return IPC.createWindow({
-      width: 500,
-      height: 400,
-      path: Paths.INVITE,
+      width: 580,
+      height: 300,
+      path: `/invite/${roomId}`,
     });
   };
 
