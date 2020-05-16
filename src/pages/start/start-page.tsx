@@ -1,4 +1,5 @@
-import { Tabs } from "antd";
+import { Tabs, Tooltip, Button, Row } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
 import React, { Component } from "react";
 import "./start-page.scss";
 import CreateComponent from "src/components/create/create-component";
@@ -56,6 +57,18 @@ export default class StartPage extends Component<IProps, IState> {
             <JoinComponent />
           </TabPane>
         </Tabs>
+        <Row className="bottom-menu">
+          <Tooltip title="Settings" className="tooltip">
+            <a href={`#${Paths.SETTINGS}`}>
+            <Button
+              size="large"
+              type="primary"
+              shape="circle"
+              icon={<SettingOutlined />}
+            />
+            </a>
+          </Tooltip>
+        </Row>
       </>
     );
   }

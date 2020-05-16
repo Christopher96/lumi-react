@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import { Route, HashRouter, Redirect, Switch } from "react-router-dom";
+import { HashRouter, Route, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 
 import MainPage from "./pages/main/main-page";
-import LoadingPage from "./pages/loading/loading-page";
 import InvitePage from "./pages/invite/invite-page";
 import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
@@ -23,7 +22,7 @@ export default class App extends Component<{}, LumiState> {
     connected: false,
     title: "Lumi",
     loading: false,
-    treeData: [],
+    loadingTitle: "",
     update: (obj: any) => {
       this.setState({ ...obj });
     },
@@ -33,12 +32,11 @@ export default class App extends Component<{}, LumiState> {
     return (
       <LumiProvider value={this.state}>
         <HashRouter hashType="slash">
-          <Route path="/" component={IPCGlobalWithRouter} />
+          <Route path="" component={IPCGlobalWithRouter} />
           <Switch>
             <Route path={Paths.START} component={StartPage} />
             <Route path={Paths.ROOM} component={RoomFolderPage} />
             <Route path={Paths.HOME} component={MainPage} />
-            <Route path={Paths.LOADING} component={LoadingPage} />
             <Route path={Paths.INVITE} component={InvitePage} />
             <Route path={Paths.SETTINGS} component={SettingsPage} />
             <Route path={Paths.LEAVE} component={LeavePage} />

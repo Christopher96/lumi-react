@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Input, Button, Row, Col } from "antd";
+import { Input, Button, Row, Col, Alert } from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import Form from "antd/lib/form/Form";
 import LumiContext from "src/context/lumi-context";
@@ -9,12 +9,18 @@ import IPC from "src/context/ipc";
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
+interface IState {
+  error: string | boolean;
+}
 
 export default class CreateComponent extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   form: any = React.createRef();
+
+  state = {
+    error: false,
+  };
 
   selectDir = () => {
     IPC.selectDir().then((path) => {
@@ -26,34 +32,49 @@ export default class CreateComponent extends Component<IProps, IState> {
 
   onFinish = (values: any) => {
     if (this.context.loading || this.context.connected) return;
-    this.context.update({
-      connected: false,
-      loading: true,
+
+    this.setState({
+      error: false,
     });
 
-    IPC.createRoom(this.context, values.source);
-  };
-
-  onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+    IPC.createRoom(this.context, values.source, values?.password).then(
+      (res: any) => {
+        if (res.error) {
+          this.setState({
+            error: res.error,
+          });
+        }
+      }
+    );
   };
 
   render() {
     const { connected, loading } = this.context;
+    const { error } = this.state;
+
+    let errorAlert = error ? (
+      <FormItem>
+        <Alert type="error" message={error} banner />
+      </FormItem>
+    ) : (
+      ""
+    );
 
     return (
       <div className="container">
         <Row justify="start">
-          <Col span={4}></Col>
-          <Col span={16}>
+          <Col span={3}></Col>
+          <Col span={18}>
             <Form
+              labelCol={{ span: 3 }}
               ref={this.form}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={this.onFinish}
-              onFinishFailed={this.onFinishFailed}
             >
+              {errorAlert}
               <FormItem
+                label="Source:"
                 name="source"
                 rules={[
                   {
@@ -73,7 +94,10 @@ export default class CreateComponent extends Component<IProps, IState> {
                   onSearch={this.selectDir}
                 />
               </FormItem>
-              <FormItem>
+              <FormItem label="Password:" name="password">
+                <Input placeholder="Enter a password (optional)" />
+              </FormItem>
+              <FormItem wrapperCol={{ offset: 3 }}>
                 <Button
                   disabled={connected}
                   loading={loading}
@@ -85,7 +109,7 @@ export default class CreateComponent extends Component<IProps, IState> {
               </FormItem>
             </Form>
           </Col>
-          <Col span={4}></Col>
+          <Col span={3}></Col>
         </Row>
       </div>
     );

@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import LumiContext from "./lumi-context";
 import IPCEvents from "./ipc-events";
+import Loading from "src/components/loading/loading";
 import { RoomData } from "./interfaces";
 import { withRouter } from "react-router";
+import IPC from "./ipc";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -20,7 +22,6 @@ class IPCGlobal extends Component<IProps, IState> {
     ipcRenderer
       .invoke(IPCEvents.CHECK_CONNECTION)
       .then((room: RoomData | boolean) => {
-        console.log(room);
         if (room !== false) {
           this.context.update({
             room,
@@ -42,10 +43,18 @@ class IPCGlobal extends Component<IProps, IState> {
         connected: false,
       });
     });
+
+    ipcRenderer.on(
+      IPCEvents.NOTIFICATION,
+      (_: any, title: string, body?: string) => {
+        IPC.notify(title, body);
+      }
+    );
   }
 
   render() {
-    return <></>;
+    const { loading, loadingTitle } = this.context;
+    return loading ? <Loading title={loadingTitle}></Loading> : <></>;
   }
 }
 

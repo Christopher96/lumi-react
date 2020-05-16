@@ -1,7 +1,13 @@
-h2 {
-  text-align: center;
+.settings-page {
+  padding-top:32px;
 }
 
 .settingsMenu {
   min-width: 100px;
+}
+
+.bottom-menu {
+  position:fixed;
+  right:2em;
+  bottom:2em;
 }

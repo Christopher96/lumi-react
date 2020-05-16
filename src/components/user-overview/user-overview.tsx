@@ -1,10 +1,13 @@
 import React, { Component } from "react";
-import { Button, Input, Avatar } from "antd";
+import { Button, Input } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { CrownFilled } from "@ant-design/icons";
 import FormItem from "antd/lib/form/FormItem";
+import { ProfilePicture } from "../image/profile-picture";
+import Form from "antd/lib/form/Form";
 
 interface IProps {
+  //userData: any;
   name: string;
   log: string;
   fileLocation: string;
@@ -15,63 +18,62 @@ interface IProps {
 interface IState {}
 
 const layout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 14 },
+  labelCol: { span: 3 }, //Offset from left side of the screen.
 };
 
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-
-export default class CreateComponent extends Component<IProps, IState> {
+export default class UserOverview extends Component<IProps, IState> {
   user_Kick = () => {
     console.log("Oh no! I've been kicked.");
   };
 
   render() {
     return (
-      <>
-        <form {...layout}>
-          <FormItem>
-            <Avatar
-              shape="circle"
-              size={95}
+      <div className="container">
+        <Form {...layout}>
+          <FormItem style={{ textAlign: "center" }}>
+            <ProfilePicture
+              size={120}
+              image={this.props.profilePictureSource}
               alt="Profile Picture"
-              src={this.props.profilePictureSource}
-            />
+            ></ProfilePicture>
+            <h1 style={{ marginTop: "1em" }}>
+              {this.props.name} {this.props.isHost ? <CrownFilled /> : ""}{" "}
+            </h1>
           </FormItem>
 
-          <FormItem {...tailLayout}>
-            <h1> {this.props.name} </h1>
-            {this.props.isHost ? <CrownFilled /> : ""}
-          </FormItem>
-
-          <FormItem>
-            <p> Last File Edited: </p>
+          <FormItem label="Last edit:">
             <Input
               disabled={true}
-              placeholder="File Location"
+              placeholder="None"
               value={this.props.fileLocation}
             />
           </FormItem>
 
+          {/*
           <FormItem>
             <p> Time Edited: </p>
             <h4> {this.props.lastEdit} </h4>
           </FormItem>
+          */}
 
-          <FormItem>
-            <p> Patch: </p>
-            <TextArea rows={10} disabled={true} value={this.props.log} />
+          <FormItem label="Log:">
+            <TextArea
+              placeholder="None"
+              rows={10}
+              disabled={true}
+              value={this.props.log}
+            />
           </FormItem>
 
-          <FormItem>
+          {/*
+          <FormItem {...tailLayout}>
             <Button onClick={this.user_Kick} type="primary">
               Kick{" "}
             </Button>
           </FormItem>
-        </form>
-      </>
+          */}
+        </Form>
+      </div>
     );
   }
 }

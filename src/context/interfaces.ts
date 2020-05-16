@@ -11,7 +11,7 @@ export interface LumiState {
 export interface Window {
   width: number;
   height: number;
-  path: Paths;
+  path: Paths | string;
 }
 
 export interface RoomData {

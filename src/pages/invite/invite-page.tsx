@@ -1,64 +1,62 @@
 import React, { Component } from "react";
-import { Input, Row, Col } from "antd";
+import { RouteComponentProps } from "react-router";
 import "./invite-page.scss";
 
-import { Button } from "antd";
+import { Input, message } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
+import FormItem from "antd/lib/form/FormItem";
+import Form from "antd/lib/form/Form";
 
-interface IProps {}
-interface IState {
-  roomID: string;
-}
+interface IProps extends RouteComponentProps {}
+interface IState {}
+
+const { Search } = Input;
 
 export default class InvitePage extends Component<IProps, IState> {
-  state = {
-    roomID: "1802471964798179042168",
-  };
-
-  inviteText = (
-    <div className="warning-text">
-      <br />
-      <div>
-        <h3>Warning:</h3>
-      </div>
-      <p>
-        Anyone with the session ID can join the session and introduce changes.
-      </p>
-      <p>
-        Make sure to keep your session ID secret from the rest of the internet
-        to keep your work safe.
-      </p>
-    </div>
-  );
+  input: any = React.createRef();
 
   onCopy = () => {
-    alert("to add some copy to clipboard feature");
+    this.input.current.input.select();
+    document.execCommand("copy");
+    message.success({ content: "Copied to clipboard!", duration: 2 });
   };
   onLink = () => {
     alert("to add some link stuff here");
   };
-  //<img src="/lumi_fisk02.gif" />
-  render() {
-    const { roomID } = this.state;
-    return (
-      <div className="center">
-        <h2>Session ID:</h2>
-        <Input placeholder={roomID} />
-        {this.inviteText}
-        <div className="stick-to-bottom">
-          <Row className="bottomButtons">
-            <Col span={12}>
-              <Button type="primary" block onClick={this.onCopy}>
-                Copy Session ID
-              </Button>
-            </Col>
 
-            <Col span={12}>
-              <Button type="primary" block onClick={this.onLink}>
-                Fetch Invite Link
-              </Button>
-            </Col>
-          </Row>
-        </div>
+  render() {
+    const id = (this.props.match.params as any).id;
+    console.log(id);
+    return (
+      <div className="container">
+        <Form>
+          <FormItem>
+            <div className="warning-text">
+              <br />
+              <div>
+                <h3>Warning:</h3>
+              </div>
+              <p>
+                Anyone with the session ID can join the session and introduce
+                changes if the room is not password protected.
+              </p>
+            </div>
+          </FormItem>
+          <FormItem label="Session ID">
+            <Search
+              ref={this.input}
+              style={{ width: "100%" }}
+              enterButton={
+                <>
+                  <span>Copy</span>
+                  <CopyOutlined />
+                </>
+              }
+              onSearch={this.onCopy}
+              value={id}
+            />
+          </FormItem>
+        </Form>
       </div>
     );
   }

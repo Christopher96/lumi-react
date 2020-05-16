@@ -7,12 +7,13 @@
     "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "rimraf build && cross-env NODE_ENV=development webpack && electron ./build/bundle.js",
-    "dist": "rimraf build && ncp ../build build && cross-env NODE_ENV=production webpack && electron-builder --dir",
+    "build": "rimraf build && ncp ../build build && cross-env NODE_ENV=production webpack && electron-builder",
+    "dist": "npm run build && electron-builder --dir",
+    "pack": "npm run build && electron-builder",
     "webpack": "webpack"
   },
   "build": {
     "appId": "com.example.lumi",
-    "extends": null,
     "directories": {
       "output": "dist"
     },
@@ -21,10 +22,17 @@
       "./node_modules/**/*"
     ],
     "linux": {
-      "target": [
-        "AppImage"
-      ],
+      "icon": "build/lumi_logo.png",
+      "target": "AppImage",
       "category": "Development;Network"
+    },
+    "win": {
+      "icon": "build/lumi_logo.png",
+      "target": "nsis"
+    },
+    "mac": {
+      "icon": "build/lumi_logo.png",
+      "target": "dmg"
     }
   },
   "author": "",
@@ -45,8 +53,9 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
+    "electron-prompt": "^1.5.1",
     "fs-extra": "^9.0.0",
-    "lumi-cli": "0.0.45",
+    "lumi-cli": "0.0.48",
     "path": "^0.12.7"
   }
 }

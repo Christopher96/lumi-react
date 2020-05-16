@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Input, Button, Col, Row } from "antd";
+import { Input, Button, Col, Row, Alert } from "antd";
 import { FolderOutlined } from "@ant-design/icons";
 import Form from "antd/lib/form/Form";
 import FormItem from "antd/lib/form/FormItem";
@@ -9,12 +9,18 @@ import LumiContext from "src/context/lumi-context";
 const { Search } = Input;
 
 interface IProps {}
-interface IState {}
+interface IState {
+  error: string | boolean;
+}
 
 export default class JoinComponent extends Component<IProps, IState> {
   static contextType = LumiContext;
 
   form: any = React.createRef();
+
+  state = {
+    error: false,
+  };
 
   selectDir = () => {
     IPC.selectDir().then((path) => {
@@ -26,12 +32,20 @@ export default class JoinComponent extends Component<IProps, IState> {
 
   onFinish = (values: any) => {
     if (this.context.loading || this.context.connected) return;
-    this.context.update({
-      connected: false,
-      loading: true,
+
+    this.setState({
+      error: false,
     });
 
-    IPC.joinRoom(this.context, values.roomID, values.source);
+    IPC.joinRoom(this.context, values.roomID, values.source).then(
+      (res: any) => {
+        if (res.error) {
+          this.setState({
+            error: res.error,
+          });
+        }
+      }
+    );
   };
 
   onFinishFailed = (errorInfo: any) => {
@@ -40,28 +54,31 @@ export default class JoinComponent extends Component<IProps, IState> {
 
   render() {
     const { connected, loading } = this.context;
+    const { error } = this.state;
 
+    let errorAlert = error ? (
+      <FormItem>
+        <Alert type="error" message={error} banner />
+      </FormItem>
+    ) : (
+      ""
+    );
     return (
       <div className="container">
         <Row justify="start">
-          <Col span={4}></Col>
-          <Col span={16}>
+          <Col span={3}></Col>
+          <Col span={18}>
             <Form
+              labelCol={{ span: 3 }}
               ref={this.form}
               name="basic"
               initialValues={{ remember: true }}
               onFinish={this.onFinish}
               onFinishFailed={this.onFinishFailed}
             >
+              {errorAlert}
               <FormItem
-                name="roomID"
-                rules={[
-                  { required: true, message: "You need to enter a room ID" },
-                ]}
-              >
-                <Input placeholder="Enter a room ID..." />
-              </FormItem>
-              <FormItem
+                label="Source"
                 name="source"
                 rules={[
                   {
@@ -81,7 +98,16 @@ export default class JoinComponent extends Component<IProps, IState> {
                   onSearch={this.selectDir}
                 />
               </FormItem>
-              <FormItem>
+              <FormItem
+                label="Room ID"
+                name="roomID"
+                rules={[
+                  { required: true, message: "You need to enter a room ID" },
+                ]}
+              >
+                <Input placeholder="Enter a room ID..." />
+              </FormItem>
+              <FormItem wrapperCol={{ offset: 3 }}>
                 <Button
                   disabled={connected}
                   loading={loading}
@@ -93,7 +119,7 @@ export default class JoinComponent extends Component<IProps, IState> {
               </FormItem>
             </Form>
           </Col>
-          <Col span={4}></Col>
+          <Col span={3}></Col>
         </Row>
       </div>
     );

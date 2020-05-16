@@ -1,3 +1,8 @@
+.change-file-user-icon {
+  position: absolute;
+  right: 10vh;
+}
+
 .ant-tree {
   font-size: 1.2em;
   .ant-tree-node-content-wrapper {
@@ -7,8 +12,8 @@
 
 .bottom-menu {
   position: fixed;
-  right: 1em;
-  bottom: 1em;
+  right: 2em;
+  bottom: 2em;
 }
 
 .tooltip {
@@ -19,11 +24,14 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
+  padding: 0.3em;
+  padding-bottom: 0;
   .userItem {
     cursor: pointer;
     white-space: nowrap;
     transition: width 0.5s;
     width: 60px;
+    margin: 0.3em;
   }
   .userItem:hover {
     width: 250px;

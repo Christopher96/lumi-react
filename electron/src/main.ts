@@ -23,29 +23,27 @@ export default class Main {
       width: 900,
       height: 680,
       webPreferences: {
-        nodeIntegration: true
-      }
+        nodeIntegration: true,
+      },
     });
 
-    const local = false;
-    process.env.SERVER_ENDPOINT = local
+    IPC.init(Main.mainWindow);
+
+    process.env.SERVER_ENDPOINT = true
       ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
 
     if (process.env.NODE_ENV === "development") {
-      //
       process.env.URL = "http://localhost:3000";
-      navMenu(Main.mainWindow);
       Main.mainWindow.loadURL(process.env.URL);
-      //
+      navMenu(Main.mainWindow);
     } else {
-      //
-      Main.mainWindow.loadFile("./build/index.html");
+      process.env.URL = "./build/index.html";
+      Main.mainWindow.loadFile(process.env.URL);
+      Main.mainWindow.setMenu(null);
     }
 
     Main.mainWindow.on("closed", Main.onClose);
-
-    IPC.init(Main.mainWindow);
   }
 
   static init() {
