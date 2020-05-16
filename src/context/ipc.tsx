@@ -1,4 +1,4 @@
-import { Window, UserData } from "./interfaces";
+import { Window, UserData, LogsQueryParams } from "./interfaces";
 import { IConfig } from "lumi-cli/dist/lib/utils/Config";
 import IPCEvents from "./ipc-events";
 import Paths from "src/pages/paths";
@@ -82,8 +82,11 @@ export default class IPC {
     return ipcRenderer.invoke(IPCEvents.SELECT_AVATAR);
   };
 
-  static fetchLogs = (amount: number): Promise<void> => {
-    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount);
+  static fetchLogs = (
+    amount: number,
+    config?: LogsQueryParams
+  ): Promise<[]> => {
+    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount, config);
   };
 
   static fetchFolder = (folder: string, roomId: string): Promise<any> => {

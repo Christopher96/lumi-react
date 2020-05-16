@@ -24,3 +24,15 @@ export interface UserData {
   username: string;
   avatar: Buffer;
 }
+
+export interface LogsQueryParams {
+  reverse?: "1" | "0";
+  offset?: string;
+}
+
+export interface logData {
+  event: any;
+  user?: any;
+  date: Date;
+  path?: any;
+}

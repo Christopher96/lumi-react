@@ -12,6 +12,7 @@ import { setPassword } from "lumi-cli/dist/lib/utils/setPassword";
 import FileTree from "./lib/FileTree";
 import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
+import { LogsQueryParams } from "lumi-cli/dist/api/routes/LogsRequest";
 import * as fse from "fs-extra";
 
 const prompt = require("electron-prompt");
@@ -284,6 +285,21 @@ export default class IPC {
       }
     );
 
+    ipcMain.handle(
+      IPCEvents.FETCH_LOG,
+      async (_, amount: number, config?: LogsQueryParams) => {
+        const res = await API.LogsRequest.getAllLogs(amount, config);
+        return res.logs.map((l) => {
+          return {
+            event: l.event,
+            user: l.byWhom?.username || "Unknown",
+            date: new Date(l.date).toLocaleString(),
+            path: l.body?.path || "",
+          };
+        });
+      }
+    );
+
     ipcMain.handle(IPCEvents.LEAVE_ROOM, async () => {
       const logo = nativeImage.createFromPath("../../src/assets/logo.png");
 
@@ -303,19 +319,6 @@ export default class IPC {
 
           return disconnect;
         });
-    });
-
-    ipcMain.handle(IPCEvents.FETCH_LOG, async (_, amount: number) => {
-      const res = await API.LogsRequest.getAllLogs(amount, { reverse: "1" });
-      console.log(res);
-      return res.logs.map((l) => {
-        return {
-          event: l.event,
-          user: l.byWhom?.username || "Unknown",
-          date: new Date(l.date).toLocaleString(),
-          path: l.body?.path || "",
-        };
-      });
     });
 
     ipcMain.handle(
@@ -338,6 +341,7 @@ export default class IPC {
           nodeIntegration: true,
         },
       });
+      win.setMenu(null);
       win.on("close", () => {
         win = null;
       });

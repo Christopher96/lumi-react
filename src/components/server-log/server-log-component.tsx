@@ -1,11 +1,24 @@
 import React, { Component } from "react";
 import IPC from "src/context/ipc";
-import { Typography, Button, List, Avatar, message, Tooltip, Tag } from "antd";
-import { ExportOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Typography,
+  Button,
+  List,
+  Avatar,
+  message,
+  Tooltip,
+  Tag,
+  Row,
+} from "antd";
+import { ExportOutlined, UserOutlined, SyncOutlined } from "@ant-design/icons";
+import { LogsQueryParams, logData } from "src/context/interfaces";
+
+import "./server-log-component.scss";
 
 interface IProps {}
 interface IState {
-  logs: any;
+  logs: logData[];
+  loading: boolean;
 }
 
 const { Title } = Typography;
@@ -13,14 +26,30 @@ const { Title } = Typography;
 export default class ServerLogComponent extends Component<IProps, IState> {
   state = {
     logs: [],
+    loading: false,
+  };
+
+  logIncrement = 5;
+
+  loadLogs = () => {
+    this.setState({
+      loading: true,
+    });
+    const offset = this.state.logs.length;
+    const config: LogsQueryParams = {
+      offset: offset.toString(),
+      reverse: "0",
+    };
+    IPC.fetchLogs(this.logIncrement, config).then((syncedLogs) => {
+      this.setState({
+        logs: this.state.logs.concat(syncedLogs),
+        loading: false,
+      });
+    });
   };
 
   componentDidMount = () => {
-    IPC.fetchLogs(10).then((logs) => {
-      this.setState({
-        logs,
-      });
-    });
+    this.loadLogs();
   };
 
   onExport = () => {
@@ -29,19 +58,6 @@ export default class ServerLogComponent extends Component<IProps, IState> {
       message.success({ content: "Exported!", duration: 2 });
     }, 1000);
   };
-
-  exportButton = (
-    <div className="exportButtonIcon">
-      <Tooltip title="Export" className="tooltip">
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<ExportOutlined />}
-          onClick={this.onExport}
-        />
-      </Tooltip>
-    </div>
-  );
 
   makeLog = (log: any) => {
     return (
@@ -62,8 +78,20 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     );
   };
 
+  exportButton = (
+    <Tooltip title="Export" className="tooltip">
+      <Button
+        size="large"
+        type="primary"
+        shape="circle"
+        icon={<ExportOutlined />}
+        onClick={this.onExport}
+      />
+    </Tooltip>
+  );
+
   render() {
-    const { logs } = this.state;
+    const { logs, loading } = this.state;
     return (
       <div className="container">
         <Title level={2}>Room logs</Title>
@@ -72,6 +100,9 @@ export default class ServerLogComponent extends Component<IProps, IState> {
           renderItem={this.makeLog}
           itemLayout="horizontal"
         ></List>
+        <Button className="view-more" onClick={this.loadLogs} loading={loading}>
+          View More
+        </Button>
       </div>
     );
   }
