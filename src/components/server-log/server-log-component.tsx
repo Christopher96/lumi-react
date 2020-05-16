@@ -1,7 +1,16 @@
 import React, { Component } from "react";
 import IPC from "src/context/ipc";
-import { Typography, Button, List, Avatar, message, Tooltip, Tag } from "antd";
-import { ExportOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Typography,
+  Button,
+  List,
+  Avatar,
+  message,
+  Tooltip,
+  Tag,
+  Row,
+} from "antd";
+import { ExportOutlined, UserOutlined, SyncOutlined } from "@ant-design/icons";
 import { LogsQueryParams, logData } from "src/context/interfaces";
 
 import "./server-log-component.scss";
@@ -29,7 +38,7 @@ export default class ServerLogComponent extends Component<IProps, IState> {
     const offset = this.state.logs.length;
     const config: LogsQueryParams = {
       offset: offset.toString(),
-      reverse: "1",
+      reverse: "0",
     };
     IPC.fetchLogs(this.logIncrement, config).then((syncedLogs) => {
       this.setState({
