@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, Redirect, Switch } from "react-router-dom";
+import { HashRouter, Route, Redirect, Switch } from "react-router-dom";
 import Paths from "src/pages/paths";
 
 import MainPage from "./pages/main/main-page";
@@ -15,8 +15,6 @@ import { LumiProvider } from "./context/lumi-context";
 import IPCGlobalWithRouter from "./context/ipc-global";
 
 import "./base.scss";
-
-const { HashRouter } = require("react-router-dom/cjs/react-router-dom");
 
 export default class App extends Component<{}, LumiState> {
   state = {
