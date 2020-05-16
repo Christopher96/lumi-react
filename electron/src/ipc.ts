@@ -289,7 +289,6 @@ export default class IPC {
       IPCEvents.FETCH_LOG,
       async (_, amount: number, config?: LogsQueryParams) => {
         const res = await API.LogsRequest.getAllLogs(amount, config);
-        console.log(res);
         return res.logs.map((l) => {
           return {
             event: l.event,
@@ -342,6 +341,7 @@ export default class IPC {
           nodeIntegration: true,
         },
       });
+      win.setMenu(null);
       win.on("close", () => {
         win = null;
       });
