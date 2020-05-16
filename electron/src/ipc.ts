@@ -341,12 +341,12 @@ export default class IPC {
           nodeIntegration: true,
         },
       });
-      win.setMenu(null);
       win.on("close", () => {
         win = null;
       });
 
       if (process.env.NODE_ENV === "production") {
+        win.setMenu(null);
         win.loadFile(process.env.URL).then(() => {
           win.webContents.send(IPCEvents.NAVIGATE, winProps.path);
         });
