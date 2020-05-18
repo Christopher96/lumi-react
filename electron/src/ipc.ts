@@ -14,9 +14,8 @@ import { Window, RoomData } from "../../src/context/interfaces";
 import IPCEvents from "../../src/context/ipc-events";
 import { LogsQueryParams } from "lumi-cli/dist/api/routes/LogsRequest";
 import * as fse from "fs-extra";
-
-const prompt = require("electron-prompt");
-const { nativeImage, ipcMain, dialog, BrowserWindow } = require("electron");
+import { nativeImage, ipcMain, dialog, BrowserWindow } from "electron";
+import prompt from "electron-prompt";
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -31,7 +30,7 @@ enum NotifyEventType {
 }
 
 export default class IPC {
-  static win: any;
+  static win: BrowserWindow;
   static connection: Connection;
 
   static async notify(
@@ -91,7 +90,7 @@ export default class IPC {
     IPC.connection = undefined;
   }
 
-  static init(mainWindow: any) {
+  static init(mainWindow: BrowserWindow) {
     IPC.win = mainWindow;
 
     ipcMain.handle(IPCEvents.CHECK_CONNECTION, () => {
@@ -241,7 +240,9 @@ export default class IPC {
               }
             );
 
+            console.log(Events[Events.room_users_update_res]);
             socket.on(Events.room_users_update_res, (eventData: any) => {
+              console.log(eventData);
               let user: any, title: string;
               const { event } = eventData;
 
@@ -261,7 +262,6 @@ export default class IPC {
               if (username) title += `: ${username}`;
 
               IPC.notify(notifyEvent, title, `ID: ${id}`);
-
               IPC.win.webContents.send(IPCEvents.UPDATE_USERS, eventData.users);
             });
 

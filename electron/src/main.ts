@@ -29,7 +29,7 @@ export default class Main {
 
     IPC.init(Main.mainWindow);
 
-    process.env.SERVER_ENDPOINT = false
+    process.env.SERVER_ENDPOINT = true
       ? "http://localhost:4200"
       : "http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com";
 
