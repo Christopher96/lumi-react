@@ -287,8 +287,14 @@ export default class IPC {
 
     ipcMain.handle(
       IPCEvents.FETCH_LOG,
-      async (_, amount: number, config?: LogsQueryParams) => {
-        const res = await API.LogsRequest.getAllLogs(amount, config);
+      async (
+        _: any,
+        roomId: string,
+        amount: number,
+        config?: LogsQueryParams
+      ) => {
+        console.log(roomId);
+        const res = await API.LogsRequest.getLog(roomId, amount, config);
         return res.logs.map((l) => {
           return {
             event: l.event,

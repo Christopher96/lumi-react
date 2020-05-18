@@ -19,7 +19,7 @@
     },
     "files": [
       "./build/**/*",
-      "./node_modules/**/*"
+      "!node_modules/**/*"
     ],
     "linux": {
       "icon": "build/lumi_logo.png",

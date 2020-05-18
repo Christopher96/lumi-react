@@ -83,10 +83,11 @@ export default class IPC {
   };
 
   static fetchLogs = (
+    roomId: string,
     amount: number,
     config?: LogsQueryParams
   ): Promise<[]> => {
-    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, amount, config);
+    return ipcRenderer.invoke(IPCEvents.FETCH_LOG, roomId, amount, config);
   };
 
   static fetchFolder = (folder: string, roomId: string): Promise<any> => {
@@ -210,11 +211,11 @@ export default class IPC {
     });
   };
 
-  static openLogs = () => {
+  static openLogs = (roomId: string) => {
     return IPC.createWindow({
       width: 800,
       height: 800,
-      path: Paths.SERVER_LOG,
+      path: `/serverlog/${roomId}`,
     });
   };
 

@@ -1,21 +1,13 @@
 import React, { Component } from "react";
 import IPC from "src/context/ipc";
-import {
-  Typography,
-  Button,
-  List,
-  Avatar,
-  message,
-  Tooltip,
-  Tag,
-  Row,
-} from "antd";
-import { ExportOutlined, UserOutlined, SyncOutlined } from "@ant-design/icons";
+import { Typography, Button, List, Avatar, message, Tooltip, Tag } from "antd";
+import { ExportOutlined, UserOutlined } from "@ant-design/icons";
 import { LogsQueryParams, logData } from "src/context/interfaces";
 
-import "./server-log-component.scss";
+import "./server-log.scss";
+import { RouteComponentProps } from "react-router-dom";
 
-interface IProps {}
+interface IProps extends RouteComponentProps {}
 interface IState {
   logs: logData[];
   loading: boolean;
@@ -23,7 +15,7 @@ interface IState {
 
 const { Title } = Typography;
 
-export default class ServerLogComponent extends Component<IProps, IState> {
+export default class ServerLog extends Component<IProps, IState> {
   state = {
     logs: [],
     loading: false,
@@ -32,6 +24,8 @@ export default class ServerLogComponent extends Component<IProps, IState> {
   logIncrement = 5;
 
   loadLogs = () => {
+    const id = (this.props.match.params as any).id;
+
     this.setState({
       loading: true,
     });
@@ -40,7 +34,7 @@ export default class ServerLogComponent extends Component<IProps, IState> {
       offset: offset.toString(),
       reverse: "0",
     };
-    IPC.fetchLogs(this.logIncrement, config).then((syncedLogs) => {
+    IPC.fetchLogs(id, this.logIncrement, config).then((syncedLogs) => {
       this.setState({
         logs: this.state.logs.concat(syncedLogs),
         loading: false,
