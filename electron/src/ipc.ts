@@ -150,7 +150,9 @@ export default class IPC {
 
         IPC.disconnect();
 
+        console.log("hai");
         const socket = await API.RoomRequest.createSocket();
+        console.log("naj");
 
         socket.on("disconnect", () => {
           IPC.disconnect();
@@ -345,6 +347,7 @@ export default class IPC {
         height: winProps.height,
         webPreferences: {
           nodeIntegration: true,
+          nodeIntegrationInWorker: true,
         },
       });
       win.on("close", () => {

@@ -1,7 +1,11 @@
 const path = require("path");
 
 module.exports = {
-  externals: ["fsevents"],
+  externals: {
+    fsevents: "commonjs fsevents",
+    bufferutil: "commonjs bufferutil",
+    "utf-8-validate": "commonjs utf-8-validate",
+  },
   target: "electron-main",
   mode: process.env.NODE_ENV,
   entry: "./src/index.ts",
