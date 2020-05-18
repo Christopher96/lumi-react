@@ -54,7 +54,7 @@ export default class Main {
     Main.app.on("ready", Main.onReady);
 
     const pathToLumiFolder = path.join(app.getPath('appData'), 'lumi'); 
-    fse.mkdirSync(pathToLumiFolder);
+    fse.ensureDir(pathToLumiFolder);
     Config.setPath(path.join(pathToLumiFolder, 'config.json'));
   }
 }
