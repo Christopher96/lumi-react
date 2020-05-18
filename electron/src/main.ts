@@ -3,6 +3,8 @@ import navMenu from "./navmenu";
 import IPC from "./ipc";
 
 import { app, BrowserWindow } from "electron";
+import { Config } from "lumi-cli/dist/lib/utils/Config";
+import fse from 'fs-extra';
 
 export default class Main {
   static mainWindow: BrowserWindow;
@@ -50,5 +52,9 @@ export default class Main {
     Main.app = app;
     Main.app.on("window-all-closed", Main.onWindowAllClosed);
     Main.app.on("ready", Main.onReady);
+
+    const pathToLumiFolder = path.join(app.getPath('appData'), 'lumi'); 
+    fse.mkdirSync(pathToLumiFolder);
+    Config.setPath(path.join(pathToLumiFolder, 'config.json'));
   }
 }
