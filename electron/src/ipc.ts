@@ -342,7 +342,6 @@ export default class IPC {
         height: winProps.height,
         webPreferences: {
           nodeIntegration: true,
-          nodeIntegrationInWorker: true,
         },
       });
       win.on("close", () => {
