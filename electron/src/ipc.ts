@@ -15,7 +15,6 @@ import IPCEvents from "../../src/context/ipc-events";
 import { LogsQueryParams } from "lumi-cli/dist/api/routes/LogsRequest";
 import * as fse from "fs-extra";
 import { nativeImage, ipcMain, dialog, BrowserWindow } from "electron";
-import prompt from "electron-prompt";
 
 interface Connection {
   socket: SocketIOClient.Socket;
@@ -162,7 +161,7 @@ export default class IPC {
             resolve({
               error: `Timed out`,
             });
-          }, 40000);
+          }, 100000);
 
           socket.once(Events.room_join_err, (res: any) => {
             resolve({
@@ -176,23 +175,21 @@ export default class IPC {
               return;
             }
 
-            prompt({
-              label: "Enter the room password:",
-              inputAttrs: {
-                type: "password",
-              },
-            })
-              .then(async (res: any) => {
-                if (res === null) {
-                  resolve({
-                    error: "Please enter a password to join this room",
-                  });
-                } else {
-                  const hash = await setPassword(res);
-                  socket.emit(Events.room_join, roomId, hash);
-                }
-              })
-              .catch(console.error);
+            IPC.win.webContents.send(
+              IPCEvents.PROMPT_OPEN,
+              "Password",
+              "Enter the password for the room:"
+            );
+            ipcMain.once(IPCEvents.PROMPT_RES, async (_, res) => {
+              if (res) {
+                const hash = await setPassword(res);
+                socket.emit(Events.room_join, roomId, hash);
+              } else {
+                resolve({
+                  error: "You are required to enter a password for this room",
+                });
+              }
+            });
           });
 
           socket.once(Events.room_join_res, async () => {

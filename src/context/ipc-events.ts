@@ -17,7 +17,9 @@ enum IPCEvents {
   SAVE_ROOM_SETTINGS = "save_room_settings",
   SAVE_INTERFACE_SETTINGS = "save_interface_settings",
   FETCH_SETTINGS = "fetch_settings",
-  NOTIFICATION = "notification"
+  NOTIFICATION = "notification",
+  PROMPT_OPEN = "prompt_open",
+  PROMPT_RES = "prompt_res",
 }
 
 export default IPCEvents;

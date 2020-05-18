@@ -2,6 +2,7 @@
   "name": "lumi",
   "version": "1.0.0",
   "description": "",
+  "email": "lumi",
   "main": "build/bundle.js",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
@@ -24,8 +25,10 @@
     ],
     "linux": {
       "icon": "build/lumi_logo.png",
-      "target": "AppImage",
-      "category": "Development;Network"
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
     "win": {
       "icon": "build/lumi_logo.png",
@@ -36,7 +39,8 @@
       "target": "dmg"
     }
   },
-  "author": "",
+  "author": "lumi <noreply@lumi.com>",
+  "homepage": "https://lumi-project.github.io/",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^13.13.5",
