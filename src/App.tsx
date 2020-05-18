@@ -8,7 +8,7 @@ import SettingsPage from "./pages/settings/settings-page";
 import StartPage from "./pages/start/start-page";
 import LeavePage from "./pages/leave/leave-page";
 import RoomFolderPage from "./pages/room/room-page";
-import ServerLogPage from "./pages/server-log/server-log-page";
+import ServerLogPage from "./pages/server-log/server-log";
 
 import { LumiState } from "./context/interfaces";
 import { LumiProvider } from "./context/lumi-context";

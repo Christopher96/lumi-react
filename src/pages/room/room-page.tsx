@@ -83,9 +83,9 @@ export default class RoomFolderPage extends Component<IProps, IState> {
     IPC.openInvite(this.context.room.roomId);
   };
 
-  openLogs() {
-    IPC.openLogs();
-  }
+  openLogs = () => {
+    IPC.openLogs(this.context.room.roomId);
+  };
   openLeave = () => {
     IPC.leaveRoom().then((leave: boolean) => {
       if (!leave) return;

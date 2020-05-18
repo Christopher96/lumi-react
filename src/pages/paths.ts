@@ -5,7 +5,7 @@ enum Paths {
   SETTINGS = "/settings",
   LEAVE = "/leave",
   ROOM = "/room",
-  SERVER_LOG = "/serverlog",
+  SERVER_LOG = "/serverlog/:id",
 }
 
 export default Paths;

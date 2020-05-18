@@ -18,8 +18,7 @@
       "output": "dist"
     },
     "files": [
-      "./build/**/*",
-      "./node_modules/**/*"
+      "./build/**/*"
     ],
     "linux": {
       "icon": "build/lumi_logo.png",
