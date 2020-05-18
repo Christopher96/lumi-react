@@ -14,6 +14,7 @@
   },
   "build": {
     "appId": "com.example.lumi",
+    "productName": "lumi",
     "directories": {
       "output": "dist"
     },
