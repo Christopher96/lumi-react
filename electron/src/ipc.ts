@@ -150,9 +150,7 @@ export default class IPC {
 
         IPC.disconnect();
 
-        console.log("hai");
         const socket = await API.RoomRequest.createSocket();
-        console.log("naj");
 
         socket.on("disconnect", () => {
           IPC.disconnect();
@@ -242,9 +240,7 @@ export default class IPC {
               }
             );
 
-            console.log(Events[Events.room_users_update_res]);
             socket.on(Events.room_users_update_res, (eventData: any) => {
-              console.log(eventData);
               let user: any, title: string;
               const { event } = eventData;
 

@@ -3,8 +3,8 @@ import navMenu from "./navmenu";
 import IPC from "./ipc";
 
 import { app, BrowserWindow } from "electron";
-import { Config } from "lumi-cli/dist/lib/utils/Config";
-import fse from 'fs-extra';
+import { Config, IConfig } from "lumi-cli/dist/lib/utils/Config";
+import fse from "fs-extra";
 
 export default class Main {
   static mainWindow: BrowserWindow;
@@ -53,8 +53,23 @@ export default class Main {
     Main.app.on("window-all-closed", Main.onWindowAllClosed);
     Main.app.on("ready", Main.onReady);
 
-    const pathToLumiFolder = path.join(app.getPath('appData'), 'lumi'); 
-    fse.mkdirSync(pathToLumiFolder);
-    Config.setPath(path.join(pathToLumiFolder, 'config.json'));
+    const pathToLumiFolder = path.join(app.getPath("appData"), "lumi");
+    const pathToLumiConfig = path.join(pathToLumiFolder, "config.json");
+    fse.ensureDir(pathToLumiFolder);
+
+    Config.setPath(pathToLumiConfig);
+
+    if (!fse.pathExistsSync(pathToLumiConfig)) {
+      // Create an empty config with default settings.
+      const defaultSettings: IConfig = {
+        username: "",
+        notifyFileChange: true,
+        notifyFileError: true,
+        notifyUserJoin: true,
+        notifyUserLeave: true,
+        theme: "Lumi_01",
+      };
+      Config.update(defaultSettings);
+    }
   }
 }
