@@ -293,7 +293,6 @@ export default class IPC {
         amount: number,
         config?: LogsQueryParams
       ) => {
-        console.log(roomId);
         const res = await API.LogsRequest.getLog(roomId, amount, config);
         return res.logs.map((l) => {
           return {
